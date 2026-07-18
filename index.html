@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kiko Sport">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Kiko Sport — Sport doux en mode jeu</title>
+<style>
+  :root {
+    --bg: #0f1023;
+    --card: #1c1e3a;
+    --card2: #26294d;
+    --accent: #7c6cff;
+    --accent2: #ff8fb1;
+    --gold: #ffd166;
+    --green: #4ade80;
+    --text: #f1f0ff;
+    --muted: #9a98c2;
+    --radius: 20px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overscroll-behavior: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(80px + var(--safe-bottom));
+  }
+  /* ---------- Header ---------- */
+  header {
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: .3px; }
+  header h1 span { color: var(--accent); }
+  .streak-pill {
+    background: linear-gradient(135deg, #ff9a3d, #ff5f6d);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: 800;
+    font-size: .95rem;
+    box-shadow: 0 4px 14px rgba(255, 95, 109, .35);
+  }
+  /* ---------- Screens / tabs ---------- */
+  .screen { display: none; flex: 1; padding: 0 16px; animation: fadeIn .25s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: rgba(20, 21, 45, .92);
+    backdrop-filter: blur(12px);
+    display: flex;
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding-bottom: var(--safe-bottom);
+    z-index: 50;
+  }
+  nav button {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: .72rem;
+    font-weight: 600;
+    padding: 10px 0 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  nav button .ico { font-size: 1.45rem; line-height: 1; filter: grayscale(1) opacity(.6); transition: .2s; }
+  nav button.active { color: var(--text); }
+  nav button.active .ico { filter: none; transform: scale(1.12); }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,.05);
+  }
+  .card h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 12px; font-weight: 700; }
+
+  /* ---------- Avatar / hero ---------- */
+  .hero {
+    text-align: center;
+    padding: 10px 18px 18px;
+    background: radial-gradient(circle at 50% 20%, rgba(124,108,255,.18), transparent 65%);
+    border-radius: var(--radius);
+  }
+  .avatar-stage {
+    width: 190px; height: 190px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .avatar-stage svg { width: 100%; height: 100%; }
+  .avatar-bob { animation: bob 3s ease-in-out infinite; transform-origin: 50% 80%; }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+  .avatar-name { font-size: 1.25rem; font-weight: 800; margin-top: 4px; }
+  .avatar-title { color: var(--gold); font-size: .85rem; font-weight: 700; margin-top: 2px; }
+  .level-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 14px;
+  }
+  .level-badge {
+    background: linear-gradient(135deg, var(--accent), #5a4bff);
+    min-width: 46px; height: 46px;
+    border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 800;
+    box-shadow: 0 4px 16px rgba(124,108,255,.4);
+  }
+  .level-badge small { font-size: .55rem; opacity: .8; font-weight: 700; }
+  .level-badge b { font-size: 1.1rem; line-height: 1; }
+  .xp-bar-wrap { flex: 1; text-align: left; }
+  .xp-bar { height: 12px; background: rgba(255,255,255,.08); border-radius: 999px; overflow: hidden; }
+  .xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 999px;
+    transition: width .6s cubic-bezier(.22,1,.36,1);
+  }
+  .xp-label { font-size: .72rem; color: var(--muted); margin-top: 5px; font-weight: 600; }
+
+  /* ---------- Quests ---------- */
+  .quest {
+    display: flex; align-items: center; gap: 13px;
+    background: var(--card2);
+    border-radius: 16px;
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,.05);
+    cursor: pointer;
+    transition: transform .12s;
+  }
+  .quest:active { transform: scale(.98); }
+  .quest.done { opacity: .55; }
+  .quest.done .q-name { text-decoration: line-through; }
+  .q-emoji {
+    font-size: 1.7rem;
+    width: 52px; height: 52px;
+    background: rgba(124,108,255,.14);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .q-body { flex: 1; min-width: 0; }
+  .q-name { font-weight: 700; font-size: .95rem; }
+  .q-meta { font-size: .75rem; color: var(--muted); margin-top: 2px; font-weight: 600; }
+  .q-xp {
+    background: rgba(255,209,102,.15);
+    color: var(--gold);
+    font-weight: 800;
+    font-size: .78rem;
+    padding: 5px 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .quest.done .q-xp { background: rgba(74,222,128,.15); color: var(--green); }
+  .day-progress { display: flex; gap: 8px; margin-bottom: 14px; }
+  .day-dot {
+    flex: 1; height: 8px; border-radius: 999px;
+    background: rgba(255,255,255,.08);
+  }
+  .day-dot.on { background: linear-gradient(90deg, var(--green), #22c55e); }
+  .all-done-banner {
+    background: linear-gradient(135deg, rgba(74,222,128,.18), rgba(34,197,94,.08));
+    border: 1px solid rgba(74,222,128,.35);
+    color: var(--green);
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+    font-weight: 800;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .all-done-banner.show { display: block; }
+
+  /* ---------- Bonus / free exercise ---------- */
+  .bonus-btn {
+    width: 100%;
+    background: var(--card2);
+    border: 1px dashed rgba(255,255,255,.2);
+    color: var(--muted);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: .88rem;
+    padding: 13px;
+    border-radius: 16px;
+    cursor: pointer;
+  }
+
+  /* ---------- Exercise modal ---------- */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(8,8,22,.85);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--card);
+    width: 100%; max-width: 480px;
+    border-radius: 26px 26px 0 0;
+    padding: 26px 22px calc(26px + var(--safe-bottom));
+    text-align: center;
+    animation: slideUp .3s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes slideUp { from { transform: translateY(60%); } to { transform: none; } }
+  .modal .m-emoji { font-size: 3.2rem; }
+  .modal h3 { font-size: 1.25rem; margin: 8px 0 4px; font-weight: 800; }
+  .modal .m-desc { color: var(--muted); font-size: .88rem; line-height: 1.5; margin-bottom: 18px; }
+  .timer-ring { position: relative; width: 150px; height: 150px; margin: 0 auto 18px; }
+  .timer-ring svg { transform: rotate(-90deg); }
+  .timer-ring .t-num {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .btn {
+    width: 100%;
+    border: none;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 15px;
+    border-radius: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #5a4bff); color: #fff; box-shadow: 0 6px 20px rgba(124,108,255,.35); }
+  .btn-ghost { background: rgba(255,255,255,.07); color: var(--muted); }
+  .btn-success { background: linear-gradient(135deg, #4ade80, #22c55e); color: #05240f; }
+
+  /* ---------- Reward overlay ---------- */
+  .reward {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    background: rgba(8,8,22,.9);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    text-align: center;
+    padding: 30px;
+  }
+  .reward.show { display: flex; }
+  .reward .r-big { font-size: 4.5rem; animation: pop .5s cubic-bezier(.22,1.6,.36,1); }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+  .reward h2 { font-size: 1.5rem; margin: 10px 0 6px; }
+  .reward p { color: var(--muted); font-weight: 600; }
+  .reward .r-xp { color: var(--gold); font-weight: 800; font-size: 1.2rem; margin-top: 8px; }
+
+  /* ---------- Stats ---------- */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat {
+    background: var(--card2);
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat b { display: block; font-size: 1.5rem; font-weight: 800; }
+  .stat span { font-size: .72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .badge {
+    aspect-ratio: 1;
+    background: var(--card2);
+    border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px;
+    font-size: 1.6rem;
+    position: relative;
+  }
+  .badge.locked { filter: grayscale(1) opacity(.35); }
+  .badge small { font-size: .52rem; color: var(--muted); font-weight: 700; text-align: center; padding: 0 4px; line-height: 1.2; }
+  .week-grid { display: flex; gap: 6px; }
+  .week-day { flex: 1; text-align: center; }
+  .week-day .wd-label { font-size: .62rem; color: var(--muted); font-weight: 700; margin-bottom: 5px; }
+  .week-day .wd-cell {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    background: rgba(255,255,255,.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem;
+  }
+  .week-day .wd-cell.done { background: rgba(74,222,128,.2); }
+  .week-day .wd-cell.today { outline: 2px solid var(--accent); }
+
+  /* ---------- Evolution list ---------- */
+  .evo { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .evo:last-child { border-bottom: none; }
+  .evo .e-ico { font-size: 1.4rem; width: 34px; text-align: center; }
+  .evo .e-name { font-weight: 700; font-size: .88rem; flex: 1; }
+  .evo .e-lvl { font-size: .75rem; color: var(--muted); font-weight: 700; }
+  .evo.locked { opacity: .4; }
+  .evo.current .e-name { color: var(--accent); }
+
+  .settings-row { display: flex; gap: 10px; margin-top: 4px; }
+  .settings-row input {
+    flex: 1;
+    background: var(--card2);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: inherit;
+    font-weight: 700;
+    padding: 12px;
+    font-size: .95rem;
+  }
+  .settings-row button {
+    background: var(--accent);
+    border: none; color: #fff;
+    font-family: inherit; font-weight: 800;
+    border-radius: 12px; padding: 0 18px;
+    cursor: pointer;
+  }
+  .danger-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid rgba(255,100,100,.35);
+    color: #ff8a8a;
+    font-family: inherit; font-weight: 700;
+    padding: 12px; border-radius: 14px;
+    cursor: pointer; font-size: .85rem;
+    margin-top: 10px;
+  }
+  .confetti {
+    position: fixed;
+    width: 10px; height: 10px;
+    top: -12px;
+    z-index: 300;
+    border-radius: 2px;
+    pointer-events: none;
+    animation: fall linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <h1>Kiko<span>Sport</span> 🎮</h1>
+    <div class="streak-pill">🔥 <span id="streakCount">0</span></div>
+  </header>
+
+  <!-- ===== ACCUEIL ===== -->
+  <section class="screen active" id="screen-home">
+    <div class="hero card">
+      <div class="avatar-stage"><div class="avatar-bob" id="avatarBox"></div></div>
+      <div class="avatar-name" id="avatarName">Kiko</div>
+      <div class="avatar-title" id="avatarTitle">Graine de sportif</div>
+      <div class="level-row">
+        <div class="level-badge"><small>NIV</small><b id="levelNum">1</b></div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
+          <div class="xp-label" id="xpLabel">0 / 50 XP</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="all-done-banner" id="doneBanner">🎉 Journée parfaite ! Kiko est en pleine forme !</div>
+
+    <div class="card">
+      <h2>Missions du jour</h2>
+      <div class="day-progress" id="dayProgress"></div>
+      <div id="questList"></div>
+      <button class="bonus-btn" id="bonusBtn">✨ Exercice bonus surprise (+8 XP)</button>
+    </div>
+  </section>
+
+  <!-- ===== PROGRES ===== -->
+  <section class="screen" id="screen-stats">
+    <div class="card">
+      <h2>Cette semaine</h2>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+    <div class="card">
+      <h2>Statistiques</h2>
+      <div class="stat-grid">
+        <div class="stat"><b id="statTotal">0</b><span>Exercices faits</span></div>
+        <div class="stat"><b id="statXp">0</b><span>XP total</span></div>
+        <div class="stat"><b id="statBest">0</b><span>Record de série</span></div>
+        <div class="stat"><b id="statPerfect">0</b><span>Journées parfaites</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Badges</h2>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== PERSONNAGE ===== -->
+  <section class="screen" id="screen-hero">
+    <div class="card">
+      <h2>Évolutions de Kiko</h2>
+      <div id="evoList"></div>
+    </div>
+    <div class="card">
+      <h2>Renommer ton compagnon</h2>
+      <div class="settings-row">
+        <input type="text" id="nameInput" maxlength="12" placeholder="Kiko">
+        <button id="nameBtn">OK</button>
+      </div>
+      <button class="danger-btn" id="resetBtn">Réinitialiser toute la progression</button>
+    </div>
+  </section>
+
+  <nav>
+    <button class="active" data-screen="home"><span class="ico">🏠</span>Accueil</button>
+    <button data-screen="stats"><span class="ico">📊</span>Progrès</button>
+    <button data-screen="hero"><span class="ico">🐣</span>Personnage</button>
+  </nav>
+</div>
+
+<!-- ===== Exercise modal ===== -->
+<div class="modal-backdrop" id="modalBack">
+  <div class="modal">
+    <div class="m-emoji" id="mEmoji">🧘</div>
+    <h3 id="mName">Exercice</h3>
+    <p class="m-desc" id="mDesc"></p>
+    <div class="timer-ring">
+      <svg width="150" height="150">
+        <circle cx="75" cy="75" r="66" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/>
+        <circle id="ringFill" cx="75" cy="75" r="66" fill="none" stroke="#7c6cff" stroke-width="10"
+                stroke-linecap="round" stroke-dasharray="414.7" stroke-dashoffset="414.7"/>
+      </svg>
+      <div class="t-num" id="tNum">0:00</div>
+    </div>
+    <button class="btn btn-primary" id="startBtn">▶ C'est parti !</button>
+    <button class="btn btn-success" id="finishBtn" style="display:none">✔ Terminé !</button>
+    <button class="btn btn-ghost" id="closeBtn">Plus tard</button>
+  </div>
+</div>
+
+<!-- ===== Reward overlay ===== -->
+<div class="reward" id="rewardBox">
+  <div class="r-big" id="rBig">⭐</div>
+  <h2 id="rTitle">Bravo !</h2>
+  <p id="rText"></p>
+  <div class="r-xp" id="rXp"></div>
+  <button class="btn btn-primary" id="rBtn" style="max-width:280px">Continuer</button>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   Kiko Sport — sport doux quotidien en mode jeu vidéo
+   Données stockées localement (localStorage), aucune connexion requise.
+   ========================================================= */
+
+const STORE_KEY = "kikoSport.v1";
+
+/* ---------- Catalogue d'exercices doux ---------- */
+const EXERCISES = [
+  { id:"marche",     emoji:"🚶‍♀️", name:"Marche tranquille",        desc:"Marche à ton rythme, dehors ou dans la maison. Respire calmement.", dur:600, xp:20 },
+  { id:"etir_dos",   emoji:"🙆‍♀️", name:"Étirement du dos",         desc:"Debout, bras vers le ciel, penche-toi doucement à droite puis à gauche.", dur:120, xp:12 },
+  { id:"chat_vache", emoji:"🐱", name:"Yoga chat-vache",          desc:"À quatre pattes, arrondis puis creuse le dos lentement, en suivant ta respiration.", dur:120, xp:12 },
+  { id:"respiration",emoji:"🌬️", name:"Respiration profonde",     desc:"Assise confortablement : inspire 4 s, bloque 4 s, expire 6 s. Répète.", dur:180, xp:10 },
+  { id:"nuque",      emoji:"🦒", name:"Étirement de la nuque",    desc:"Incline doucement la tête de chaque côté, sans forcer. Épaules relâchées.", dur:90, xp:10 },
+  { id:"epaules",    emoji:"🌀", name:"Rotations des épaules",    desc:"De grands cercles lents avec les épaules, vers l'arrière puis vers l'avant.", dur:90, xp:10 },
+  { id:"squat",      emoji:"🪑", name:"Squats sur chaise",        desc:"Assieds-toi et relève-toi d'une chaise lentement, 8 à 10 fois.", dur:120, xp:15 },
+  { id:"mollets",    emoji:"🦵", name:"Montées sur pointes",      desc:"Debout, monte sur la pointe des pieds puis redescends doucement. 12 fois.", dur:90, xp:12 },
+  { id:"equilibre",  emoji:"🦩", name:"Équilibre du flamant",     desc:"Tiens-toi sur un pied près d'un appui. 20 s de chaque côté.", dur:90, xp:12 },
+  { id:"pont",       emoji:"🌉", name:"Pont fessier doux",        desc:"Allongée, genoux pliés : soulève le bassin doucement, 8 à 10 fois.", dur:120, xp:15 },
+  { id:"marche_place",emoji:"🎵", name:"Marche sur place en musique", desc:"Mets une chanson que tu aimes et marche sur place jusqu'à la fin.", dur:180, xp:14 },
+  { id:"genoux",     emoji:"🦿", name:"Montées de genoux douces", desc:"Debout, lève un genou après l'autre, tranquillement, comme une marche exagérée.", dur:120, xp:14 },
+  { id:"bras",       emoji:"💪", name:"Cercles de bras",          desc:"Bras tendus sur les côtés, fais de petits cercles, 30 s dans chaque sens.", dur:90, xp:10 },
+  { id:"enfant",     emoji:"🧎‍♀️", name:"Posture de l'enfant",      desc:"À genoux, assise sur les talons, front vers le sol, bras allongés. Respire.", dur:120, xp:10 },
+  { id:"jambes_mur", emoji:"🧱", name:"Jambes contre le mur",     desc:"Allongée, jambes posées verticalement contre un mur. Détente totale.", dur:240, xp:12 },
+  { id:"gainage",    emoji:"🛡️", name:"Gainage doux sur genoux",  desc:"Planche sur les genoux et les avant-bras. Tiens 15 à 20 s, 2 fois.", dur:90, xp:15 },
+];
+
+const BONUS_POOL = ["etir_dos","respiration","nuque","epaules","bras","enfant"];
+
+/* ---------- Évolutions du personnage ---------- */
+const EVOLUTIONS = [
+  { lvl:1,  name:"Graine de sportif",   ico:"🐣" },
+  { lvl:3,  name:"Apprenti bandeau",    ico:"🎽" },
+  { lvl:5,  name:"Marcheur motivé",     ico:"👟" },
+  { lvl:8,  name:"Héros à la cape",     ico:"🦸" },
+  { lvl:12, name:"Étoile du stade",     ico:"⭐" },
+  { lvl:16, name:"Légende dorée",       ico:"👑" },
+];
+
+/* ---------- Badges ---------- */
+const BADGES = [
+  { id:"first",    ico:"🎯", name:"1er exercice",     test: s => s.totalDone >= 1 },
+  { id:"streak3",  ico:"🔥", name:"Série de 3 j",     test: s => s.bestStreak >= 3 },
+  { id:"streak7",  ico:"🌋", name:"Série de 7 j",     test: s => s.bestStreak >= 7 },
+  { id:"streak30", ico:"🏆", name:"Série de 30 j",    test: s => s.bestStreak >= 30 },
+  { id:"lvl5",     ico:"🚀", name:"Niveau 5",         test: s => s.level >= 5 },
+  { id:"lvl10",    ico:"💎", name:"Niveau 10",        test: s => s.level >= 10 },
+  { id:"ex50",     ico:"🎖️", name:"50 exercices",     test: s => s.totalDone >= 50 },
+  { id:"perfect7", ico:"🌈", name:"7 j. parfaits",    test: s => s.perfectDays >= 7 },
+];
+
+/* ---------- État ---------- */
+function defaultState() {
+  return {
+    name: "Kiko",
+    xp: 0,
+    totalDone: 0,
+    streak: 0,
+    bestStreak: 0,
+    perfectDays: 0,
+    lastDay: null,        // dernier jour avec au moins 1 exercice
+    history: {},          // "YYYY-MM-DD" -> nb exercices faits
+    questsDay: null,      // jour des missions courantes
+    quests: [],           // [{exId, done}]
+  };
+}
+let S = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return Object.assign(defaultState(), JSON.parse(raw));
+  } catch (e) {}
+  return defaultState();
+}
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
+
+/* ---------- Dates ---------- */
+function todayKey(d = new Date()) {
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function daysBetween(a, b) {
+  return Math.round((new Date(b) - new Date(a)) / 86400000);
+}
+
+/* ---------- Niveaux ---------- */
+function xpForLevel(lvl) { return 50 + (lvl - 1) * 25; }
+function levelFromXp(xp) {
+  let lvl = 1, rest = xp;
+  while (rest >= xpForLevel(lvl)) { rest -= xpForLevel(lvl); lvl++; }
+  return { lvl, into: rest, need: xpForLevel(lvl) };
+}
+Object.defineProperty(S, "level", { get() { return levelFromXp(this.xp).lvl; }, configurable: true });
+
+function currentEvo(lvl) {
+  let evo = EVOLUTIONS[0];
+  for (const e of EVOLUTIONS) if (lvl >= e.lvl) evo = e;
+  return evo;
+}
+
+/* ---------- Missions quotidiennes (déterministes par date) ---------- */
+function seededPick(dayKey, count) {
+  let seed = 0;
+  for (const c of dayKey) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
+  const pool = [...EXERCISES.keys()];
+  const picked = [];
+  for (let i = 0; i < count; i++) {
+    seed = (seed * 1103515245 + 12345) >>> 0;
+    picked.push(pool.splice(seed % pool.length, 1)[0]);
+  }
+  return picked.map(i => EXERCISES[i].id);
+}
+
+function ensureToday() {
+  const t = todayKey();
+  // casse la série si un jour a été sauté
+  if (S.lastDay && daysBetween(S.lastDay, t) > 1) S.streak = 0;
+  if (S.questsDay !== t) {
+    S.questsDay = t;
+    S.quests = seededPick(t, 3).map(id => ({ exId: id, done: false }));
+    save();
+  }
+}
+
+/* ---------- Avatar SVG ---------- */
+function avatarSvg(lvl) {
+  const headband = lvl >= 3, shoes = lvl >= 5, cape = lvl >= 8, star = lvl >= 12, crown = lvl >= 16;
+  const bodyCol = lvl >= 12 ? "#ffd166" : lvl >= 8 ? "#8ce0a1" : lvl >= 5 ? "#7cc4ff" : lvl >= 3 ? "#b9a8ff" : "#ffc9de";
+  const aura = star ? `<circle cx="100" cy="105" r="88" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="6 10" opacity=".6">
+      <animateTransform attributeName="transform" type="rotate" from="0 100 105" to="360 100 105" dur="12s" repeatCount="indefinite"/></circle>` : "";
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    ${aura}
+    ${cape ? `<path d="M55 100 Q40 160 60 178 L100 150 L140 178 Q160 160 145 100 Z" fill="#ff5f6d" opacity=".9"/>` : ""}
+    <ellipse cx="100" cy="182" rx="52" ry="9" fill="rgba(0,0,0,.3)"/>
+    <!-- jambes -->
+    <rect x="78" y="148" width="16" height="28" rx="8" fill="${bodyCol}"/>
+    <rect x="106" y="148" width="16" height="28" rx="8" fill="${bodyCol}"/>
+    ${shoes ? `<ellipse cx="86" cy="177" rx="14" ry="7" fill="#4f46e5"/><ellipse cx="114" cy="177" rx="14" ry="7" fill="#4f46e5"/>
+               <rect x="76" y="171" width="20" height="5" rx="2.5" fill="#fff" opacity=".85"/><rect x="104" y="171" width="20" height="5" rx="2.5" fill="#fff" opacity=".85"/>` : ""}
+    <!-- corps -->
+    <ellipse cx="100" cy="112" rx="52" ry="56" fill="${bodyCol}"/>
+    <ellipse cx="100" cy="126" rx="34" ry="30" fill="#fff" opacity=".35"/>
+    <!-- bras -->
+    <ellipse cx="45" cy="115" rx="12" ry="20" fill="${bodyCol}" transform="rotate(20 45 115)"/>
+    <ellipse cx="155" cy="115" rx="12" ry="20" fill="${bodyCol}" transform="rotate(-20 155 115)"/>
+    <!-- visage -->
+    <circle cx="82" cy="98" r="7" fill="#1c1e3a"/>
+    <circle cx="118" cy="98" r="7" fill="#1c1e3a"/>
+    <circle cx="84.5" cy="95.5" r="2.4" fill="#fff"/>
+    <circle cx="120.5" cy="95.5" r="2.4" fill="#fff"/>
+    <path d="M88 116 Q100 126 112 116" stroke="#1c1e3a" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="72" cy="110" rx="7" ry="4.5" fill="#ff8fb1" opacity=".7"/>
+    <ellipse cx="128" cy="110" rx="7" ry="4.5" fill="#ff8fb1" opacity=".7"/>
+    ${headband ? `<path d="M52 82 Q100 62 148 82 L146 92 Q100 74 54 92 Z" fill="#ff5f6d"/><circle cx="151" cy="86" r="5" fill="#ff5f6d"/>` : ""}
+    ${crown ? `<path d="M74 52 L82 66 L92 50 L100 64 L108 50 L118 66 L126 52 L124 72 L76 72 Z" fill="#ffd166" stroke="#e0a93e" stroke-width="2"/>` : ""}
+    ${star && !crown ? `<text x="100" y="52" font-size="26" text-anchor="middle">⭐</text>` : ""}
+  </svg>`;
+}
+
+/* ---------- Rendu ---------- */
+const $ = id => document.getElementById(id);
+
+function fmt(sec) {
+  return Math.floor(sec/60) + ":" + String(sec%60).padStart(2,"0");
+}
+
+function render() {
+  ensureToday();
+  const { lvl, into, need } = levelFromXp(S.xp);
+  const evo = currentEvo(lvl);
+
+  $("streakCount").textContent = S.streak;
+  $("avatarBox").innerHTML = avatarSvg(lvl);
+  $("avatarName").textContent = S.name;
+  $("avatarTitle").textContent = evo.ico + " " + evo.name;
+  $("levelNum").textContent = lvl;
+  $("xpFill").style.width = Math.round(into / need * 100) + "%";
+  $("xpLabel").textContent = into + " / " + need + " XP avant le niveau " + (lvl+1);
+
+  // missions
+  const doneCount = S.quests.filter(q => q.done).length;
+  $("dayProgress").innerHTML = S.quests.map(q => `<div class="day-dot ${q.done ? "on" : ""}"></div>`).join("");
+  $("doneBanner").classList.toggle("show", doneCount === S.quests.length && S.quests.length > 0);
+  $("questList").innerHTML = S.quests.map((q, i) => {
+    const ex = EXERCISES.find(e => e.id === q.exId);
+    return `<div class="quest ${q.done ? "done" : ""}" data-i="${i}">
+      <div class="q-emoji">${ex.emoji}</div>
+      <div class="q-body">
+        <div class="q-name">${ex.name}</div>
+        <div class="q-meta">⏱ ${fmt(ex.dur)}</div>
+      </div>
+      <div class="q-xp">${q.done ? "✔ fait" : "+" + ex.xp + " XP"}</div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".quest").forEach(el => {
+    el.onclick = () => {
+      const q = S.quests[+el.dataset.i];
+      if (!q.done) openExercise(EXERCISES.find(e => e.id === q.exId), +el.dataset.i);
+    };
+  });
+
+  renderStats();
+  renderHero(lvl);
+}
+
+function renderStats() {
+  $("statTotal").textContent = S.totalDone;
+  $("statXp").textContent = S.xp;
+  $("statBest").textContent = S.bestStreak;
+  $("statPerfect").textContent = S.perfectDays;
+
+  // semaine (lundi -> dimanche)
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  const labels = ["L","M","M","J","V","S","D"];
+  let html = "";
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    const k = todayKey(d);
+    const n = S.history[k] || 0;
+    const isToday = k === todayKey();
+    html += `<div class="week-day"><div class="wd-label">${labels[i]}</div>
+      <div class="wd-cell ${n > 0 ? "done" : ""} ${isToday ? "today" : ""}">${n > 0 ? "✔" : ""}</div></div>`;
+  }
+  $("weekGrid").innerHTML = html;
+
+  $("badgeGrid").innerHTML = BADGES.map(b => {
+    const ok = b.test(S);
+    return `<div class="badge ${ok ? "" : "locked"}">${b.ico}<small>${b.name}</small></div>`;
+  }).join("");
+}
+
+function renderHero(lvl) {
+  $("evoList").innerHTML = EVOLUTIONS.map(e => {
+    const unlocked = lvl >= e.lvl;
+    const isCurrent = currentEvo(lvl) === e;
+    return `<div class="evo ${unlocked ? "" : "locked"} ${isCurrent ? "current" : ""}">
+      <div class="e-ico">${unlocked ? e.ico : "🔒"}</div>
+      <div class="e-name">${e.name}</div>
+      <div class="e-lvl">niv. ${e.lvl}</div>
+    </div>`;
+  }).join("");
+  $("nameInput").value = S.name;
+}
+
+/* ---------- Modal exercice ---------- */
+let modalCtx = null; // { ex, questIndex|null, timer, remaining }
+
+function openExercise(ex, questIndex) {
+  modalCtx = { ex, questIndex, timer: null, remaining: ex.dur };
+  $("mEmoji").textContent = ex.emoji;
+  $("mName").textContent = ex.name;
+  $("mDesc").textContent = ex.desc;
+  $("tNum").textContent = fmt(ex.dur);
+  $("ringFill").style.strokeDashoffset = 414.7;
+  $("startBtn").style.display = "";
+  $("finishBtn").style.display = "none";
+  $("modalBack").classList.add("show");
+}
+
+function closeModal() {
+  if (modalCtx && modalCtx.timer) clearInterval(modalCtx.timer);
+  modalCtx = null;
+  $("modalBack").classList.remove("show");
+}
+
+$("startBtn").onclick = () => {
+  const ctx = modalCtx;
+  $("startBtn").style.display = "none";
+  $("finishBtn").style.display = "";
+  ctx.timer = setInterval(() => {
+    ctx.remaining--;
+    if (ctx.remaining <= 0) {
+      clearInterval(ctx.timer);
+      ctx.remaining = 0;
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+    $("tNum").textContent = fmt(ctx.remaining);
+    $("ringFill").style.strokeDashoffset = 414.7 * (ctx.remaining / ctx.ex.dur);
+  }, 1000);
+};
+
+$("finishBtn").onclick = () => {
+  const { ex, questIndex } = modalCtx;
+  closeModal();
+  completeExercise(ex, questIndex);
+};
+$("closeBtn").onclick = closeModal;
+$("modalBack").onclick = e => { if (e.target === $("modalBack")) closeModal(); };
+
+/* ---------- Complétion & récompenses ---------- */
+function completeExercise(ex, questIndex) {
+  const prevLvl = levelFromXp(S.xp).lvl;
+  const t = todayKey();
+
+  if (questIndex != null) S.quests[questIndex].done = true;
+  S.xp += ex.xp;
+  S.totalDone++;
+  S.history[t] = (S.history[t] || 0) + 1;
+
+  // série
+  if (S.lastDay !== t) {
+    S.streak = (S.lastDay && daysBetween(S.lastDay, t) === 1) ? S.streak + 1 : 1;
+    S.lastDay = t;
+    if (S.streak > S.bestStreak) S.bestStreak = S.streak;
+  }
+
+  const allDone = S.quests.length > 0 && S.quests.every(q => q.done);
+  let perfectNow = false;
+  if (allDone && questIndex != null) { S.perfectDays++; perfectNow = true; }
+
+  save();
+  render();
+  confetti();
+
+  const newLvl = levelFromXp(S.xp).lvl;
+  if (newLvl > prevLvl) {
+    const evo = currentEvo(newLvl);
+    const evolved = EVOLUTIONS.some(e => e.lvl === newLvl);
+    showReward(evolved ? evo.ico : "🆙",
+      "Niveau " + newLvl + " !",
+      evolved ? S.name + " a évolué : « " + evo.name + " » !" : S.name + " devient plus fort !",
+      "+" + ex.xp + " XP");
+  } else if (perfectNow) {
+    showReward("🌟", "Journée parfaite !", "Toutes les missions du jour sont faites. " + S.name + " est super fier de toi !", "+" + ex.xp + " XP");
+  } else {
+    showReward("💪", "Bien joué !", ex.name + " terminé. " + S.name + " te fait un high five !", "+" + ex.xp + " XP");
+  }
+}
+
+function showReward(big, title, text, xp) {
+  $("rBig").textContent = big;
+  $("rTitle").textContent = title;
+  $("rText").textContent = text;
+  $("rXp").textContent = xp;
+  $("rewardBox").classList.add("show");
+}
+$("rBtn").onclick = () => $("rewardBox").classList.remove("show");
+
+function confetti() {
+  const colors = ["#7c6cff","#ff8fb1","#ffd166","#4ade80","#7cc4ff"];
+  for (let i = 0; i < 26; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (1.6 + Math.random() * 1.4) + "s";
+    c.style.animationDelay = (Math.random() * .4) + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3400);
+  }
+}
+
+/* ---------- Bonus ---------- */
+$("bonusBtn").onclick = () => {
+  const id = BONUS_POOL[Math.floor(Math.random() * BONUS_POOL.length)];
+  const ex = Object.assign({}, EXERCISES.find(e => e.id === id), { xp: 8 });
+  openExercise(ex, null);
+};
+
+/* ---------- Navigation ---------- */
+document.querySelectorAll("nav button").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    btn.classList.add("active");
+    $("screen-" + btn.dataset.screen).classList.add("active");
+  };
+});
+
+/* ---------- Réglages ---------- */
+$("nameBtn").onclick = () => {
+  const v = $("nameInput").value.trim();
+  if (v) { S.name = v; save(); render(); }
+};
+$("resetBtn").onclick = () => {
+  if (confirm("Tout effacer et repartir de zéro ? Cette action est définitive.")) {
+    localStorage.removeItem(STORE_KEY);
+    location.reload();
+  }
+};
+
+/* ---------- PWA ---------- */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+/* ---------- Go ---------- */
+render();
+// re-render au retour sur l'app (changement de jour)
+document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+</script>
+</body>
+</html>
