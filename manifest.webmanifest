@@ -1,14 +1,14 @@
 {
-  "name": "Kiko Sport — Sport doux en mode jeu",
-  "short_name": "Kiko Sport",
-  "description": "Fais du sport doux chaque jour et fais évoluer ton personnage !",
+  "name": "Astria — L'héroïne du Royaume Étoilé",
+  "short_name": "Astria",
+  "description": "Fais du sport doux chaque jour et fais évoluer ton héroïne dans un monde fantastique !",
   "lang": "fr",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f1023",
-  "theme_color": "#4f46e5",
+  "background_color": "#150c2e",
+  "theme_color": "#2a1454",
   "icons": [
     {
       "src": "icon.svg",

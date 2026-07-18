@@ -1,5 +1,5 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "kiko-sport-v1";
+const CACHE = "astria-v1";
 const ASSETS = [
   "./",
   "./index.html",

@@ -1,27 +1,34 @@
-# 🐣 Kiko Sport — Sport doux en mode jeu vidéo
+# 👑 Royaume d'Astria — Sport doux en monde fantastique
 
 Une application mobile pour faire du **sport doux quotidiennement**, présentée
-comme un jeu vidéo : tu fais tes exercices, ton compagnon **Kiko** gagne de
-l'expérience, monte de niveau et **évolue visuellement** au fil des jours.
+comme un jeu de rôle fantastique : chaque exercice réel est une **quête** du
+Royaume Étoilé, et ton **héroïne personnalisable** gagne des talents et des
+équipements magiques au fil de tes séances.
 
 ## ✨ Fonctionnalités
 
-- **Un personnage à faire évoluer** : Kiko change d'apparence en montant de
-  niveau (bandeau, baskets, cape, aura d'étoile, couronne dorée…)
-- **3 missions par jour**, tirées d'un catalogue de 16 exercices doux :
-  marche, étirements, yoga, respiration, renforcement léger… Les missions
-  changent chaque jour automatiquement.
-- **Minuteur guidé** pour chaque exercice, avec vibration à la fin
-- **Série de jours (🔥 streak)** : fais au moins un exercice par jour pour ne
-  pas la casser
-- **XP, niveaux, badges** et statistiques (semaine, record de série,
-  journées parfaites)
-- **Exercice bonus surprise** pour gagner un peu d'XP en plus
-- Personnage **renommable**
+- **Héroïne 100 % personnalisable** : peau (5 teintes), coiffure (longs,
+  couettes, chignon, tresse), couleur de cheveux (8), yeux (5), robe (6),
+  et son prénom
+- **Elle évolue selon TES exercices** — 4 talents nourris par 4 familles
+  d'exercices :
+  - ⚔️ **Force** (squats, gainage, pont fessier…) → gants, épaulières, épée de lumière → *Guerrière*
+  - 🥾 **Endurance** (marche, montées de genoux…) → bottes, cape d'exploratrice, cape céleste → *Exploratrice*
+  - 🦋 **Grâce** (étirements, yoga…) → rubans, ailes de fée, ailes de papillon → *Danseuse féérique*
+  - ✨ **Magie** (respiration, relaxation, équilibre…) → pendentif de lune, bâton des étoiles, aura → *Enchanteresse*
+- Son **titre** reflète son talent dominant et son niveau global
+  (« Guerrière novice » → « Enchanteresse légendaire »), et le niveau global
+  débloque diadème, couronne royale et aura légendaire
+- **3 quêtes par jour** (toujours 3 familles différentes), habillées en
+  aventures : « Traverser la Forêt d'Émeraude », « Bâtir le Pont de Lune »,
+  « L'épreuve de la fée funambule »…
+- **Minuteur guidé** pour chaque quête, vibration à la fin
+- **Flamme quotidienne (🔥 streak)**, trophées, chroniques hebdomadaires,
+  quête bonus surprise
 
 ## 📱 Installation sur ton téléphone
 
-C'est une **PWA** (comme l'application de budget) : pas besoin d'app store.
+C'est une **PWA** : pas besoin d'app store.
 
 1. Héberge les fichiers (le plus simple : **GitHub Pages** — Settings →
    Pages → déployer depuis la branche)
@@ -42,7 +49,7 @@ npx http-server .
 
 | Fichier | Rôle |
 |---|---|
-| `index.html` | Toute l'application (interface + logique du jeu) |
+| `index.html` | Toute l'application (interface + logique du jeu + avatar SVG) |
 | `manifest.webmanifest` | Métadonnées d'installation PWA |
 | `sw.js` | Service worker (fonctionnement hors-ligne) |
 | `icon.svg` / `icon-512.png` | Icônes de l'application |

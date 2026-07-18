@@ -3,25 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#2a1454">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Kiko Sport">
+<meta name="apple-mobile-web-app-title" content="Astria">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<title>Kiko Sport — Sport doux en mode jeu</title>
+<title>Astria — L'héroïne du Royaume Étoilé</title>
 <style>
   :root {
-    --bg: #0f1023;
-    --card: #1c1e3a;
-    --card2: #26294d;
-    --accent: #7c6cff;
-    --accent2: #ff8fb1;
-    --gold: #ffd166;
-    --green: #4ade80;
-    --text: #f1f0ff;
-    --muted: #9a98c2;
+    --bg: #150c2e;
+    --bg2: #1e1240;
+    --card: rgba(40, 26, 74, .82);
+    --card2: rgba(58, 38, 102, .65);
+    --gold: #f5c96b;
+    --gold-soft: rgba(245, 201, 107, .28);
+    --accent: #b78bff;
+    --text: #f7f2ff;
+    --muted: #b3a5d6;
+    --force: #ff8a75;
+    --endurance: #7fd6a4;
+    --grace: #ff9ed2;
+    --magie: #9db8ff;
     --radius: 20px;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -29,29 +33,50 @@
   html, body { height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -10%, #4b2a86 0%, transparent 60%),
+      linear-gradient(180deg, #241249 0%, #150c2e 55%, #0e0820 100%);
+    background-attachment: fixed;
     color: var(--text);
     overscroll-behavior: none;
     user-select: none;
     -webkit-user-select: none;
   }
+  .fantasy { font-family: Georgia, "Times New Roman", serif; }
   #app {
     max-width: 480px;
     margin: 0 auto;
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    padding-bottom: calc(80px + var(--safe-bottom));
+    padding-bottom: calc(84px + var(--safe-bottom));
+    position: relative;
+    z-index: 1;
   }
+  /* étoiles du fond */
+  #skyStars { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  #skyStars span {
+    position: absolute;
+    color: #fff;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%,100% { opacity: .15 } 50% { opacity: .85 } }
+
   /* ---------- Header ---------- */
   header {
-    padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 10px;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-  header h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: .3px; }
-  header h1 span { color: var(--accent); }
+  header h1 {
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--gold);
+  }
+  header h1 small { display: block; font-size: .62rem; color: var(--muted); letter-spacing: 2.5px; font-weight: 400; text-transform: uppercase; }
   .streak-pill {
     background: linear-gradient(135deg, #ff9a3d, #ff5f6d);
     border-radius: 999px;
@@ -59,22 +84,23 @@
     font-weight: 800;
     font-size: .95rem;
     box-shadow: 0 4px 14px rgba(255, 95, 109, .35);
+    border: 1px solid rgba(255,255,255,.25);
   }
-  /* ---------- Screens / tabs ---------- */
-  .screen { display: none; flex: 1; padding: 0 16px; animation: fadeIn .25s ease; }
+
+  /* ---------- Screens / nav ---------- */
+  .screen { display: none; flex: 1; padding: 0 14px; animation: fadeIn .25s ease; }
   .screen.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
   nav {
     position: fixed;
     bottom: 0; left: 50%;
     transform: translateX(-50%);
     width: 100%;
     max-width: 480px;
-    background: rgba(20, 21, 45, .92);
+    background: rgba(24, 14, 48, .93);
     backdrop-filter: blur(12px);
     display: flex;
-    border-top: 1px solid rgba(255,255,255,.06);
+    border-top: 1px solid var(--gold-soft);
     padding-bottom: var(--safe-bottom);
     z-index: 50;
   }
@@ -83,7 +109,7 @@
     background: none;
     border: none;
     color: var(--muted);
-    font-size: .72rem;
+    font-size: .7rem;
     font-weight: 600;
     padding: 10px 0 12px;
     display: flex;
@@ -93,151 +119,305 @@
     cursor: pointer;
     font-family: inherit;
   }
-  nav button .ico { font-size: 1.45rem; line-height: 1; filter: grayscale(1) opacity(.6); transition: .2s; }
-  nav button.active { color: var(--text); }
+  nav button .ico { font-size: 1.4rem; line-height: 1; filter: grayscale(1) opacity(.55); transition: .2s; }
+  nav button.active { color: var(--gold); }
   nav button.active .ico { filter: none; transform: scale(1.12); }
 
-  /* ---------- Cards ---------- */
+  /* ---------- Cartes ---------- */
   .card {
     background: var(--card);
     border-radius: var(--radius);
     padding: 18px;
     margin-bottom: 14px;
-    border: 1px solid rgba(255,255,255,.05);
+    border: 1px solid var(--gold-soft);
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
   }
-  .card h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 12px; font-weight: 700; }
-
-  /* ---------- Avatar / hero ---------- */
-  .hero {
+  .card h2 {
+    font-family: Georgia, serif;
+    font-size: .82rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 13px;
+    font-weight: 700;
     text-align: center;
-    padding: 10px 18px 18px;
-    background: radial-gradient(circle at 50% 20%, rgba(124,108,255,.18), transparent 65%);
-    border-radius: var(--radius);
   }
-  .avatar-stage {
-    width: 190px; height: 190px;
-    margin: 0 auto;
+  .card h2::before { content: "✦ "; opacity: .7; }
+  .card h2::after { content: " ✦"; opacity: .7; }
+
+  /* ---------- Monde / héroïne ---------- */
+  .world-card { padding: 0; overflow: hidden; }
+  .world {
     position: relative;
+    height: 300px;
+    background: linear-gradient(180deg, #2b1657 0%, #4b2a86 45%, #6d3f9e 72%, #8a56ae 100%);
+    overflow: hidden;
   }
-  .avatar-stage svg { width: 100%; height: 100%; }
-  .avatar-bob { animation: bob 3s ease-in-out infinite; transform-origin: 50% 80%; }
-  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
-  .avatar-name { font-size: 1.25rem; font-weight: 800; margin-top: 4px; }
-  .avatar-title { color: var(--gold); font-size: .85rem; font-weight: 700; margin-top: 2px; }
-  .level-row {
-    display: flex; align-items: center; gap: 10px;
-    margin-top: 14px;
+  .world .moon {
+    position: absolute; top: 22px; right: 26px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: #f7ecc9;
+    box-shadow: 0 0 30px 8px rgba(247, 236, 201, .45);
   }
+  .world .moon::after {
+    content: ""; position: absolute; top: 4px; left: -6px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #3a2170;
+    opacity: 0;
+  }
+  .world .hill {
+    position: absolute; border-radius: 50%;
+  }
+  .world .hill.h1 { width: 340px; height: 190px; left: -90px; bottom: -110px; background: #241549; }
+  .world .hill.h2 { width: 380px; height: 200px; right: -110px; bottom: -125px; background: #2e1a5c; }
+  .world .castle {
+    position: absolute; left: 18px; bottom: 58px;
+    font-size: 2rem; opacity: .85;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+  }
+  .world .trees { position: absolute; right: 14px; bottom: 62px; font-size: 1.5rem; opacity: .85; }
+  .world .wstar { position: absolute; color: #ffeebd; animation: twinkle 2.6s ease-in-out infinite; }
+  .world .sparkle { position: absolute; color: #ffd9fa; animation: floatUp 5s linear infinite; opacity: 0; font-size: .8rem; }
+  @keyframes floatUp {
+    0% { transform: translateY(0); opacity: 0; }
+    15% { opacity: .9; }
+    100% { transform: translateY(-130px); opacity: 0; }
+  }
+  .hero-stand {
+    position: absolute;
+    left: 50%; bottom: -4px;
+    transform: translateX(-50%);
+    width: 205px; height: 250px;
+  }
+  .hero-stand svg { width: 100%; height: 100%; }
+  .hero-bob { animation: bob 3.4s ease-in-out infinite; transform-origin: 50% 90%; }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+  .hero-caption { text-align: center; padding: 14px 18px 18px; }
+  .avatar-name { font-family: Georgia, serif; font-size: 1.35rem; font-weight: 700; letter-spacing: .5px; }
+  .avatar-title { color: var(--gold); font-size: .84rem; font-weight: 700; margin-top: 3px; font-style: italic; font-family: Georgia, serif; }
+  .level-row { display: flex; align-items: center; gap: 10px; margin-top: 13px; }
   .level-badge {
-    background: linear-gradient(135deg, var(--accent), #5a4bff);
+    background: radial-gradient(circle at 30% 25%, #ffe9b0, #f5c96b 40%, #c8963a);
+    color: #4a3208;
     min-width: 46px; height: 46px;
-    border-radius: 14px;
+    border-radius: 50%;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     font-weight: 800;
-    box-shadow: 0 4px 16px rgba(124,108,255,.4);
+    box-shadow: 0 4px 16px rgba(245, 201, 107, .35);
+    border: 2px solid #fff3d1;
   }
-  .level-badge small { font-size: .55rem; opacity: .8; font-weight: 700; }
-  .level-badge b { font-size: 1.1rem; line-height: 1; }
+  .level-badge small { font-size: .5rem; font-weight: 800; letter-spacing: .5px; }
+  .level-badge b { font-size: 1.15rem; line-height: 1; }
   .xp-bar-wrap { flex: 1; text-align: left; }
-  .xp-bar { height: 12px; background: rgba(255,255,255,.08); border-radius: 999px; overflow: hidden; }
+  .xp-bar { height: 12px; background: rgba(0,0,0,.35); border-radius: 999px; overflow: hidden; border: 1px solid var(--gold-soft); }
   .xp-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    background: linear-gradient(90deg, #f5c96b, #ffe9b0);
     border-radius: 999px;
     transition: width .6s cubic-bezier(.22,1,.36,1);
   }
   .xp-label { font-size: .72rem; color: var(--muted); margin-top: 5px; font-weight: 600; }
 
-  /* ---------- Quests ---------- */
+  /* ---------- Quêtes ---------- */
   .quest {
-    display: flex; align-items: center; gap: 13px;
+    display: flex; align-items: center; gap: 12px;
     background: var(--card2);
     border-radius: 16px;
-    padding: 13px 14px;
+    padding: 13px 13px;
     margin-bottom: 10px;
-    border: 1px solid rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.07);
+    border-left: 4px solid var(--qc, var(--gold));
     cursor: pointer;
     transition: transform .12s;
   }
   .quest:active { transform: scale(.98); }
-  .quest.done { opacity: .55; }
+  .quest.done { opacity: .5; }
   .quest.done .q-name { text-decoration: line-through; }
   .q-emoji {
-    font-size: 1.7rem;
-    width: 52px; height: 52px;
-    background: rgba(124,108,255,.14);
-    border-radius: 14px;
+    font-size: 1.6rem;
+    width: 50px; height: 50px;
+    background: rgba(0,0,0,.25);
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
+    border: 1px solid var(--gold-soft);
   }
   .q-body { flex: 1; min-width: 0; }
-  .q-name { font-weight: 700; font-size: .95rem; }
-  .q-meta { font-size: .75rem; color: var(--muted); margin-top: 2px; font-weight: 600; }
+  .q-name { font-weight: 700; font-size: .92rem; font-family: Georgia, serif; }
+  .q-meta { font-size: .73rem; color: var(--muted); margin-top: 3px; font-weight: 600; }
+  .q-meta b { color: var(--qc, var(--gold)); font-weight: 700; }
   .q-xp {
-    background: rgba(255,209,102,.15);
+    background: var(--gold-soft);
     color: var(--gold);
     font-weight: 800;
-    font-size: .78rem;
+    font-size: .76rem;
     padding: 5px 10px;
     border-radius: 999px;
     flex-shrink: 0;
   }
-  .quest.done .q-xp { background: rgba(74,222,128,.15); color: var(--green); }
+  .quest.done .q-xp { background: rgba(127,214,164,.18); color: var(--endurance); }
   .day-progress { display: flex; gap: 8px; margin-bottom: 14px; }
-  .day-dot {
-    flex: 1; height: 8px; border-radius: 999px;
-    background: rgba(255,255,255,.08);
-  }
-  .day-dot.on { background: linear-gradient(90deg, var(--green), #22c55e); }
+  .day-dot { flex: 1; height: 8px; border-radius: 999px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.06); }
+  .day-dot.on { background: linear-gradient(90deg, #f5c96b, #ffe9b0); border-color: transparent; }
   .all-done-banner {
-    background: linear-gradient(135deg, rgba(74,222,128,.18), rgba(34,197,94,.08));
-    border: 1px solid rgba(74,222,128,.35);
-    color: var(--green);
+    background: linear-gradient(135deg, rgba(245,201,107,.2), rgba(245,201,107,.06));
+    border: 1px solid var(--gold-soft);
+    color: var(--gold);
     border-radius: 16px;
     padding: 14px;
     text-align: center;
-    font-weight: 800;
+    font-weight: 700;
+    font-family: Georgia, serif;
     margin-bottom: 14px;
     display: none;
   }
   .all-done-banner.show { display: block; }
-
-  /* ---------- Bonus / free exercise ---------- */
   .bonus-btn {
     width: 100%;
-    background: var(--card2);
-    border: 1px dashed rgba(255,255,255,.2);
+    background: none;
+    border: 1px dashed var(--gold-soft);
     color: var(--muted);
-    font-family: inherit;
+    font-family: Georgia, serif;
     font-weight: 700;
-    font-size: .88rem;
+    font-size: .86rem;
     padding: 13px;
     border-radius: 16px;
     cursor: pointer;
   }
 
-  /* ---------- Exercise modal ---------- */
+  /* ---------- Attributs ---------- */
+  .attr { margin-bottom: 12px; }
+  .attr:last-child { margin-bottom: 0; }
+  .attr-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .attr-name { font-weight: 700; font-size: .86rem; }
+  .attr-lvl { font-size: .72rem; color: var(--muted); font-weight: 700; }
+  .attr-bar { height: 9px; background: rgba(0,0,0,.35); border-radius: 999px; overflow: hidden; }
+  .attr-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
+
+  /* ---------- Customisation ---------- */
+  .cust-label { font-size: .72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 8px; }
+  .cust-label:first-child { margin-top: 0; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 9px; }
+  .swatch {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.18);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .swatch.sel { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft), 0 0 12px rgba(245,201,107,.4); transform: scale(1.08); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    background: var(--card2);
+    border: 1px solid rgba(255,255,255,.12);
+    color: var(--text);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: .8rem;
+    padding: 9px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .chip.sel { background: var(--gold); color: #4a3208; border-color: var(--gold); }
+  .hero-preview {
+    width: 175px; height: 212px;
+    margin: 0 auto 4px;
+    background: radial-gradient(circle at 50% 30%, rgba(183,139,255,.22), transparent 70%);
+    border-radius: 20px;
+  }
+  .hero-preview svg { width: 100%; height: 100%; }
+
+  /* ---------- Équipements ---------- */
+  .evo { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .evo:last-child { border-bottom: none; }
+  .evo .e-ico { font-size: 1.3rem; width: 32px; text-align: center; }
+  .evo .e-name { font-weight: 700; font-size: .85rem; flex: 1; }
+  .evo .e-req { font-size: .7rem; color: var(--muted); font-weight: 700; text-align: right; }
+  .evo.locked { opacity: .38; }
+  .evo.locked .e-ico { filter: grayscale(1); }
+
+  /* ---------- Stats ---------- */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat { background: var(--card2); border-radius: 16px; padding: 14px; text-align: center; border: 1px solid rgba(255,255,255,.06); }
+  .stat b { display: block; font-size: 1.5rem; font-weight: 800; font-family: Georgia, serif; color: var(--gold); }
+  .stat span { font-size: .7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .badge {
+    aspect-ratio: 1;
+    background: var(--card2);
+    border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; font-size: 1.55rem;
+    border: 1px solid var(--gold-soft);
+  }
+  .badge.locked { filter: grayscale(1) opacity(.3); }
+  .badge small { font-size: .52rem; color: var(--muted); font-weight: 700; text-align: center; padding: 0 4px; line-height: 1.2; }
+  .week-grid { display: flex; gap: 6px; }
+  .week-day { flex: 1; text-align: center; }
+  .week-day .wd-label { font-size: .62rem; color: var(--muted); font-weight: 700; margin-bottom: 5px; }
+  .week-day .wd-cell {
+    aspect-ratio: 1; border-radius: 10px;
+    background: rgba(0,0,0,.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .85rem; border: 1px solid rgba(255,255,255,.05);
+  }
+  .week-day .wd-cell.done { background: var(--gold-soft); border-color: var(--gold-soft); }
+  .week-day .wd-cell.today { outline: 2px solid var(--accent); }
+
+  /* ---------- Réglages ---------- */
+  .settings-row { display: flex; gap: 10px; }
+  .settings-row input {
+    flex: 1;
+    background: rgba(0,0,0,.3);
+    border: 1px solid var(--gold-soft);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: Georgia, serif;
+    font-weight: 700;
+    padding: 12px;
+    font-size: .95rem;
+  }
+  .settings-row button {
+    background: var(--gold);
+    border: none; color: #4a3208;
+    font-family: inherit; font-weight: 800;
+    border-radius: 12px; padding: 0 18px;
+    cursor: pointer;
+  }
+  .danger-btn {
+    width: 100%; background: none;
+    border: 1px solid rgba(255,100,100,.35);
+    color: #ff9d9d;
+    font-family: inherit; font-weight: 700;
+    padding: 12px; border-radius: 14px;
+    cursor: pointer; font-size: .84rem;
+    margin-top: 12px;
+  }
+
+  /* ---------- Modal exercice ---------- */
   .modal-backdrop {
     position: fixed; inset: 0;
-    background: rgba(8,8,22,.85);
+    background: rgba(10, 6, 24, .87);
     backdrop-filter: blur(6px);
     display: none;
-    align-items: flex-end;
-    justify-content: center;
+    align-items: flex-end; justify-content: center;
     z-index: 100;
   }
   .modal-backdrop.show { display: flex; }
   .modal {
-    background: var(--card);
+    background: linear-gradient(180deg, #32205e, #241549);
     width: 100%; max-width: 480px;
     border-radius: 26px 26px 0 0;
+    border-top: 1px solid var(--gold-soft);
     padding: 26px 22px calc(26px + var(--safe-bottom));
     text-align: center;
     animation: slideUp .3s cubic-bezier(.22,1,.36,1);
   }
   @keyframes slideUp { from { transform: translateY(60%); } to { transform: none; } }
-  .modal .m-emoji { font-size: 3.2rem; }
-  .modal h3 { font-size: 1.25rem; margin: 8px 0 4px; font-weight: 800; }
+  .modal .m-emoji { font-size: 3rem; }
+  .modal h3 { font-family: Georgia, serif; font-size: 1.2rem; margin: 8px 0 2px; font-weight: 700; color: var(--gold); }
+  .modal .m-real { font-size: .8rem; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
   .modal .m-desc { color: var(--muted); font-size: .88rem; line-height: 1.5; margin-bottom: 18px; }
   .timer-ring { position: relative; width: 150px; height: 150px; margin: 0 auto 18px; }
   .timer-ring svg { transform: rotate(-90deg); }
@@ -246,299 +426,312 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 2rem; font-weight: 800;
     font-variant-numeric: tabular-nums;
+    font-family: Georgia, serif;
   }
   .btn {
-    width: 100%;
-    border: none;
-    font-family: inherit;
-    font-weight: 800;
-    font-size: 1rem;
-    padding: 15px;
-    border-radius: 16px;
-    cursor: pointer;
-    margin-top: 8px;
+    width: 100%; border: none;
+    font-family: Georgia, serif; font-weight: 700; font-size: 1rem;
+    padding: 15px; border-radius: 16px;
+    cursor: pointer; margin-top: 8px;
   }
-  .btn-primary { background: linear-gradient(135deg, var(--accent), #5a4bff); color: #fff; box-shadow: 0 6px 20px rgba(124,108,255,.35); }
-  .btn-ghost { background: rgba(255,255,255,.07); color: var(--muted); }
-  .btn-success { background: linear-gradient(135deg, #4ade80, #22c55e); color: #05240f; }
+  .btn-primary { background: linear-gradient(135deg, #f5c96b, #e0a93e); color: #4a3208; box-shadow: 0 6px 20px rgba(245,201,107,.3); }
+  .btn-success { background: linear-gradient(135deg, #7fd6a4, #4caf82); color: #06301c; }
+  .btn-ghost { background: rgba(255,255,255,.08); color: var(--muted); }
 
-  /* ---------- Reward overlay ---------- */
+  /* ---------- Récompense ---------- */
   .reward {
     position: fixed; inset: 0;
     display: none;
-    align-items: center; justify-content: center;
-    flex-direction: column;
-    background: rgba(8,8,22,.9);
+    align-items: center; justify-content: center; flex-direction: column;
+    background: rgba(10, 6, 24, .92);
     backdrop-filter: blur(8px);
     z-index: 200;
-    text-align: center;
-    padding: 30px;
+    text-align: center; padding: 30px;
   }
   .reward.show { display: flex; }
   .reward .r-big { font-size: 4.5rem; animation: pop .5s cubic-bezier(.22,1.6,.36,1); }
   @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
-  .reward h2 { font-size: 1.5rem; margin: 10px 0 6px; }
-  .reward p { color: var(--muted); font-weight: 600; }
-  .reward .r-xp { color: var(--gold); font-weight: 800; font-size: 1.2rem; margin-top: 8px; }
-
-  /* ---------- Stats ---------- */
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .stat {
-    background: var(--card2);
-    border-radius: 16px;
-    padding: 14px;
-    text-align: center;
-  }
-  .stat b { display: block; font-size: 1.5rem; font-weight: 800; }
-  .stat span { font-size: .72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-  .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .badge {
-    aspect-ratio: 1;
-    background: var(--card2);
-    border-radius: 16px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 4px;
-    font-size: 1.6rem;
-    position: relative;
-  }
-  .badge.locked { filter: grayscale(1) opacity(.35); }
-  .badge small { font-size: .52rem; color: var(--muted); font-weight: 700; text-align: center; padding: 0 4px; line-height: 1.2; }
-  .week-grid { display: flex; gap: 6px; }
-  .week-day { flex: 1; text-align: center; }
-  .week-day .wd-label { font-size: .62rem; color: var(--muted); font-weight: 700; margin-bottom: 5px; }
-  .week-day .wd-cell {
-    aspect-ratio: 1;
-    border-radius: 10px;
-    background: rgba(255,255,255,.06);
-    display: flex; align-items: center; justify-content: center;
-    font-size: .9rem;
-  }
-  .week-day .wd-cell.done { background: rgba(74,222,128,.2); }
-  .week-day .wd-cell.today { outline: 2px solid var(--accent); }
-
-  /* ---------- Evolution list ---------- */
-  .evo { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
-  .evo:last-child { border-bottom: none; }
-  .evo .e-ico { font-size: 1.4rem; width: 34px; text-align: center; }
-  .evo .e-name { font-weight: 700; font-size: .88rem; flex: 1; }
-  .evo .e-lvl { font-size: .75rem; color: var(--muted); font-weight: 700; }
-  .evo.locked { opacity: .4; }
-  .evo.current .e-name { color: var(--accent); }
-
-  .settings-row { display: flex; gap: 10px; margin-top: 4px; }
-  .settings-row input {
-    flex: 1;
-    background: var(--card2);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: inherit;
-    font-weight: 700;
-    padding: 12px;
-    font-size: .95rem;
-  }
-  .settings-row button {
-    background: var(--accent);
-    border: none; color: #fff;
-    font-family: inherit; font-weight: 800;
-    border-radius: 12px; padding: 0 18px;
-    cursor: pointer;
-  }
-  .danger-btn {
-    width: 100%;
-    background: none;
-    border: 1px solid rgba(255,100,100,.35);
-    color: #ff8a8a;
-    font-family: inherit; font-weight: 700;
-    padding: 12px; border-radius: 14px;
-    cursor: pointer; font-size: .85rem;
-    margin-top: 10px;
-  }
-  .confetti {
+  .reward h2 { font-family: Georgia, serif; font-size: 1.45rem; margin: 10px 0 6px; color: var(--gold); }
+  .reward p { color: var(--muted); font-weight: 600; max-width: 300px; line-height: 1.5; }
+  .reward .r-xp { color: var(--gold); font-weight: 800; font-size: 1.15rem; margin-top: 10px; font-family: Georgia, serif; }
+  .sparkfetti {
     position: fixed;
-    width: 10px; height: 10px;
-    top: -12px;
+    top: -20px;
     z-index: 300;
-    border-radius: 2px;
     pointer-events: none;
     animation: fall linear forwards;
+    font-size: 1rem;
   }
-  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+  @keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
 </style>
 </head>
 <body>
+<div id="skyStars"></div>
 <div id="app">
 
   <header>
-    <h1>Kiko<span>Sport</span> 🎮</h1>
+    <h1>Royaume d'Astria<small>Chroniques d'une héroïne</small></h1>
     <div class="streak-pill">🔥 <span id="streakCount">0</span></div>
   </header>
 
   <!-- ===== ACCUEIL ===== -->
   <section class="screen active" id="screen-home">
-    <div class="hero card">
-      <div class="avatar-stage"><div class="avatar-bob" id="avatarBox"></div></div>
-      <div class="avatar-name" id="avatarName">Kiko</div>
-      <div class="avatar-title" id="avatarTitle">Graine de sportif</div>
-      <div class="level-row">
-        <div class="level-badge"><small>NIV</small><b id="levelNum">1</b></div>
-        <div class="xp-bar-wrap">
-          <div class="xp-bar"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
-          <div class="xp-label" id="xpLabel">0 / 50 XP</div>
+    <div class="card world-card">
+      <div class="world" id="worldScene">
+        <div class="moon"></div>
+        <div class="hill h1"></div>
+        <div class="hill h2"></div>
+        <div class="castle">🏰</div>
+        <div class="trees">🌲🌲</div>
+        <div class="hero-stand"><div class="hero-bob" id="avatarBox"></div></div>
+      </div>
+      <div class="hero-caption">
+        <div class="avatar-name" id="avatarName">Lyra</div>
+        <div class="avatar-title" id="avatarTitle">Aventurière novice</div>
+        <div class="level-row">
+          <div class="level-badge"><small>NIV</small><b id="levelNum">1</b></div>
+          <div class="xp-bar-wrap">
+            <div class="xp-bar"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
+            <div class="xp-label" id="xpLabel">0 / 50 XP</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="all-done-banner" id="doneBanner">🎉 Journée parfaite ! Kiko est en pleine forme !</div>
+    <div class="all-done-banner" id="doneBanner">🌟 Journée légendaire ! Le royaume est fier de toi.</div>
 
     <div class="card">
-      <h2>Missions du jour</h2>
+      <h2>Quêtes du jour</h2>
       <div class="day-progress" id="dayProgress"></div>
       <div id="questList"></div>
-      <button class="bonus-btn" id="bonusBtn">✨ Exercice bonus surprise (+8 XP)</button>
+      <button class="bonus-btn" id="bonusBtn">🔮 Quête secrète de la fée (+8 XP)</button>
     </div>
   </section>
 
-  <!-- ===== PROGRES ===== -->
+  <!-- ===== HÉROÏNE ===== -->
+  <section class="screen" id="screen-hero">
+    <div class="card">
+      <h2>Ton héroïne</h2>
+      <div class="hero-preview" id="heroPreview"></div>
+      <div class="settings-row">
+        <input type="text" id="nameInput" maxlength="14" placeholder="Nom de l'héroïne">
+        <button id="nameBtn">OK</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Apparence</h2>
+      <div class="cust-label">Peau</div>
+      <div class="swatches" id="skinRow"></div>
+      <div class="cust-label">Coiffure</div>
+      <div class="chips" id="hairStyleRow"></div>
+      <div class="cust-label">Couleur de cheveux</div>
+      <div class="swatches" id="hairColorRow"></div>
+      <div class="cust-label">Yeux</div>
+      <div class="swatches" id="eyeRow"></div>
+      <div class="cust-label">Robe</div>
+      <div class="swatches" id="dressRow"></div>
+    </div>
+    <div class="card">
+      <h2>Talents</h2>
+      <div id="attrList"></div>
+    </div>
+    <div class="card">
+      <h2>Équipements à débloquer</h2>
+      <div id="evoList"></div>
+      <button class="danger-btn" id="resetBtn">Recommencer l'aventure à zéro</button>
+    </div>
+  </section>
+
+  <!-- ===== PROGRÈS ===== -->
   <section class="screen" id="screen-stats">
     <div class="card">
       <h2>Cette semaine</h2>
       <div class="week-grid" id="weekGrid"></div>
     </div>
     <div class="card">
-      <h2>Statistiques</h2>
+      <h2>Chroniques</h2>
       <div class="stat-grid">
-        <div class="stat"><b id="statTotal">0</b><span>Exercices faits</span></div>
+        <div class="stat"><b id="statTotal">0</b><span>Quêtes accomplies</span></div>
         <div class="stat"><b id="statXp">0</b><span>XP total</span></div>
-        <div class="stat"><b id="statBest">0</b><span>Record de série</span></div>
-        <div class="stat"><b id="statPerfect">0</b><span>Journées parfaites</span></div>
+        <div class="stat"><b id="statBest">0</b><span>Record de flamme</span></div>
+        <div class="stat"><b id="statPerfect">0</b><span>Jours légendaires</span></div>
       </div>
     </div>
     <div class="card">
-      <h2>Badges</h2>
+      <h2>Trophées</h2>
       <div class="badge-grid" id="badgeGrid"></div>
     </div>
   </section>
 
-  <!-- ===== PERSONNAGE ===== -->
-  <section class="screen" id="screen-hero">
-    <div class="card">
-      <h2>Évolutions de Kiko</h2>
-      <div id="evoList"></div>
-    </div>
-    <div class="card">
-      <h2>Renommer ton compagnon</h2>
-      <div class="settings-row">
-        <input type="text" id="nameInput" maxlength="12" placeholder="Kiko">
-        <button id="nameBtn">OK</button>
-      </div>
-      <button class="danger-btn" id="resetBtn">Réinitialiser toute la progression</button>
-    </div>
-  </section>
-
   <nav>
-    <button class="active" data-screen="home"><span class="ico">🏠</span>Accueil</button>
-    <button data-screen="stats"><span class="ico">📊</span>Progrès</button>
-    <button data-screen="hero"><span class="ico">🐣</span>Personnage</button>
+    <button class="active" data-screen="home"><span class="ico">🏰</span>Royaume</button>
+    <button data-screen="hero"><span class="ico">🧝‍♀️</span>Héroïne</button>
+    <button data-screen="stats"><span class="ico">📜</span>Chroniques</button>
   </nav>
 </div>
 
-<!-- ===== Exercise modal ===== -->
+<!-- ===== Modal quête ===== -->
 <div class="modal-backdrop" id="modalBack">
   <div class="modal">
     <div class="m-emoji" id="mEmoji">🧘</div>
-    <h3 id="mName">Exercice</h3>
+    <h3 id="mName">Quête</h3>
+    <div class="m-real" id="mReal"></div>
     <p class="m-desc" id="mDesc"></p>
     <div class="timer-ring">
       <svg width="150" height="150">
         <circle cx="75" cy="75" r="66" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/>
-        <circle id="ringFill" cx="75" cy="75" r="66" fill="none" stroke="#7c6cff" stroke-width="10"
+        <circle id="ringFill" cx="75" cy="75" r="66" fill="none" stroke="#f5c96b" stroke-width="10"
                 stroke-linecap="round" stroke-dasharray="414.7" stroke-dashoffset="414.7"/>
       </svg>
       <div class="t-num" id="tNum">0:00</div>
     </div>
-    <button class="btn btn-primary" id="startBtn">▶ C'est parti !</button>
-    <button class="btn btn-success" id="finishBtn" style="display:none">✔ Terminé !</button>
+    <button class="btn btn-primary" id="startBtn">⚔ Partir en quête !</button>
+    <button class="btn btn-success" id="finishBtn" style="display:none">✔ Quête accomplie !</button>
     <button class="btn btn-ghost" id="closeBtn">Plus tard</button>
   </div>
 </div>
 
-<!-- ===== Reward overlay ===== -->
+<!-- ===== Récompense ===== -->
 <div class="reward" id="rewardBox">
   <div class="r-big" id="rBig">⭐</div>
   <h2 id="rTitle">Bravo !</h2>
   <p id="rText"></p>
   <div class="r-xp" id="rXp"></div>
-  <button class="btn btn-primary" id="rBtn" style="max-width:280px">Continuer</button>
+  <button class="btn btn-primary" id="rBtn" style="max-width:280px">Continuer l'aventure</button>
 </div>
 
 <script>
 "use strict";
 
 /* =========================================================
-   Kiko Sport — sport doux quotidien en mode jeu vidéo
-   Données stockées localement (localStorage), aucune connexion requise.
+   Royaume d'Astria — sport doux quotidien en monde fantastique.
+   Chaque exercice réel est une quête ; l'héroïne gagne des talents
+   (Force, Endurance, Grâce, Magie) selon le type d'exercice, et
+   son équipement évolue avec ses talents.
+   Données 100 % locales (localStorage).
    ========================================================= */
 
-const STORE_KEY = "kikoSport.v1";
+const STORE_KEY = "astria.v1";
+localStorage.removeItem("kikoSport.v1"); // ancienne version
 
-/* ---------- Catalogue d'exercices doux ---------- */
+/* ---------- Quêtes (exercices doux déguisés) ---------- */
+/* cat: force ⚔️ | endurance 🥾 | grace 🦋 | magie ✨ */
 const EXERCISES = [
-  { id:"marche",     emoji:"🚶‍♀️", name:"Marche tranquille",        desc:"Marche à ton rythme, dehors ou dans la maison. Respire calmement.", dur:600, xp:20 },
-  { id:"etir_dos",   emoji:"🙆‍♀️", name:"Étirement du dos",         desc:"Debout, bras vers le ciel, penche-toi doucement à droite puis à gauche.", dur:120, xp:12 },
-  { id:"chat_vache", emoji:"🐱", name:"Yoga chat-vache",          desc:"À quatre pattes, arrondis puis creuse le dos lentement, en suivant ta respiration.", dur:120, xp:12 },
-  { id:"respiration",emoji:"🌬️", name:"Respiration profonde",     desc:"Assise confortablement : inspire 4 s, bloque 4 s, expire 6 s. Répète.", dur:180, xp:10 },
-  { id:"nuque",      emoji:"🦒", name:"Étirement de la nuque",    desc:"Incline doucement la tête de chaque côté, sans forcer. Épaules relâchées.", dur:90, xp:10 },
-  { id:"epaules",    emoji:"🌀", name:"Rotations des épaules",    desc:"De grands cercles lents avec les épaules, vers l'arrière puis vers l'avant.", dur:90, xp:10 },
-  { id:"squat",      emoji:"🪑", name:"Squats sur chaise",        desc:"Assieds-toi et relève-toi d'une chaise lentement, 8 à 10 fois.", dur:120, xp:15 },
-  { id:"mollets",    emoji:"🦵", name:"Montées sur pointes",      desc:"Debout, monte sur la pointe des pieds puis redescends doucement. 12 fois.", dur:90, xp:12 },
-  { id:"equilibre",  emoji:"🦩", name:"Équilibre du flamant",     desc:"Tiens-toi sur un pied près d'un appui. 20 s de chaque côté.", dur:90, xp:12 },
-  { id:"pont",       emoji:"🌉", name:"Pont fessier doux",        desc:"Allongée, genoux pliés : soulève le bassin doucement, 8 à 10 fois.", dur:120, xp:15 },
-  { id:"marche_place",emoji:"🎵", name:"Marche sur place en musique", desc:"Mets une chanson que tu aimes et marche sur place jusqu'à la fin.", dur:180, xp:14 },
-  { id:"genoux",     emoji:"🦿", name:"Montées de genoux douces", desc:"Debout, lève un genou après l'autre, tranquillement, comme une marche exagérée.", dur:120, xp:14 },
-  { id:"bras",       emoji:"💪", name:"Cercles de bras",          desc:"Bras tendus sur les côtés, fais de petits cercles, 30 s dans chaque sens.", dur:90, xp:10 },
-  { id:"enfant",     emoji:"🧎‍♀️", name:"Posture de l'enfant",      desc:"À genoux, assise sur les talons, front vers le sol, bras allongés. Respire.", dur:120, xp:10 },
-  { id:"jambes_mur", emoji:"🧱", name:"Jambes contre le mur",     desc:"Allongée, jambes posées verticalement contre un mur. Détente totale.", dur:240, xp:12 },
-  { id:"gainage",    emoji:"🛡️", name:"Gainage doux sur genoux",  desc:"Planche sur les genoux et les avant-bras. Tiens 15 à 20 s, 2 fois.", dur:90, xp:15 },
+  { id:"marche",      cat:"endurance", emoji:"🌲", name:"Traverser la Forêt d'Émeraude", real:"Marche tranquille",
+    desc:"Pars marcher à ton rythme, dehors ou dans la maison. Respire l'air de la forêt.", dur:600, xp:20 },
+  { id:"marche_place",cat:"endurance", emoji:"🎻", name:"La danse du village en fête", real:"Marche sur place en musique",
+    desc:"Mets une chanson que tu aimes et marche sur place jusqu'à la fin, comme au bal du village.", dur:180, xp:14 },
+  { id:"genoux",      cat:"endurance", emoji:"⛰️", name:"Gravir la Colline aux Lucioles", real:"Montées de genoux douces",
+    desc:"Debout, lève un genou après l'autre tranquillement, comme si tu grimpais un sentier magique.", dur:120, xp:14 },
+
+  { id:"squat",       cat:"force", emoji:"🪨", name:"Soulever les pierres du vieux pont", real:"Squats sur chaise",
+    desc:"Assieds-toi et relève-toi d'une chaise lentement, 8 à 10 fois. Chaque pierre compte !", dur:120, xp:15 },
+  { id:"pont",        cat:"force", emoji:"🌉", name:"Bâtir le Pont de Lune", real:"Pont fessier doux",
+    desc:"Allongée, genoux pliés : soulève le bassin doucement 8 à 10 fois pour bâtir l'arche.", dur:120, xp:15 },
+  { id:"gainage",     cat:"force", emoji:"🛡️", name:"Tenir le Bouclier du Royaume", real:"Gainage doux sur genoux",
+    desc:"Planche sur les genoux et les avant-bras. Tiens 15 à 20 s, 2 fois. Le royaume compte sur toi.", dur:90, xp:15 },
+  { id:"mollets",     cat:"force", emoji:"🏹", name:"L'entraînement de l'archère", real:"Montées sur pointes",
+    desc:"Debout, monte sur la pointe des pieds puis redescends doucement, 12 fois, comme pour viser plus haut.", dur:90, xp:12 },
+
+  { id:"etir_dos",    cat:"grace", emoji:"🌳", name:"S'étirer comme le Grand Saule", real:"Étirement du dos",
+    desc:"Debout, bras vers le ciel, penche-toi doucement à droite puis à gauche, comme un saule dans le vent.", dur:120, xp:12 },
+  { id:"chat_vache",  cat:"grace", emoji:"🐉", name:"Le réveil du petit dragon", real:"Yoga chat-vache",
+    desc:"À quatre pattes, arrondis puis creuse le dos lentement, en suivant ta respiration.", dur:120, xp:12 },
+  { id:"nuque",       cat:"grace", emoji:"🦢", name:"La grâce du cygne du lac", real:"Étirement de la nuque",
+    desc:"Incline doucement la tête de chaque côté, sans forcer, épaules relâchées.", dur:90, xp:10 },
+  { id:"epaules",     cat:"grace", emoji:"🌀", name:"Les ailes du moulin enchanté", real:"Rotations des épaules",
+    desc:"De grands cercles lents avec les épaules, vers l'arrière puis vers l'avant.", dur:90, xp:10 },
+  { id:"bras",        cat:"grace", emoji:"🦋", name:"Le vol du papillon de cristal", real:"Cercles de bras",
+    desc:"Bras tendus sur les côtés, fais de petits cercles, 30 s dans chaque sens.", dur:90, xp:10 },
+  { id:"enfant",      cat:"grace", emoji:"🌙", name:"Repos au Temple de la Lune", real:"Posture de l'enfant",
+    desc:"À genoux, assise sur les talons, front vers le sol, bras allongés. Respire profondément.", dur:120, xp:10 },
+
+  { id:"respiration", cat:"magie", emoji:"✨", name:"Invoquer le Souffle de magie", real:"Respiration profonde",
+    desc:"Assise confortablement : inspire 4 s, retiens 4 s, expire 6 s. Sens la magie circuler.", dur:180, xp:10 },
+  { id:"jambes_mur",  cat:"magie", emoji:"🧝‍♀️", name:"La méditation de l'elfe", real:"Jambes contre le mur",
+    desc:"Allongée, jambes posées verticalement contre un mur. Détente totale, comme les elfes des bois.", dur:240, xp:12 },
+  { id:"equilibre",   cat:"magie", emoji:"🧚", name:"L'épreuve de la fée funambule", real:"Équilibre sur un pied",
+    desc:"Tiens-toi sur un pied près d'un appui, 20 s de chaque côté, légère comme une fée.", dur:90, xp:12 },
 ];
 
-const BONUS_POOL = ["etir_dos","respiration","nuque","epaules","bras","enfant"];
+const CATS = {
+  force:     { label:"Force",     emoji:"⚔️", color:"var(--force)",     colorRaw:"#ff8a75" },
+  endurance: { label:"Endurance", emoji:"🥾", color:"var(--endurance)", colorRaw:"#7fd6a4" },
+  grace:     { label:"Grâce",     emoji:"🦋", color:"var(--grace)",     colorRaw:"#ff9ed2" },
+  magie:     { label:"Magie",     emoji:"✨", color:"var(--magie)",     colorRaw:"#9db8ff" },
+};
 
-/* ---------- Évolutions du personnage ---------- */
-const EVOLUTIONS = [
-  { lvl:1,  name:"Graine de sportif",   ico:"🐣" },
-  { lvl:3,  name:"Apprenti bandeau",    ico:"🎽" },
-  { lvl:5,  name:"Marcheur motivé",     ico:"👟" },
-  { lvl:8,  name:"Héros à la cape",     ico:"🦸" },
-  { lvl:12, name:"Étoile du stade",     ico:"⭐" },
-  { lvl:16, name:"Légende dorée",       ico:"👑" },
+const CLASS_BY_CAT = {
+  force: "Guerrière", endurance: "Exploratrice", grace: "Danseuse féérique", magie: "Enchanteresse",
+};
+function rankAdj(lvl) {
+  if (lvl >= 12) return "légendaire";
+  if (lvl >= 8) return "héroïque";
+  if (lvl >= 4) return "courageuse";
+  return "novice";
+}
+
+/* ---------- Équipements débloqués par talents ---------- */
+const UNLOCKS = [
+  { cat:"force",     lvl:2, ico:"🧤", name:"Gants de combat" },
+  { cat:"force",     lvl:4, ico:"🛡️", name:"Épaulières dorées" },
+  { cat:"force",     lvl:6, ico:"⚔️", name:"Épée de lumière" },
+  { cat:"endurance", lvl:2, ico:"🥾", name:"Bottes de voyage" },
+  { cat:"endurance", lvl:4, ico:"🧣", name:"Cape d'exploratrice" },
+  { cat:"endurance", lvl:6, ico:"🌌", name:"Cape céleste" },
+  { cat:"grace",     lvl:2, ico:"🎀", name:"Rubans enchantés" },
+  { cat:"grace",     lvl:4, ico:"🧚", name:"Ailes de fée" },
+  { cat:"grace",     lvl:6, ico:"🦋", name:"Grandes ailes de papillon" },
+  { cat:"magie",     lvl:2, ico:"🌙", name:"Pendentif de lune" },
+  { cat:"magie",     lvl:4, ico:"🪄", name:"Bâton des étoiles" },
+  { cat:"magie",     lvl:6, ico:"💫", name:"Aura magique" },
+  { cat:"niveau",    lvl:5,  ico:"👸", name:"Diadème de cristal" },
+  { cat:"niveau",    lvl:10, ico:"👑", name:"Couronne royale" },
+  { cat:"niveau",    lvl:15, ico:"🌟", name:"Aura légendaire" },
 ];
 
-/* ---------- Badges ---------- */
+/* ---------- Options de customisation ---------- */
+const SKINS = ["#ffe3cc", "#f6c9a0", "#d9a06f", "#a5714a", "#6f4a30"];
+const HAIR_STYLES = [
+  { id:"long",  label:"Longs" },
+  { id:"tails", label:"Couettes" },
+  { id:"bun",   label:"Chignon" },
+  { id:"braid", label:"Tresse" },
+];
+const HAIR_COLORS = ["#5a3b26", "#2b2233", "#e8c66f", "#b6472e", "#e87fb0", "#5b7fd4", "#cfd4e8", "#7a4fb0"];
+const EYE_COLORS = ["#5a768c", "#4a7a4f", "#6b4a2f", "#7a5fb0", "#3a3a4a"];
+const DRESS_COLORS = ["#8a5fd4", "#e05a8a", "#3f8f6b", "#4a6fd4", "#c44f4f", "#3a9aa0"];
+
+/* ---------- Trophées ---------- */
 const BADGES = [
-  { id:"first",    ico:"🎯", name:"1er exercice",     test: s => s.totalDone >= 1 },
-  { id:"streak3",  ico:"🔥", name:"Série de 3 j",     test: s => s.bestStreak >= 3 },
-  { id:"streak7",  ico:"🌋", name:"Série de 7 j",     test: s => s.bestStreak >= 7 },
-  { id:"streak30", ico:"🏆", name:"Série de 30 j",    test: s => s.bestStreak >= 30 },
-  { id:"lvl5",     ico:"🚀", name:"Niveau 5",         test: s => s.level >= 5 },
-  { id:"lvl10",    ico:"💎", name:"Niveau 10",        test: s => s.level >= 10 },
-  { id:"ex50",     ico:"🎖️", name:"50 exercices",     test: s => s.totalDone >= 50 },
-  { id:"perfect7", ico:"🌈", name:"7 j. parfaits",    test: s => s.perfectDays >= 7 },
+  { id:"first",    ico:"🗡️", name:"Première quête",    test: s => s.totalDone >= 1 },
+  { id:"streak3",  ico:"🔥", name:"Flamme de 3 j",     test: s => s.bestStreak >= 3 },
+  { id:"streak7",  ico:"🐉", name:"Flamme de 7 j",     test: s => s.bestStreak >= 7 },
+  { id:"streak30", ico:"🏰", name:"Flamme de 30 j",    test: s => s.bestStreak >= 30 },
+  { id:"lvl5",     ico:"🌟", name:"Niveau 5",          test: s => s.level >= 5 },
+  { id:"lvl10",    ico:"👑", name:"Niveau 10",         test: s => s.level >= 10 },
+  { id:"ex50",     ico:"📜", name:"50 quêtes",         test: s => s.totalDone >= 50 },
+  { id:"perfect7", ico:"🦄", name:"7 j. légendaires",  test: s => s.perfectDays >= 7 },
 ];
 
 /* ---------- État ---------- */
+function defaultCustom() {
+  return { skin: 0, hairStyle: "long", hair: "#5a3b26", eyes: "#5a768c", dress: "#8a5fd4" };
+}
 function defaultState() {
   return {
-    name: "Kiko",
+    name: "Lyra",
     xp: 0,
+    attrs: { force: 0, endurance: 0, grace: 0, magie: 0 },
+    custom: defaultCustom(),
     totalDone: 0,
     streak: 0,
     bestStreak: 0,
     perfectDays: 0,
-    lastDay: null,        // dernier jour avec au moins 1 exercice
-    history: {},          // "YYYY-MM-DD" -> nb exercices faits
-    questsDay: null,      // jour des missions courantes
-    quests: [],           // [{exId, done}]
+    lastDay: null,
+    history: {},
+    questsDay: null,
+    quests: [],
   };
 }
 let S = load();
@@ -546,7 +739,14 @@ let S = load();
 function load() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return Object.assign(defaultState(), JSON.parse(raw));
+    if (raw) {
+      const d = defaultState();
+      const p = JSON.parse(raw);
+      const s = Object.assign(d, p);
+      s.attrs = Object.assign({ force:0, endurance:0, grace:0, magie:0 }, p.attrs || {});
+      s.custom = Object.assign(defaultCustom(), p.custom || {});
+      return s;
+    }
   } catch (e) {}
   return defaultState();
 }
@@ -556,9 +756,7 @@ function save() { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
 function todayKey(d = new Date()) {
   return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
-function daysBetween(a, b) {
-  return Math.round((new Date(b) - new Date(a)) / 86400000);
-}
+function daysBetween(a, b) { return Math.round((new Date(b) - new Date(a)) / 86400000); }
 
 /* ---------- Niveaux ---------- */
 function xpForLevel(lvl) { return 50 + (lvl - 1) * 25; }
@@ -569,102 +767,255 @@ function levelFromXp(xp) {
 }
 Object.defineProperty(S, "level", { get() { return levelFromXp(this.xp).lvl; }, configurable: true });
 
-function currentEvo(lvl) {
-  let evo = EVOLUTIONS[0];
-  for (const e of EVOLUTIONS) if (lvl >= e.lvl) evo = e;
-  return evo;
+function attrNeed(lvl) { return 30 + (lvl - 1) * 15; }
+function attrLevel(xp) {
+  let lvl = 1, rest = xp;
+  while (rest >= attrNeed(lvl)) { rest -= attrNeed(lvl); lvl++; }
+  return { lvl, into: rest, need: attrNeed(lvl) };
 }
 
-/* ---------- Missions quotidiennes (déterministes par date) ---------- */
-function seededPick(dayKey, count) {
+function heroClass() {
+  const entries = Object.entries(S.attrs);
+  const max = Math.max(...entries.map(([, v]) => v));
+  if (max <= 0) return "Aventurière";
+  const best = entries.find(([, v]) => v === max)[0];
+  return CLASS_BY_CAT[best];
+}
+
+/* ---------- Quêtes quotidiennes (3 catégories différentes, choix seedé) ---------- */
+function makeRng(dayKey) {
   let seed = 0;
   for (const c of dayKey) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
-  const pool = [...EXERCISES.keys()];
-  const picked = [];
-  for (let i = 0; i < count; i++) {
-    seed = (seed * 1103515245 + 12345) >>> 0;
-    picked.push(pool.splice(seed % pool.length, 1)[0]);
-  }
-  return picked.map(i => EXERCISES[i].id);
+  return () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed; };
 }
-
+function pickQuests(dayKey) {
+  const rng = makeRng(dayKey);
+  const cats = Object.keys(CATS);
+  const chosen = [];
+  while (chosen.length < 3) chosen.push(cats.splice(rng() % cats.length, 1)[0]);
+  return chosen.map(cat => {
+    const pool = EXERCISES.filter(e => e.cat === cat);
+    return { exId: pool[rng() % pool.length].id, done: false };
+  });
+}
 function ensureToday() {
   const t = todayKey();
-  // casse la série si un jour a été sauté
   if (S.lastDay && daysBetween(S.lastDay, t) > 1) S.streak = 0;
   if (S.questsDay !== t) {
     S.questsDay = t;
-    S.quests = seededPick(t, 3).map(id => ({ exId: id, done: false }));
+    S.quests = pickQuests(t);
     save();
   }
 }
 
-/* ---------- Avatar SVG ---------- */
-function avatarSvg(lvl) {
-  const headband = lvl >= 3, shoes = lvl >= 5, cape = lvl >= 8, star = lvl >= 12, crown = lvl >= 16;
-  const bodyCol = lvl >= 12 ? "#ffd166" : lvl >= 8 ? "#8ce0a1" : lvl >= 5 ? "#7cc4ff" : lvl >= 3 ? "#b9a8ff" : "#ffc9de";
-  const aura = star ? `<circle cx="100" cy="105" r="88" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="6 10" opacity=".6">
-      <animateTransform attributeName="transform" type="rotate" from="0 100 105" to="360 100 105" dur="12s" repeatCount="indefinite"/></circle>` : "";
-  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-    ${aura}
-    ${cape ? `<path d="M55 100 Q40 160 60 178 L100 150 L140 178 Q160 160 145 100 Z" fill="#ff5f6d" opacity=".9"/>` : ""}
-    <ellipse cx="100" cy="182" rx="52" ry="9" fill="rgba(0,0,0,.3)"/>
-    <!-- jambes -->
-    <rect x="78" y="148" width="16" height="28" rx="8" fill="${bodyCol}"/>
-    <rect x="106" y="148" width="16" height="28" rx="8" fill="${bodyCol}"/>
-    ${shoes ? `<ellipse cx="86" cy="177" rx="14" ry="7" fill="#4f46e5"/><ellipse cx="114" cy="177" rx="14" ry="7" fill="#4f46e5"/>
-               <rect x="76" y="171" width="20" height="5" rx="2.5" fill="#fff" opacity=".85"/><rect x="104" y="171" width="20" height="5" rx="2.5" fill="#fff" opacity=".85"/>` : ""}
-    <!-- corps -->
-    <ellipse cx="100" cy="112" rx="52" ry="56" fill="${bodyCol}"/>
-    <ellipse cx="100" cy="126" rx="34" ry="30" fill="#fff" opacity=".35"/>
-    <!-- bras -->
-    <ellipse cx="45" cy="115" rx="12" ry="20" fill="${bodyCol}" transform="rotate(20 45 115)"/>
-    <ellipse cx="155" cy="115" rx="12" ry="20" fill="${bodyCol}" transform="rotate(-20 155 115)"/>
-    <!-- visage -->
-    <circle cx="82" cy="98" r="7" fill="#1c1e3a"/>
-    <circle cx="118" cy="98" r="7" fill="#1c1e3a"/>
-    <circle cx="84.5" cy="95.5" r="2.4" fill="#fff"/>
-    <circle cx="120.5" cy="95.5" r="2.4" fill="#fff"/>
-    <path d="M88 116 Q100 126 112 116" stroke="#1c1e3a" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <ellipse cx="72" cy="110" rx="7" ry="4.5" fill="#ff8fb1" opacity=".7"/>
-    <ellipse cx="128" cy="110" rx="7" ry="4.5" fill="#ff8fb1" opacity=".7"/>
-    ${headband ? `<path d="M52 82 Q100 62 148 82 L146 92 Q100 74 54 92 Z" fill="#ff5f6d"/><circle cx="151" cy="86" r="5" fill="#ff5f6d"/>` : ""}
-    ${crown ? `<path d="M74 52 L82 66 L92 50 L100 64 L108 50 L118 66 L126 52 L124 72 L76 72 Z" fill="#ffd166" stroke="#e0a93e" stroke-width="2"/>` : ""}
-    ${star && !crown ? `<text x="100" y="52" font-size="26" text-anchor="middle">⭐</text>` : ""}
-  </svg>`;
+/* =========================================================
+   Avatar SVG — héroïne customisable + équipement évolutif
+   ========================================================= */
+function heroSvg() {
+  const c = S.custom;
+  const skin = SKINS[c.skin] || SKINS[0];
+  const hair = c.hair, dress = c.dress, eyes = c.eyes;
+  const gLvl = levelFromXp(S.xp).lvl;
+  const aF = attrLevel(S.attrs.force).lvl;
+  const aE = attrLevel(S.attrs.endurance).lvl;
+  const aG = attrLevel(S.attrs.grace).lvl;
+  const aM = attrLevel(S.attrs.magie).lvl;
+
+  const has = {
+    gants: aF >= 2, epaulieres: aF >= 4, epee: aF >= 6,
+    bottes: aE >= 2, cape: aE >= 4, capeCeleste: aE >= 6,
+    rubans: aG >= 2, ailes: aG >= 4, grandesAiles: aG >= 6,
+    pendentif: aM >= 2, baton: aM >= 4, aura: aM >= 6,
+    diademe: gLvl >= 5 && gLvl < 10, couronne: gLvl >= 10, auraOr: gLvl >= 15,
+  };
+
+  const dressDark = shade(dress, -28);
+  const dressLight = shade(dress, 30);
+  const hairDark = shade(hair, -22);
+  const capeCol = has.capeCeleste ? "#3a4fa8" : "#2e8b6a";
+
+  let s = `<svg viewBox="0 0 220 260" xmlns="http://www.w3.org/2000/svg">`;
+
+  /* --- auras (fond) --- */
+  if (has.auraOr) s += `<circle cx="110" cy="130" r="100" fill="none" stroke="#f5c96b" stroke-width="3" stroke-dasharray="5 12" opacity=".65">
+    <animateTransform attributeName="transform" type="rotate" from="0 110 130" to="360 110 130" dur="14s" repeatCount="indefinite"/></circle>
+    <text x="30" y="60" font-size="14" opacity=".8">✨</text><text x="185" y="90" font-size="12" opacity=".8">✨</text>`;
+  else if (has.aura) s += `<circle cx="110" cy="130" r="95" fill="none" stroke="#c3a8ff" stroke-width="2.5" stroke-dasharray="4 10" opacity=".6">
+    <animateTransform attributeName="transform" type="rotate" from="0 110 130" to="360 110 130" dur="16s" repeatCount="indefinite"/></circle>
+    <text x="34" y="70" font-size="12" opacity=".75">✦</text><text x="182" y="100" font-size="11" opacity=".75">✦</text>`;
+
+  /* --- ailes --- */
+  if (has.grandesAiles) s += `
+    <path d="M74 128 Q 22 92 18 140 Q 20 180 72 162 Z" fill="#ffd1ec" opacity=".8"/>
+    <path d="M146 128 Q 198 92 202 140 Q 200 180 148 162 Z" fill="#ffd1ec" opacity=".8"/>
+    <path d="M76 140 Q 40 150 42 182 Q 60 190 78 164 Z" fill="#e8b3ff" opacity=".75"/>
+    <path d="M144 140 Q 180 150 178 182 Q 160 190 142 164 Z" fill="#e8b3ff" opacity=".75"/>`;
+  else if (has.ailes) s += `
+    <ellipse cx="66" cy="140" rx="22" ry="34" fill="#cfe6ff" opacity=".7" transform="rotate(18 66 140)"/>
+    <ellipse cx="154" cy="140" rx="22" ry="34" fill="#cfe6ff" opacity=".7" transform="rotate(-18 154 140)"/>`;
+
+  /* --- cape --- */
+  if (has.cape) s += `<path d="M80 126 Q 58 190 72 216 L 110 202 L 148 216 Q 162 190 140 126 Q 110 116 80 126 Z" fill="${capeCol}" opacity=".92"/>
+    ${has.capeCeleste ? '<text x="82" y="180" font-size="9" opacity=".9">✦</text><text x="126" y="196" font-size="8" opacity=".9">✦</text><text x="100" y="205" font-size="7" opacity=".8">✦</text>' : ''}`;
+
+  /* --- cheveux (arrière) --- */
+  s += backHair(c.hairStyle, hair, hairDark);
+
+  /* --- ombre au sol --- */
+  s += `<ellipse cx="110" cy="243" rx="58" ry="8" fill="rgba(0,0,0,.3)"/>`;
+
+  /* --- jambes --- */
+  s += `<rect x="94" y="198" width="12" height="34" rx="6" fill="${skin}"/>
+        <rect x="114" y="198" width="12" height="34" rx="6" fill="${skin}"/>`;
+  if (has.bottes) s += `
+    <path d="M90 212 h20 v18 q0 6 -6 6 h-14 q-4 0 -4 -5 v-13 q0 -6 4 -6" fill="#8a5a33"/>
+    <path d="M110 212 h20 q4 0 4 6 v13 q0 5 -4 5 h-14 q-6 0 -6 -6 Z" fill="#8a5a33"/>
+    <rect x="88" y="209" width="24" height="6" rx="3" fill="#a87040"/>
+    <rect x="108" y="209" width="24" height="6" rx="3" fill="#a87040"/>`;
+  else s += `<ellipse cx="100" cy="234" rx="11" ry="5" fill="${dressDark}"/>
+             <ellipse cx="120" cy="234" rx="11" ry="5" fill="${dressDark}"/>`;
+
+  /* --- robe --- */
+  s += `<path d="M84 128 Q 110 119 136 128 L 150 200 Q 110 212 70 200 Z" fill="${dress}"/>
+        <path d="M110 122 L 136 128 L 150 200 Q 130 206 110 206 Z" fill="rgba(0,0,0,.14)"/>
+        <path d="M72 193 Q 110 204 148 193 L 150 200 Q 110 212 70 200 Z" fill="${dressLight}" opacity=".85"/>
+        <path d="M86 142 Q 110 150 134 142 L 134 150 Q 110 158 86 150 Z" fill="${dressLight}" opacity=".9"/>`;
+
+  /* --- bras + manches --- */
+  s += `<ellipse cx="76" cy="150" rx="8" ry="17" fill="${skin}" transform="rotate(14 76 150)"/>
+        <ellipse cx="144" cy="150" rx="8" ry="17" fill="${skin}" transform="rotate(-14 144 150)"/>
+        <circle cx="84" cy="131" r="10" fill="${dressDark}"/>
+        <circle cx="136" cy="131" r="10" fill="${dressDark}"/>`;
+  if (has.epaulieres) s += `
+    <ellipse cx="84" cy="127" rx="13" ry="9" fill="#f5c96b" stroke="#c8963a" stroke-width="2"/>
+    <ellipse cx="136" cy="127" rx="13" ry="9" fill="#f5c96b" stroke="#c8963a" stroke-width="2"/>`;
+
+  /* --- épée (main droite, avant la main) --- */
+  if (has.epee) s += `
+    <rect x="147.5" y="106" width="6" height="56" rx="2.5" fill="#e8eefb" stroke="#b9c4dd" stroke-width="1"/>
+    <path d="M147.5 106 L150.5 96 L153.5 106 Z" fill="#e8eefb"/>
+    <rect x="139" y="160" width="23" height="6.5" rx="3" fill="#f5c96b"/>
+    <circle cx="150.5" cy="174" r="4.5" fill="#f5c96b"/>`;
+
+  /* --- bâton (main gauche) --- */
+  if (has.baton) s += `
+    <rect x="67" y="102" width="4.5" height="74" rx="2" fill="#8a5a33"/>
+    <circle cx="69" cy="97" r="8" fill="#ffe9b0" opacity=".5"/>
+    <text x="69" y="103" font-size="14" text-anchor="middle">⭐</text>`;
+
+  /* --- mains --- */
+  const handCol = has.gants ? "#a8442f" : skin;
+  s += `<circle cx="70" cy="166" r="7.5" fill="${handCol}"/>
+        <circle cx="150" cy="166" r="7.5" fill="${handCol}"/>`;
+
+  /* --- tête --- */
+  s += `<ellipse cx="110" cy="80" rx="43" ry="44" fill="${skin}"/>`;
+
+  /* --- pendentif --- */
+  if (has.pendentif) s += `
+    <path d="M96 125 Q 110 134 124 125" stroke="#f5c96b" stroke-width="2" fill="none"/>
+    <text x="110" y="142" font-size="10" text-anchor="middle">🌙</text>`;
+
+  /* --- visage --- */
+  s += `
+    <path d="M78 80 Q 87 74 96 80" stroke="#3a2b3f" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".65"/>
+    <path d="M124 80 Q 133 74 142 80" stroke="#3a2b3f" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".65"/>
+    <circle cx="88" cy="90" r="8.5" fill="${eyes}"/>
+    <circle cx="132" cy="90" r="8.5" fill="${eyes}"/>
+    <circle cx="88" cy="90" r="4" fill="#221826"/>
+    <circle cx="132" cy="90" r="4" fill="#221826"/>
+    <circle cx="90.5" cy="87" r="2.6" fill="#fff"/>
+    <circle cx="134.5" cy="87" r="2.6" fill="#fff"/>
+    <ellipse cx="76" cy="104" rx="8" ry="4.5" fill="#ff9eb5" opacity=".55"/>
+    <ellipse cx="144" cy="104" rx="8" ry="4.5" fill="#ff9eb5" opacity=".55"/>
+    <path d="M102 111 Q 110 118 118 111" stroke="#8a4a58" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+
+  /* --- frange (avant) --- */
+  s += `<path d="M66 82 Q 62 38 110 34 Q 158 38 154 82 Q 150 60 137 57 Q 129 73 119 60 Q 111 75 101 60 Q 91 73 83 57 Q 70 60 66 82 Z" fill="${hair}"/>`;
+
+  /* --- rubans --- */
+  if (has.rubans) s += `
+    <g transform="translate(69,55)"><path d="M0 0 L-9 -7 L-8 3 Z" fill="#ff8fb1"/><path d="M0 0 L9 -7 L8 3 Z" fill="#ff8fb1"/><circle r="3" fill="#ffd1ec"/></g>
+    <g transform="translate(151,55)"><path d="M0 0 L-9 -7 L-8 3 Z" fill="#ff8fb1"/><path d="M0 0 L9 -7 L8 3 Z" fill="#ff8fb1"/><circle r="3" fill="#ffd1ec"/></g>`;
+
+  /* --- couronne / diadème --- */
+  if (has.couronne) s += `
+    <path d="M84 40 L90 22 L100 36 L110 18 L120 36 L130 22 L136 40 Q 110 32 84 40 Z" fill="#f5c96b" stroke="#c8963a" stroke-width="2"/>
+    <circle cx="110" cy="26" r="3" fill="#ff6b8a"/>`;
+  else if (has.diademe) s += `
+    <path d="M90 46 Q 110 38 130 46" stroke="#f5c96b" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="110" cy="41" r="4" fill="#9fe8ff" stroke="#f5c96b" stroke-width="1.5"/>`;
+
+  s += `</svg>`;
+  return s;
 }
 
-/* ---------- Rendu ---------- */
+function backHair(style, hair, hairDark) {
+  if (style === "bun") return `
+    <circle cx="110" cy="30" r="17" fill="${hair}"/>
+    <path d="M96 38 Q 110 30 124 38" stroke="${hairDark}" stroke-width="3" fill="none"/>
+    <ellipse cx="110" cy="74" rx="48" ry="47" fill="${hair}"/>`;
+  if (style === "tails") return `
+    <ellipse cx="110" cy="74" rx="48" ry="47" fill="${hair}"/>
+    <path d="M64 62 Q 38 90 44 150 Q 48 178 60 184 Q 70 170 68 130 Q 68 92 72 70 Z" fill="${hair}"/>
+    <path d="M156 62 Q 182 90 176 150 Q 172 178 160 184 Q 150 170 152 130 Q 152 92 148 70 Z" fill="${hair}"/>
+    <circle cx="66" cy="66" r="5" fill="#ff8fb1"/>
+    <circle cx="154" cy="66" r="5" fill="#ff8fb1"/>`;
+  if (style === "braid") return `
+    <ellipse cx="110" cy="74" rx="48" ry="47" fill="${hair}"/>
+    <circle cx="150" cy="120" r="11" fill="${hair}"/>
+    <circle cx="155" cy="140" r="10.5" fill="${hairDark}"/>
+    <circle cx="151" cy="160" r="10" fill="${hair}"/>
+    <circle cx="155" cy="179" r="9" fill="${hairDark}"/>
+    <circle cx="152" cy="196" r="7" fill="${hair}"/>
+    <path d="M152 203 L148 214 M152 203 L157 214 M152 203 L152 216" stroke="${hair}" stroke-width="2.5" stroke-linecap="round"/>`;
+  /* long (défaut) */
+  return `
+    <path d="M110 28 C 58 32 54 92 62 136 C 66 168 72 194 88 204 Q 110 210 132 204 C 148 194 154 168 158 136 C 166 92 162 32 110 28 Z" fill="${hair}"/>
+    <path d="M62 136 C 66 168 72 194 88 204 Q 96 206 104 207 C 88 190 80 160 80 120 Z" fill="${hairDark}" opacity=".5"/>`;
+}
+
+/* Assombrir / éclaircir une couleur hexadécimale */
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, Math.max(0, (n >> 16) + amt));
+  const g = Math.min(255, Math.max(0, ((n >> 8) & 0xff) + amt));
+  const b = Math.min(255, Math.max(0, (n & 0xff) + amt));
+  return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
+}
+
+/* =========================================================
+   Rendu
+   ========================================================= */
 const $ = id => document.getElementById(id);
-
-function fmt(sec) {
-  return Math.floor(sec/60) + ":" + String(sec%60).padStart(2,"0");
-}
+function fmt(sec) { return Math.floor(sec/60) + ":" + String(sec%60).padStart(2,"0"); }
 
 function render() {
   ensureToday();
   const { lvl, into, need } = levelFromXp(S.xp);
-  const evo = currentEvo(lvl);
 
   $("streakCount").textContent = S.streak;
-  $("avatarBox").innerHTML = avatarSvg(lvl);
+  const svg = heroSvg();
+  $("avatarBox").innerHTML = svg;
+  $("heroPreview").innerHTML = svg;
   $("avatarName").textContent = S.name;
-  $("avatarTitle").textContent = evo.ico + " " + evo.name;
+  $("avatarTitle").textContent = "❝ " + heroClass() + " " + rankAdj(lvl) + " ❞";
   $("levelNum").textContent = lvl;
   $("xpFill").style.width = Math.round(into / need * 100) + "%";
   $("xpLabel").textContent = into + " / " + need + " XP avant le niveau " + (lvl+1);
 
-  // missions
+  /* quêtes */
   const doneCount = S.quests.filter(q => q.done).length;
   $("dayProgress").innerHTML = S.quests.map(q => `<div class="day-dot ${q.done ? "on" : ""}"></div>`).join("");
   $("doneBanner").classList.toggle("show", doneCount === S.quests.length && S.quests.length > 0);
   $("questList").innerHTML = S.quests.map((q, i) => {
     const ex = EXERCISES.find(e => e.id === q.exId);
-    return `<div class="quest ${q.done ? "done" : ""}" data-i="${i}">
+    const cat = CATS[ex.cat];
+    return `<div class="quest ${q.done ? "done" : ""}" data-i="${i}" style="--qc:${cat.colorRaw}">
       <div class="q-emoji">${ex.emoji}</div>
       <div class="q-body">
         <div class="q-name">${ex.name}</div>
-        <div class="q-meta">⏱ ${fmt(ex.dur)}</div>
+        <div class="q-meta"><b>${cat.emoji} ${cat.label}</b> · ${ex.real} · ⏱ ${fmt(ex.dur)}</div>
       </div>
       <div class="q-xp">${q.done ? "✔ fait" : "+" + ex.xp + " XP"}</div>
     </div>`;
@@ -676,8 +1027,57 @@ function render() {
     };
   });
 
+  renderCustom();
+  renderAttrs(lvl);
   renderStats();
-  renderHero(lvl);
+}
+
+function renderCustom() {
+  const c = S.custom;
+  $("nameInput").value = S.name;
+  $("skinRow").innerHTML = SKINS.map((col, i) =>
+    `<div class="swatch ${c.skin === i ? "sel" : ""}" data-k="skin" data-v="${i}" style="background:${col}"></div>`).join("");
+  $("hairStyleRow").innerHTML = HAIR_STYLES.map(h =>
+    `<button class="chip ${c.hairStyle === h.id ? "sel" : ""}" data-k="hairStyle" data-v="${h.id}">${h.label}</button>`).join("");
+  $("hairColorRow").innerHTML = HAIR_COLORS.map(col =>
+    `<div class="swatch ${c.hair === col ? "sel" : ""}" data-k="hair" data-v="${col}" style="background:${col}"></div>`).join("");
+  $("eyeRow").innerHTML = EYE_COLORS.map(col =>
+    `<div class="swatch ${c.eyes === col ? "sel" : ""}" data-k="eyes" data-v="${col}" style="background:${col}"></div>`).join("");
+  $("dressRow").innerHTML = DRESS_COLORS.map(col =>
+    `<div class="swatch ${c.dress === col ? "sel" : ""}" data-k="dress" data-v="${col}" style="background:${col}"></div>`).join("");
+  document.querySelectorAll("[data-k]").forEach(el => {
+    el.onclick = () => {
+      const k = el.dataset.k;
+      S.custom[k] = k === "skin" ? +el.dataset.v : el.dataset.v;
+      save();
+      render();
+    };
+  });
+}
+
+function renderAttrs(gLvl) {
+  $("attrList").innerHTML = Object.keys(CATS).map(k => {
+    const cat = CATS[k];
+    const a = attrLevel(S.attrs[k]);
+    return `<div class="attr">
+      <div class="attr-head">
+        <span class="attr-name">${cat.emoji} ${cat.label}</span>
+        <span class="attr-lvl">niv. ${a.lvl} — ${a.into}/${a.need}</span>
+      </div>
+      <div class="attr-bar"><div class="attr-fill" style="width:${Math.round(a.into/a.need*100)}%;background:${cat.colorRaw}"></div></div>
+    </div>`;
+  }).join("");
+
+  $("evoList").innerHTML = UNLOCKS.map(u => {
+    const cur = u.cat === "niveau" ? gLvl : attrLevel(S.attrs[u.cat]).lvl;
+    const ok = cur >= u.lvl;
+    const catLabel = u.cat === "niveau" ? "Niveau" : CATS[u.cat].label;
+    return `<div class="evo ${ok ? "" : "locked"}">
+      <div class="e-ico">${u.ico}</div>
+      <div class="e-name">${u.name}</div>
+      <div class="e-req">${ok ? "✔ porté" : catLabel + " niv. " + u.lvl}</div>
+    </div>`;
+  }).join("");
 }
 
 function renderStats() {
@@ -686,7 +1086,6 @@ function renderStats() {
   $("statBest").textContent = S.bestStreak;
   $("statPerfect").textContent = S.perfectDays;
 
-  // semaine (lundi -> dimanche)
   const now = new Date();
   const monday = new Date(now);
   monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
@@ -698,36 +1097,42 @@ function renderStats() {
     const n = S.history[k] || 0;
     const isToday = k === todayKey();
     html += `<div class="week-day"><div class="wd-label">${labels[i]}</div>
-      <div class="wd-cell ${n > 0 ? "done" : ""} ${isToday ? "today" : ""}">${n > 0 ? "✔" : ""}</div></div>`;
+      <div class="wd-cell ${n > 0 ? "done" : ""} ${isToday ? "today" : ""}">${n > 0 ? "⭐" : ""}</div></div>`;
   }
   $("weekGrid").innerHTML = html;
 
-  $("badgeGrid").innerHTML = BADGES.map(b => {
-    const ok = b.test(S);
-    return `<div class="badge ${ok ? "" : "locked"}">${b.ico}<small>${b.name}</small></div>`;
-  }).join("");
+  $("badgeGrid").innerHTML = BADGES.map(b =>
+    `<div class="badge ${b.test(S) ? "" : "locked"}">${b.ico}<small>${b.name}</small></div>`).join("");
 }
 
-function renderHero(lvl) {
-  $("evoList").innerHTML = EVOLUTIONS.map(e => {
-    const unlocked = lvl >= e.lvl;
-    const isCurrent = currentEvo(lvl) === e;
-    return `<div class="evo ${unlocked ? "" : "locked"} ${isCurrent ? "current" : ""}">
-      <div class="e-ico">${unlocked ? e.ico : "🔒"}</div>
-      <div class="e-name">${e.name}</div>
-      <div class="e-lvl">niv. ${e.lvl}</div>
-    </div>`;
-  }).join("");
-  $("nameInput").value = S.name;
-}
+/* ---------- Décor : étoiles ---------- */
+(function stars() {
+  let html = "";
+  for (let i = 0; i < 34; i++) {
+    const size = (Math.random() * .5 + .35).toFixed(2);
+    html += `<span style="left:${Math.random()*100}%;top:${Math.random()*100}%;font-size:${size}rem;animation-delay:${(Math.random()*3).toFixed(1)}s">✦</span>`;
+  }
+  $("skyStars").innerHTML = html;
+  let w = "";
+  for (let i = 0; i < 12; i++) {
+    w += `<span class="wstar" style="left:${Math.random()*100}%;top:${Math.random()*55}%;font-size:${(Math.random()*.4+.3).toFixed(2)}rem;animation-delay:${(Math.random()*3).toFixed(1)}s">✦</span>`;
+  }
+  for (let i = 0; i < 5; i++) {
+    w += `<span class="sparkle" style="left:${15+Math.random()*70}%;bottom:${20+Math.random()*30}px;animation-delay:${(Math.random()*5).toFixed(1)}s">✧</span>`;
+  }
+  $("worldScene").insertAdjacentHTML("beforeend", w);
+})();
 
-/* ---------- Modal exercice ---------- */
-let modalCtx = null; // { ex, questIndex|null, timer, remaining }
+/* =========================================================
+   Modal quête + minuteur
+   ========================================================= */
+let modalCtx = null;
 
 function openExercise(ex, questIndex) {
   modalCtx = { ex, questIndex, timer: null, remaining: ex.dur };
   $("mEmoji").textContent = ex.emoji;
   $("mName").textContent = ex.name;
+  $("mReal").textContent = CATS[ex.cat].emoji + " " + ex.real;
   $("mDesc").textContent = ex.desc;
   $("tNum").textContent = fmt(ex.dur);
   $("ringFill").style.strokeDashoffset = 414.7;
@@ -735,13 +1140,11 @@ function openExercise(ex, questIndex) {
   $("finishBtn").style.display = "none";
   $("modalBack").classList.add("show");
 }
-
 function closeModal() {
   if (modalCtx && modalCtx.timer) clearInterval(modalCtx.timer);
   modalCtx = null;
   $("modalBack").classList.remove("show");
 }
-
 $("startBtn").onclick = () => {
   const ctx = modalCtx;
   $("startBtn").style.display = "none";
@@ -757,7 +1160,6 @@ $("startBtn").onclick = () => {
     $("ringFill").style.strokeDashoffset = 414.7 * (ctx.remaining / ctx.ex.dur);
   }, 1000);
 };
-
 $("finishBtn").onclick = () => {
   const { ex, questIndex } = modalCtx;
   closeModal();
@@ -766,17 +1168,27 @@ $("finishBtn").onclick = () => {
 $("closeBtn").onclick = closeModal;
 $("modalBack").onclick = e => { if (e.target === $("modalBack")) closeModal(); };
 
-/* ---------- Complétion & récompenses ---------- */
+/* =========================================================
+   Complétion, récompenses, équipements
+   ========================================================= */
+function unlockedSet() {
+  const gLvl = levelFromXp(S.xp).lvl;
+  return new Set(UNLOCKS.filter(u =>
+    (u.cat === "niveau" ? gLvl : attrLevel(S.attrs[u.cat]).lvl) >= u.lvl
+  ).map(u => u.name));
+}
+
 function completeExercise(ex, questIndex) {
   const prevLvl = levelFromXp(S.xp).lvl;
+  const prevUnlocks = unlockedSet();
   const t = todayKey();
 
   if (questIndex != null) S.quests[questIndex].done = true;
   S.xp += ex.xp;
+  S.attrs[ex.cat] = (S.attrs[ex.cat] || 0) + ex.xp;
   S.totalDone++;
   S.history[t] = (S.history[t] || 0) + 1;
 
-  // série
   if (S.lastDay !== t) {
     S.streak = (S.lastDay && daysBetween(S.lastDay, t) === 1) ? S.streak + 1 : 1;
     S.lastDay = t;
@@ -789,20 +1201,25 @@ function completeExercise(ex, questIndex) {
 
   save();
   render();
-  confetti();
+  sparkfetti();
 
   const newLvl = levelFromXp(S.xp).lvl;
-  if (newLvl > prevLvl) {
-    const evo = currentEvo(newLvl);
-    const evolved = EVOLUTIONS.some(e => e.lvl === newLvl);
-    showReward(evolved ? evo.ico : "🆙",
-      "Niveau " + newLvl + " !",
-      evolved ? S.name + " a évolué : « " + evo.name + " » !" : S.name + " devient plus fort !",
-      "+" + ex.xp + " XP");
+  const newUnlocks = [...unlockedSet()].filter(n => !prevUnlocks.has(n));
+  const cat = CATS[ex.cat];
+
+  if (newUnlocks.length > 0) {
+    const item = UNLOCKS.find(u => u.name === newUnlocks[0]);
+    showReward(item.ico, "Nouvel équipement !",
+      S.name + " reçoit « " + item.name + " » ! Regarde-la, elle a changé ✨", "+" + ex.xp + " XP " + cat.emoji);
+  } else if (newLvl > prevLvl) {
+    showReward("🌟", "Niveau " + newLvl + " !",
+      S.name + " devient " + heroClass() + " " + rankAdj(newLvl) + " !", "+" + ex.xp + " XP " + cat.emoji);
   } else if (perfectNow) {
-    showReward("🌟", "Journée parfaite !", "Toutes les missions du jour sont faites. " + S.name + " est super fier de toi !", "+" + ex.xp + " XP");
+    showReward("🦄", "Journée légendaire !",
+      "Toutes les quêtes du jour sont accomplies. Le royaume chante tes exploits !", "+" + ex.xp + " XP " + cat.emoji);
   } else {
-    showReward("💪", "Bien joué !", ex.name + " terminé. " + S.name + " te fait un high five !", "+" + ex.xp + " XP");
+    showReward(ex.emoji, "Quête accomplie !",
+      "« " + ex.name + " » — le talent " + cat.label + " de " + S.name + " grandit.", "+" + ex.xp + " XP " + cat.emoji);
   }
 }
 
@@ -815,21 +1232,23 @@ function showReward(big, title, text, xp) {
 }
 $("rBtn").onclick = () => $("rewardBox").classList.remove("show");
 
-function confetti() {
-  const colors = ["#7c6cff","#ff8fb1","#ffd166","#4ade80","#7cc4ff"];
-  for (let i = 0; i < 26; i++) {
+function sparkfetti() {
+  const glyphs = ["✦", "✧", "⭐", "💜", "🌟"];
+  for (let i = 0; i < 22; i++) {
     const c = document.createElement("div");
-    c.className = "confetti";
+    c.className = "sparkfetti";
+    c.textContent = glyphs[i % glyphs.length];
     c.style.left = Math.random() * 100 + "vw";
-    c.style.background = colors[i % colors.length];
-    c.style.animationDuration = (1.6 + Math.random() * 1.4) + "s";
+    c.style.fontSize = (0.7 + Math.random() * 0.8) + "rem";
+    c.style.animationDuration = (1.8 + Math.random() * 1.5) + "s";
     c.style.animationDelay = (Math.random() * .4) + "s";
     document.body.appendChild(c);
-    setTimeout(() => c.remove(), 3400);
+    setTimeout(() => c.remove(), 3800);
   }
 }
 
-/* ---------- Bonus ---------- */
+/* ---------- Quête bonus ---------- */
+const BONUS_POOL = ["etir_dos", "respiration", "nuque", "epaules", "bras", "enfant", "jambes_mur"];
 $("bonusBtn").onclick = () => {
   const id = BONUS_POOL[Math.floor(Math.random() * BONUS_POOL.length)];
   const ex = Object.assign({}, EXERCISES.find(e => e.id === id), { xp: 8 });
@@ -852,7 +1271,7 @@ $("nameBtn").onclick = () => {
   if (v) { S.name = v; save(); render(); }
 };
 $("resetBtn").onclick = () => {
-  if (confirm("Tout effacer et repartir de zéro ? Cette action est définitive.")) {
+  if (confirm("Tout effacer et recommencer l'aventure à zéro ? Cette action est définitive.")) {
     localStorage.removeItem(STORE_KEY);
     location.reload();
   }
@@ -865,7 +1284,6 @@ if ("serviceWorker" in navigator) {
 
 /* ---------- Go ---------- */
 render();
-// re-render au retour sur l'app (changement de jour)
 document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
 </script>
 </body>
