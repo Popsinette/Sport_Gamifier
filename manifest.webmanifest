@@ -1,14 +1,15 @@
 {
-  "name": "Rituels — Habitudes quotidiennes",
-  "short_name": "Rituels",
-  "description": "Suis tes habitudes quotidiennes, gagne de l'XP, monte de niveau et décroche des trophées.",
+  "name": "Odyssée — Habitudes & voyage",
+  "short_name": "Odyssée",
+  "description": "Vos habitudes quotidiennes font avancer un voyageur à travers des centaines de paysages.",
   "lang": "fr",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f2f2f7",
-  "theme_color": "#f2f2f7",
+  "background_color": "#eef1f5",
+  "theme_color": "#eef1f5",
+  "categories": ["health", "lifestyle", "productivity"],
   "icons": [
     {
       "src": "icon.svg",

@@ -1,8 +1,12 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "rituels-v3";
+const CACHE = "odyssee-v1";
 const ASSETS = [
   "./",
   "./index.html",
+  "./styles.css",
+  "./icons.js",
+  "./world.js",
+  "./app.js",
   "./manifest.webmanifest",
   "./icon.svg",
   "./icon-512.png"

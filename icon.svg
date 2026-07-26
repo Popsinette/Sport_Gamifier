@@ -1,16 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#5ac8fa"/>
-      <stop offset="1" stop-color="#007aff"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#20304e"/>
+      <stop offset=".52" stop-color="#4f6ea8"/>
+      <stop offset="1" stop-color="#f0b98a"/>
     </linearGradient>
-    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b7f5c8"/>
-      <stop offset="1" stop-color="#34c759"/>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fa4c4"/><stop offset="1" stop-color="#b9c8dc"/>
     </linearGradient>
+    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4e6486"/><stop offset="1" stop-color="#6d84a6"/>
+    </linearGradient>
+    <linearGradient id="near" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22334c"/><stop offset="1" stop-color="#16233a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fff0cc" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#fff0cc" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="rr"><rect width="512" height="512" rx="115"/></clipPath>
   </defs>
-  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="42"/>
-  <path d="M 256 106 A 150 150 0 1 1 126 181" fill="none" stroke="url(#ring)" stroke-width="42" stroke-linecap="round"/>
-  <path d="M 196 262 L 240 306 L 326 210" fill="none" stroke="#ffffff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g clip-path="url(#rr)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <circle cx="352" cy="196" r="132" fill="url(#glow)"/>
+    <circle cx="352" cy="196" r="34" fill="#fff4d8"/>
+    <circle cx="118" cy="96" r="3.4" fill="#fff" opacity=".85"/>
+    <circle cx="196" cy="62" r="2.6" fill="#fff" opacity=".7"/>
+    <circle cx="86" cy="168" r="2.4" fill="#fff" opacity=".6"/>
+    <circle cx="268" cy="104" r="2.8" fill="#fff" opacity=".75"/>
+
+    <!-- crêtes lointaines -->
+    <path d="M-20 300 L96 196 L182 268 L250 214 L340 300 L440 226 L540 300 L540 520 L-20 520 Z" fill="url(#far)" opacity=".85"/>
+    <path d="M96 196 L128 224 L96 236 L64 224 Z" fill="#fff" opacity=".9"/>
+    <path d="M440 226 L466 250 L440 260 L414 250 Z" fill="#fff" opacity=".9"/>
+
+    <!-- relief moyen -->
+    <path d="M-20 356 L84 274 L168 340 L246 292 L330 358 L420 300 L540 366 L540 520 L-20 520 Z" fill="url(#mid)"/>
+
+    <!-- premier plan -->
+    <path d="M-20 424 L120 372 L260 420 L400 376 L540 428 L540 520 L-20 520 Z" fill="url(#near)"/>
+
+    <!-- sentier -->
+    <path d="M-20 452 Q 256 436 540 452 L540 470 Q 256 456 -20 470 Z" fill="#c8a878" opacity=".55"/>
+
+    <!-- le voyageur -->
+    <g transform="translate(198 452) scale(3.05)">
+      <ellipse cx="0" cy="1.5" rx="13" ry="3.2" fill="#000" opacity=".28"/>
+      <rect x="-4.4" y="-16" width="3.6" height="17" rx="1.8" fill="#1a2436"/>
+      <rect x="1.2" y="-16" width="3.6" height="17" rx="1.8" fill="#243044"/>
+      <path d="M0 -41 C 5 -40 6.5 -28 7.4 -12.6 Q 3.8 -10.8 0 -11 Q -3.8 -11.2 -7.4 -13.2 C -6.6 -28 -5 -40 0 -41 Z" fill="#4a6ec0"/>
+      <path d="M1.4 -40.2 C 5.6 -39 7 -27 7.6 -13.2" stroke="#ffd9a6" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <circle cx="1" cy="-44" r="3.8" fill="#f0c39e"/>
+      <path d="M-5.4 -39.4 Q -6.4 -51 2 -50.8 Q 5.8 -50.6 5 -44.6 Q 2.6 -46.4 1.2 -43 Q -0.4 -39.4 -5.4 -39.4 Z" fill="#3d5ca8"/>
+      <path d="M-0.6 -50.8 Q 5.8 -50.4 5 -44.6" stroke="#ffd9a6" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <path d="M-1.8 -38.6 Q -11 -37 -19 -31 Q -12.4 -33.4 -3.6 -34.6 Z" fill="#e07a5f"/>
+      <path d="M-2 -34.6 Q -9.6 -30.6 -15 -22.4 Q -9 -27.4 -3 -31.2 Z" fill="#c9634a"/>
+    </g>
+  </g>
 </svg>
