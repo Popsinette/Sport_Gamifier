@@ -1,162 +1,301 @@
-# Générer les personnages — prompts prêts à l'emploi
+# Prompts de génération — à copier tels quels
 
-Le moteur attend des sprites (voir `DESIGN.md` §7 et `assets/hero/README.md`).
-Ce fichier contient les prompts à coller directement dans Midjourney, DALL·E,
-Leonardo ou Flux pour produire des personnages **fidèles à la planche de
-référence**.
+Chaque prompt est **complet et autonome**. Ne change rien d'autre que ce qui
+est écrit : c'est la répétition mot pour mot du bloc de description qui garde
+le personnage identique d'une image à l'autre.
 
----
+## Les trois règles
 
-## Étape 1 — Fixer le style (à faire une seule fois)
+1. **Reste dans la même conversation** (ChatGPT / Midjourney) pour tout un
+   personnage. C'est le principal facteur de cohérence.
+2. **Fond gris uni**, jamais de décor ni d'ombre au sol — c'est ce qui permet
+   le détourage propre.
+3. **Nomme le fichier** en le téléchargeant : `explorateur-marche.png`,
+   `reveur-repos.png`… pour qu'on s'y retrouve.
 
-Génère d'abord **un seul personnage de face**, itère jusqu'à ce qu'il te
-plaise, puis **garde son URL / sa seed** : elle servira de référence pour tous
-les autres.
+## Ordre conseillé
 
-### Prompt de base (Midjourney v6+)
-
-```
-chibi adventurer character, semi-realistic stylized game art, big head small
-body proportions 2.7 heads tall, large expressive eyes with two highlights,
-soft rosy cheeks, gentle subsurface skin shading, hand-painted fabric with
-visible folds, worn leather straps, knitted wool texture, small metal buckles,
-warm natural palette, soft ambient occlusion, no harsh outlines, front view,
-full body, standing neutral pose, clean off-white background, character sheet,
-Nintendo meets Ghibli meets Spiritfarer, cozy indie game key art
---ar 1:1 --style raw --s 250
-```
-
-### Réglages qui comptent
-
-| Réglage | Valeur | Pourquoi |
-|---|---|---|
-| `--style raw` | toujours | évite le lissage « joli » qui écrase les matières |
-| `--s 250` | 150–400 | au-delà, le modèle invente et casse la cohérence |
-| `--ar 1:1` | toujours | les cases de l'atlas sont carrées |
-| `--cref <url> --cw 100` | dès la 2ᵉ image | **c'est la clé de la cohérence entre poses** |
-
-> `--cw 100` verrouille le visage **et** les vêtements. `--cw 0` ne garde que le
-> visage : utile pour changer de tenue en gardant le même personnage.
+Si tu ne fais que trois poses, fais **marche**, **joie**, **saut** : ce sont
+celles que l'application déclenche le plus souvent.
 
 ---
 
-## Étape 2 — Les cinq archétypes
+# PARTIE A — L'Explorateur, les autres poses
 
-Reprends le prompt de base et remplace le bloc de description.
-Les codes couleur sont ceux **échantillonnés dans ta planche**.
+> Ton personnage existe déjà au repos (`idle`). Voici les 8 autres.
 
-### 1 · L'Explorateur — *curieux et courageux*
-```
-brown tousled hair, teal tunic #4b786a, orange-rust cape #b75a29,
-dark brown leather harness #532f14, cream linen shirt #e7d3b2,
-bulky travel backpack with crossed straps and bedroll, sturdy brown boots,
-confident curious expression
-```
+## A1 · Marche ⭐ priorité
 
-### 2 · Le Voyageur des Brumes — *mystérieux et poétique*
 ```
-white hair, deep indigo hooded cloak #201c47 with golden embroidery #e7b86c,
-face partly in hood shadow, holding a small glowing brass lantern,
-midnight blue layers #10152c, muted violet accents #a57aa7,
-quiet mysterious expression
-```
-
-### 3 · La Gardienne de Lumière — *douce et bienveillante*
-```
-long white hair, cream robe #e7d6bd with golden stole #f1c26f,
-soft star motifs, sage green trim #82aca2, warm peach skin tones #e49f82,
-brown leather boots #7a522f, gentle kind smile, faint warm glow from garment
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown tousled hair. Teal tunic (#4b786a), orange-rust
+cape (#b75a29), dark brown leather harness (#532f14), cream linen shirt
+(#e7d3b2). Bulky travel backpack with crossed straps and a bedroll. Sturdy
+brown boots. Confident curious expression.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, strict side view facing right, mid-stride walking, one leg
+forward one leg back, arms swinging, cape flowing behind him.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
 ```
 
-### 4 · L'Aventurière des Saisons — *libre et déterminée*
+## A2 · Joie ⭐ priorité
+
 ```
-brown hair in high ponytail with green ribbon, olive green hooded cape #7d8b50,
-tan leather tunic #cba772, rust orange accents #c16737, thigh satchel,
-dark brown boots #523f2c, determined lively expression
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown tousled hair. Teal tunic (#4b786a), orange-rust
+cape (#b75a29), dark brown leather harness (#532f14), cream linen shirt
+(#e7d3b2). Bulky travel backpack with crossed straps and a bedroll. Sturdy
+brown boots.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, three-quarter view, jumping with joy, both arms raised high,
+eyes closed in happy curved arcs, big open smile, cape and hair lifted upward.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
 ```
 
-### 5 · Le Petit Rêveur — *rêveur et optimiste*
+## A3 · Saut ⭐ priorité
+
 ```
-curly grey-blue hair, midnight blue cape #788695 covered in tiny golden stars,
-soft light blue wool outfit #9cafba, cream scarf #efd7ac,
-dreamy optimistic expression, looking slightly upward
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown tousled hair. Teal tunic (#4b786a), orange-rust
+cape (#b75a29), dark brown leather harness (#532f14), cream linen shirt
+(#e7d3b2). Bulky travel backpack with crossed straps and a bedroll. Sturdy
+brown boots. Determined focused expression.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, strict side view facing right, leaping through the air, knees
+tucked up, arms forward for balance, cape streaming behind.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## A4 · Course
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown tousled hair. Teal tunic (#4b786a), orange-rust
+cape (#b75a29), dark brown leather harness (#532f14), cream linen shirt
+(#e7d3b2). Bulky travel backpack with crossed straps and a bedroll. Sturdy
+brown boots. Excited energetic expression.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, strict side view facing right, running fast, body leaning
+forward, long stride, arms pumping, cape streaming straight behind.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## A5 · Regarder autour
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown tousled hair. Teal tunic (#4b786a), orange-rust
+cape (#b75a29), dark brown leather harness (#532f14), cream linen shirt
+(#e7d3b2). Bulky travel backpack with crossed straps and a bedroll. Sturdy
+brown boots. Curious wondering expression.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, standing still, turning his head to look over his shoulder
+back at the viewer, one hand shading his eyes, discovering something.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## A6 · Assis (repos)
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown tousled hair. Teal tunic (#4b786a), orange-rust
+cape (#b75a29), dark brown leather harness (#532f14), cream linen shirt
+(#e7d3b2). Travel backpack set down beside him. Sturdy brown boots.
+Calm resting expression.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, side view facing right, sitting on the ground, knees drawn up,
+arms resting on knees, taking a break, cape pooling around him.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## A7 · Dormir
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Soft rosy cheeks, gentle skin shading, eyes closed peacefully.
+Brown tousled hair. Teal tunic (#4b786a), orange-rust cape (#b75a29) used
+as a blanket, cream linen shirt (#e7d3b2). Travel backpack used as a pillow.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, side view, curled up asleep on the ground, peaceful serene face,
+one small sleep bubble floating above.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## A8 · Franchir un obstacle
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown tousled hair. Teal tunic (#4b786a), orange-rust
+cape (#b75a29), dark brown leather harness (#532f14), cream linen shirt
+(#e7d3b2). Bulky travel backpack with crossed straps and a bedroll. Sturdy
+brown boots. Straining determined expression, brow furrowed.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm natural palette, soft ambient occlusion, NO harsh black outlines.
+Full body, side view facing right, leaning forward and pushing hard against
+something invisible with both hands, feet braced, effortful pose.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
 ```
 
 ---
 
-## Étape 3 — Les poses
+# PARTIE B — Les quatre autres personnages
 
-Ajoute `--cref <url_du_perso> --cw 100` à **chacun** de ces prompts.
+> Commence par la pose **au repos** de chacun. Une fois que le personnage te
+> plaît, décline ses poses en reprenant la structure de la partie A :
+> tu gardes tout le bloc et tu remplaces uniquement la ligne
+> `Full body, …`.
 
-| Fichier | À ajouter au prompt |
+## B1 · Le Voyageur des Brumes — *mystérieux et poétique*
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Short white hair. Deep indigo hooded cloak (#201c47)
+with fine golden embroidery (#e7b86c), midnight blue layered clothes
+(#10152c), muted violet accents (#a57aa7). Face partly in the shadow of the
+hood. Holding a small glowing brass lantern in one hand. Dark leather boots.
+Quiet mysterious expression, calm and thoughtful.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Cool moonlit palette, soft ambient occlusion, NO harsh black outlines,
+subtle warm glow from the lantern.
+Full body, side view facing right, standing relaxed, arms at sides.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## B2 · La Gardienne de Lumière — *douce et bienveillante*
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+warm peach skin tones (#e49f82). Long flowing white hair. Cream robe
+(#e7d6bd) with a golden stole (#f1c26f) draped over one shoulder, soft star
+motifs embroidered on the fabric, sage green trim (#82aca2), brown leather
+boots (#7a522f). Gentle kind smile.
+Hand-painted fabric with visible folds, fine embroidery, small metal
+buckles. Warm golden palette, soft ambient occlusion, NO harsh black
+outlines, faint warm glow emanating from the garment.
+Full body, side view facing right, standing relaxed, arms at sides.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## B3 · L'Aventurière des Saisons — *libre et déterminée*
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Brown hair tied in a high ponytail with a green ribbon.
+Olive green hooded cape (#7d8b50), tan leather tunic (#cba772), rust orange
+accents (#c16737), a small satchel strapped to her thigh, dark brown boots
+(#523f2c). Determined lively expression.
+Hand-painted fabric with visible folds, worn leather, small metal buckles.
+Warm forest palette, soft ambient occlusion, NO harsh black outlines.
+Full body, side view facing right, standing relaxed, arms at sides.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## B4 · Le Petit Rêveur — *rêveur et optimiste*
+
+```
+Chibi adventurer character for a cozy indie video game. Semi-realistic
+stylized game art, big head small body, 2.7 heads tall proportions.
+Large expressive eyes with two light reflections, soft rosy cheeks,
+gentle skin shading. Curly grey-blue hair. Midnight blue cape (#788695)
+covered in tiny golden stars, soft light blue wool outfit (#9cafba), cream
+knitted scarf (#efd7ac), simple leather boots. Dreamy optimistic expression,
+looking slightly upward as if daydreaming.
+Hand-painted fabric with visible folds, knitted wool texture, small metal
+buckles. Soft twilight palette, soft ambient occlusion, NO harsh black
+outlines.
+Full body, side view facing right, standing relaxed, arms at sides.
+Plain flat light grey background, no ground shadow, no text.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+---
+
+# PARTIE C — Compagnons *(optionnel, plus tard)*
+
+Même recette, corps d'animal chibi.
+
+## C1 · Renard des brumes
+```
+Chibi fox companion for a cozy indie video game. Semi-realistic stylized
+game art, big head small body, large expressive eyes with two light
+reflections. Orange-rust fur, cream chest and tail tip, small blue scarf
+around the neck. Sitting, side view facing right, alert friendly expression.
+Hand-painted fur texture, soft ambient occlusion, NO harsh black outlines.
+Warm natural palette. Plain flat light grey background, no ground shadow.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+## C2 · Chat des étoiles
+```
+Chibi cat companion for a cozy indie video game. Semi-realistic stylized
+game art, big head small body, large expressive eyes with two light
+reflections. Dark midnight blue fur with tiny star speckles, small golden
+medallion on a collar, long elegant tail. Sitting, side view facing right,
+calm mysterious expression.
+Hand-painted fur texture, soft ambient occlusion, NO harsh black outlines.
+Cool twilight palette. Plain flat light grey background, no ground shadow.
+Style: Nintendo meets Studio Ghibli meets Spiritfarer.
+```
+
+---
+
+# Si le résultat dérive
+
+| Problème | À ajouter au prompt |
 |---|---|
-| `idle` | `standing relaxed, side view facing right, arms at sides` |
-| `walk` | `mid-stride walking, side view facing right, cape flowing behind, one leg forward` |
-| `run` | `running fast, side view facing right, leaning forward, cape streaming` |
-| `jump` | `jumping, side view facing right, knees tucked, cape lifted` |
-| `cheer` | `jumping with joy, arms raised, eyes closed happy arcs, big smile` |
-| `look` | `looking around curiously over the shoulder, three-quarter view` |
-| `sit` | `sitting on the ground, knees up, resting, side view` |
-| `sleep` | `sleeping curled up on the ground, peaceful, side view` |
-
-**Toujours terminer par** :
-`, full body, centered, clean transparent-ready flat background, no shadow on ground`
+| Trop adulte / trop réaliste | `cuter, rounder face, bigger head, smaller body` |
+| Contours noirs marqués | `no line art, painted shading only, no outlines` |
+| Vue de face au lieu du profil | `strict side profile view, facing right, NOT front view` |
+| Personnage différent du précédent | `same character as the previous image, identical face and outfit` |
+| Décor apparu au fond | `isolated character on plain flat grey backdrop, no environment` |
+| Ombre au sol | `no cast shadow, no ground, character floating on flat background` |
 
 ---
 
-## Étape 4 — Le point difficile, dit franchement
+# Ce que je fais à réception
 
-Un générateur d'images ne produit **pas** 12 images cohérentes d'un cycle de
-marche. Même avec `--cref`, les plis et les proportions bougent d'une image à
-l'autre : au montage, ça scintille.
+Pour chaque image : détourage du fond, recadrage, calage sur l'ancre
+(pieds à 94 %, hauteur 86 % de la case), export 512 et 1024, écriture du
+JSON, mise à jour du manifeste, intégration et capture de contrôle dans le
+décor.
 
-Trois voies réalistes, de la plus rapide à la plus belle :
-
-### Voie A — Poses fixes *(1 heure, gros gain visuel immédiat)*
-Génère **1 image par état** (idle, walk, cheer, jump…). Le moteur les affiche
-en maintien, sans interpolation. Le personnage ne « marche » pas, mais il est
-enfin au niveau de ta planche. **C'est ce que je recommande pour commencer.**
-→ Atlas de 1 colonne × 8 lignes.
-
-### Voie B — Animation par déformation *(1 week-end)*
-Génère **une seule image nette** du personnage, découpe-la en morceaux
-(tête, buste, bras, jambes, cape) dans Photoshop ou Photopea, puis anime les
-morceaux dans **Rive** (gratuit, exporte en Lottie) ou **Spine**. C'est la
-méthode des studios indés : une illustration, un squelette, toutes les
-animations. Qualité de la référence **et** mouvement fluide.
-
-### Voie C — Commande à un illustrateur
-Envoie-lui `DESIGN.md` + `assets/hero/README.md` : la spec est complète
-(proportions mesurées, palettes, format d'atlas, ancrages). Compter
-150–400 € pour un personnage complet animé.
-
----
-
-## Étape 5 — Intégration
-
-Quelle que soit la voie, tu déposes les fichiers dans `assets/hero/` avec un
-`manifest.json`, tu recharges : le moteur bascule automatiquement.
-
-Pour la **voie A**, le JSON minimal d'une pièce :
-
-```json
-{
-  "image": "outfit_tunic.png",
-  "frameW": 512, "frameH": 512,
-  "anchorX": 0.5, "anchorY": 0.94, "heightRatio": 0.86,
-  "animations": {
-    "idle":  { "row": 0, "frames": 1, "fps": 1, "loop": true },
-    "walk":  { "row": 1, "frames": 1, "fps": 1, "loop": true },
-    "cheer": { "row": 2, "frames": 1, "fps": 1, "loop": false },
-    "jump":  { "row": 3, "frames": 1, "fps": 1, "loop": false }
-  }
-}
-```
-
-Une image par ligne, empilées verticalement dans un seul PNG. C'est tout.
-
-> **Le plus simple pour démarrer** : un seul fichier `body_n.png` +
-> `body_n.json` contenant le personnage **entier** (tenue, cape, sac compris).
-> Le moteur n'exige pas les couches séparées — elles ne servent que si tu veux
-> que la garde-robe change l'apparence. Avec un seul atlas, tu as déjà ton
-> héros au bon niveau visuel dans l'application.
+Tu peux m'en envoyer plusieurs d'un coup.
