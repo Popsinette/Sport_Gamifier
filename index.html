@@ -168,6 +168,67 @@
     line-height: 1.45;
   }
 
+  /* ---------- Voyage (randonnée animée) ---------- */
+  .journey-card { padding: 0; overflow: hidden; }
+  .journey-scene { display: block; width: 100%; height: auto; }
+  .pl-far { animation: scrollX 30s linear infinite; }
+  .pl-near { animation: scrollX 15s linear infinite; }
+  @keyframes scrollX { to { transform: translateX(-400px); } }
+  .journey-scene.paused .pl-far, .journey-scene.paused .pl-near { animation-play-state: paused; }
+  .hiker-bob { animation: hikerBob .6s ease-in-out infinite; }
+  @keyframes hikerBob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.5px) } }
+  .legF, .legB, .armF { transform-box: fill-box; transform-origin: 50% 4%; }
+  .legF { animation: swing .6s ease-in-out infinite; }
+  .legB { animation: swing .6s ease-in-out infinite -.3s; }
+  .armF { animation: swing .6s ease-in-out infinite -.3s; }
+  @keyframes swing { 0%,100% { transform: rotate(24deg) } 50% { transform: rotate(-24deg) } }
+  .journey-scene.paused .legF, .journey-scene.paused .legB, .journey-scene.paused .armF { animation: none; }
+  .ob-shake { transform-box: fill-box; transform-origin: 50% 100%; animation: obShake 2.4s ease-in-out infinite; }
+  @keyframes obShake { 0%,88%,100% { transform: rotate(0) } 92% { transform: rotate(-3deg) } 96% { transform: rotate(3deg) } }
+  .journey-info {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px;
+    border-top: .5px solid var(--sep);
+  }
+  .ji-biome { font-size: .88rem; font-weight: 700; }
+  .ji-steps { font-size: .74rem; color: var(--sub); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .ob-panel { padding: 0 16px 14px; }
+  .ob-head { display: flex; justify-content: space-between; align-items: baseline; font-size: .9rem; font-weight: 700; margin-bottom: 8px; }
+  .ob-head .ob-xp { font-size: .72rem; font-weight: 800; color: var(--orange); }
+  .req-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .req-chip {
+    font-size: .72rem; font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--fill);
+    color: var(--sub);
+  }
+  .req-chip.ok { background: rgba(52, 199, 89, .16); color: var(--green); }
+  .ob-sport {
+    width: 100%;
+    background: var(--fill);
+    border: none; border-radius: 12px;
+    color: var(--text);
+    font-family: inherit; font-weight: 700; font-size: .82rem;
+    padding: 11px 12px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    text-align: left;
+    line-height: 1.4;
+  }
+  .ob-sport.done { background: rgba(52, 199, 89, .16); color: var(--green); }
+  .ob-pass {
+    width: 100%;
+    background: linear-gradient(90deg, var(--tint), var(--tint2));
+    border: none; border-radius: 12px;
+    color: #fff;
+    font-family: inherit; font-weight: 800; font-size: .9rem;
+    padding: 12px;
+    cursor: pointer;
+  }
+  .ob-pass:disabled { opacity: .4; }
+  .ob-none { padding: 0 16px 14px; font-size: .78rem; color: var(--sub); font-weight: 600; }
+
   /* ---------- Défi de la semaine ---------- */
   .challenge { padding: 14px 16px; display: flex; align-items: center; gap: 13px; }
   .ch-ico {
@@ -547,6 +608,9 @@
       <div class="hero-quote" id="heroQuote">« Chaque petit pas compte. »</div>
     </div>
 
+    <div class="section-title">Ton voyage</div>
+    <div class="card journey-card" id="journeyCard"></div>
+
     <div class="section-title">Défi de la semaine</div>
     <div class="card">
       <div class="challenge" id="challengeCard"></div>
@@ -771,6 +835,8 @@ const TROPHIES = [
   { ico:"📚", name:"5 habitudes",       stat:"habitCount",  goal:5 },
   { ico:"❄️", name:"3 gels en réserve", stat:"freezes",     goal:3 },
   { ico:"🏁", name:"5 défis réussis",   stat:"challengesWon", goal:5 },
+  { ico:"🥾", name:"10 obstacles",      stat:"obstacles",   goal:10 },
+  { ico:"🌍", name:"5 paysages",        stat:"biomes",      goal:5 },
 ];
 
 /* Défis hebdomadaires (rotation) */
@@ -780,10 +846,46 @@ const CHALLENGES = [
   { ico:"🌟", name:"Collectionneuse",   desc:"Coche 15 habitudes cette semaine", goal:15, xp:40, kind:"checks" },
 ];
 
+/* =========================================================
+   Voyage : la marcheuse traverse le monde, 1 coche = 1 pas.
+   Les obstacles exigent un défi sportif immédiat et/ou un
+   niveau / une série ; les grands obstacles ouvrent un
+   nouveau paysage.
+   ========================================================= */
+const BIOME_LEN = 25;
+const BIOMES = [
+  { name:"Montagne",  flag:"🏔️", sky:["#a8d8f0","#e8f4fb"], ground:"#7aa66b", path:"#c9b48f" },
+  { name:"Japon",     flag:"⛩️", sky:["#f7c9dd","#fdeef5"], ground:"#8fb573", path:"#d8c4a0" },
+  { name:"Jungle",    flag:"🌴", sky:["#bde3c8","#e9f7ea"], ground:"#4e8a48", path:"#a08a5a" },
+  { name:"Australie", flag:"🦘", sky:["#ffd9a0","#ffefd5"], ground:"#d9995a", path:"#c07f42" },
+  { name:"Grèce",     flag:"🏛️", sky:["#a8ccf0","#eaf3fc"], ground:"#e0d6b8", path:"#f0e8d0" },
+];
+const OBSTACLES = [
+  { id:"o1",  pos:6,   emoji:"🪨", name:"Un rocher bloque le sentier",  sport:"10 squats sur chaise", xp:15 },
+  { id:"o2",  pos:12,  emoji:"🌲", name:"Tronc d'arbre tombé",          reqs:[{t:"level",n:2}], xp:15 },
+  { id:"o3",  pos:18,  emoji:"🏞️", name:"Torrent de montagne",          reqs:[{t:"streak",n:2}], sport:"20 s de gainage doux", xp:20 },
+  { id:"o4",  pos:25,  big:1, emoji:"⛰️", name:"Le col enneigé",        reqs:[{t:"level",n:3}], sport:"20 montées de genoux", xp:40 },
+  { id:"o5",  pos:32,  emoji:"⛩️", name:"La porte torii est gardée",    sport:"10 grandes respirations lentes", xp:15 },
+  { id:"o6",  pos:40,  emoji:"🎋", name:"Bambous couchés par le vent",  reqs:[{t:"streak",n:3}], xp:20 },
+  { id:"o7",  pos:50,  big:1, emoji:"🌊", name:"Le fleuve sauvage",     reqs:[{t:"level",n:5}], sport:"15 squats + 20 s d'équilibre", xp:40 },
+  { id:"o8",  pos:58,  emoji:"🌿", name:"Lianes emmêlées",              sport:"30 s de cercles de bras", xp:15 },
+  { id:"o9",  pos:66,  emoji:"🐒", name:"Pont de singe fragile",        reqs:[{t:"total",n:40}], xp:20 },
+  { id:"o10", pos:75,  big:1, emoji:"🧗‍♀️", name:"La falaise rouge",      reqs:[{t:"level",n:7}], sport:"20 squats + 30 s de gainage", xp:40 },
+  { id:"o11", pos:83,  emoji:"🐍", name:"Un serpent fait la sieste",    sport:"1 min de marche sur place, sans bruit", xp:15 },
+  { id:"o12", pos:91,  emoji:"🏜️", name:"Tempête de sable",             reqs:[{t:"streak",n:5}], xp:20 },
+  { id:"o13", pos:100, big:1, emoji:"⛵", name:"La traversée vers la Grèce", reqs:[{t:"level",n:9}], sport:"25 montées de genoux + 30 s d'équilibre", xp:50 },
+  { id:"o14", pos:108, emoji:"🏛️", name:"Colonnes effondrées",          sport:"10 pompes contre le mur", xp:20 },
+  { id:"o15", pos:116, emoji:"🐐", name:"Chèvres têtues sur le chemin", reqs:[{t:"total",n:80}], xp:20 },
+  { id:"o16", pos:125, big:1, emoji:"🌟", name:"L'ascension de l'Olympe", reqs:[{t:"level",n:11},{t:"streak",n:7}], sport:"30 s de gainage + 20 squats", xp:60 },
+];
+const sportDone = new Set(); /* défis sportifs validés (session en cours) */
+
 /* ---------- État ---------- */
 function defaultState() {
   return {
     xp: 0,
+    journeySteps: 0,
+    passedObstacles: [],
     totalDone: 0,
     perfectDays: 0,
     bestStreak: 0,
@@ -805,8 +907,10 @@ function load() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (raw) {
-      const s = Object.assign(defaultState(), JSON.parse(raw));
+      const p = JSON.parse(raw);
+      const s = Object.assign(defaultState(), p);
       s.habits.forEach((h, i) => { if (!h.color) h.color = HABIT_COLORS[i % HABIT_COLORS.length]; });
+      if (p.journeySteps == null) s.journeySteps = s.totalDone; /* migration : repartir de ses coches */
       return s;
     }
   } catch (e) {}
@@ -947,11 +1051,13 @@ function toggleHabit(h) {
     list.splice(idx, 1);
     S.xp = Math.max(0, S.xp - xp);
     S.totalDone = Math.max(0, S.totalDone - 1);
+    S.journeySteps = Math.max(0, S.journeySteps - 1);
     checked = false;
   } else {
     list.push(h.id);
     S.xp += xp;
     S.totalDone++;
+    S.journeySteps++;
     checked = true;
     if (navigator.vibrate) navigator.vibrate(12);
   }
@@ -1069,6 +1175,8 @@ function render() {
   const qi = Math.floor(today.getTime() / 86400000) % QUOTES.length;
   $("heroQuote").textContent = "« " + QUOTES[qi] + " »";
 
+  renderJourney();
+
   /* --- défi de la semaine --- */
   const ch = currentChallenge();
   const prog = Math.min(challengeProgress(ch), ch.goal);
@@ -1161,6 +1269,8 @@ function render() {
     totalDone: S.totalDone, bestStreak: S.bestStreak, perfectDays: S.perfectDays,
     level: lvl, habitCount: S.habits.length, freezes: S.freezes,
     challengesWon: Object.values(S.challenges).filter(Boolean).length,
+    obstacles: S.passedObstacles.length,
+    biomes: Math.min(BIOMES.length, Math.floor(journeyState().pos / BIOME_LEN) + 1),
   };
 
   /* prochain trophée (le plus proche en % de progression) */
@@ -1226,6 +1336,167 @@ function render() {
   } else if (S.kindReset) {
     S.kindReset = false; save();
     showAlert("🌱", "Nouvelle page", "Tu as fait une pause, et c'est ok — tes progrès et ton XP sont intacts. Chaque journée parfaite offre un gel ❄️ pour protéger ta prochaine série.");
+  }
+}
+
+/* =========================================================
+   Rendu du voyage
+   ========================================================= */
+function journeyState() {
+  const passed = new Set(S.passedObstacles);
+  const lastPassed = OBSTACLES.filter(o => passed.has(o.id)).reduce((m, o) => Math.max(m, o.pos), 0);
+  const next = OBSTACLES.find(o => !passed.has(o.id));
+  const base = Math.max(S.journeySteps, lastPassed);
+  const pos = next ? Math.min(base, next.pos) : base;
+  const blocked = !!next && base >= next.pos;
+  return { pos, next, blocked };
+}
+
+function reqLabel(r) {
+  if (r.t === "level") return "Niveau " + r.n;
+  if (r.t === "streak") return "Série de " + r.n + " j";
+  return r.n + " coches au total";
+}
+function reqMet(r) {
+  if (r.t === "level") return levelFromXp(S.xp).lvl >= r.n;
+  if (r.t === "streak") return globalStreak() >= r.n;
+  return S.totalDone >= r.n;
+}
+function reqCur(r) {
+  if (r.t === "level") return levelFromXp(S.xp).lvl;
+  if (r.t === "streak") return globalStreak();
+  return S.totalDone;
+}
+
+/* décor d'un paysage (une tuile de 400 px, répétée pour le défilement) */
+function biomeDeco(bi, layer) {
+  const far = {
+    0: `<path d="M-10 100 L60 38 L130 100 Z" fill="#8fa8bd"/><path d="M60 38 L74 52 L60 56 L46 52 Z" fill="#fff"/>
+        <path d="M90 100 L170 52 L250 100 Z" fill="#a8bdd0"/><path d="M170 52 L182 64 L170 68 L158 64 Z" fill="#fff"/>
+        <path d="M230 100 L310 30 L395 100 Z" fill="#7e99b0"/><path d="M310 30 L326 46 L310 52 L294 46 Z" fill="#fff"/>`,
+    1: `<path d="M40 100 L140 34 L240 100 Z" fill="#b0a8c8"/><path d="M110 54 L140 34 L170 54 L160 62 L120 62 Z" fill="#fff"/>
+        <text x="280" y="98" font-size="30">⛩️</text><text x="20" y="90" font-size="20">🌸</text><text x="350" y="80" font-size="16">🌸</text>`,
+    2: `<ellipse cx="70" cy="100" rx="60" ry="34" fill="#3c6e46"/><ellipse cx="210" cy="102" rx="80" ry="40" fill="#498152"/>
+        <ellipse cx="340" cy="100" rx="60" ry="32" fill="#3c6e46"/><text x="300" y="52" font-size="20">🦜</text>`,
+    3: `<path d="M60 100 Q 90 46 150 52 Q 210 56 230 100 Z" fill="#c25b38"/>
+        <path d="M255 100 Q 268 76 290 78 Q 308 80 315 100 Z" fill="#d06a44"/><text x="345" y="96" font-size="22">🦘</text>`,
+    4: `<rect x="60" y="58" width="90" height="8" fill="#e8e0d0"/><rect x="66" y="66" width="8" height="30" fill="#e8e0d0"/>
+        <rect x="86" y="66" width="8" height="30" fill="#e8e0d0"/><rect x="106" y="66" width="8" height="30" fill="#e8e0d0"/>
+        <rect x="126" y="66" width="8" height="30" fill="#e8e0d0"/><rect x="54" y="50" width="102" height="10" rx="3" fill="#f0e8d8"/>
+        <rect x="0" y="88" width="400" height="14" fill="#5a9fd4" opacity=".7"/><text x="300" y="70" font-size="22">⛵</text>`,
+  }[bi];
+  const near = {
+    0: `<text x="26" y="150" font-size="30">🌲</text><text x="186" y="146" font-size="26">🌲</text><text x="326" y="152" font-size="32">🌲</text>`,
+    1: `<text x="56" y="150" font-size="30">🌸</text><text x="226" y="148" font-size="27">🎋</text><text x="336" y="146" font-size="25">🏮</text>`,
+    2: `<text x="36" y="152" font-size="32">🌴</text><text x="176" y="147" font-size="27">🌿</text><text x="296" y="152" font-size="32">🌴</text>`,
+    3: `<text x="66" y="149" font-size="26">🌾</text><text x="216" y="146" font-size="23">🪨</text><text x="326" y="149" font-size="26">🌾</text>`,
+    4: `<text x="46" y="149" font-size="27">🫒</text><text x="196" y="147" font-size="25">🏺</text><text x="316" y="149" font-size="27">🫒</text>`,
+  }[bi];
+  return layer === "far" ? far : near;
+}
+
+let journeyMemo = "";
+function renderJourney() {
+  const { pos, next, blocked } = journeyState();
+  const bi = Math.floor(pos / BIOME_LEN) % BIOMES.length;
+  const tour = Math.floor(pos / (BIOME_LEN * BIOMES.length));
+  const biome = BIOMES[bi];
+  const sportOk = next ? sportDone.has(next.id) : false;
+  const memo = [pos, blocked, next && next.id, sportOk, S.accent, S.xp, S.totalDone, globalStreak()].join("|");
+  if (memo === journeyMemo) return;
+  journeyMemo = memo;
+
+  const accent = ACCENTS[S.accent] || ACCENTS[0];
+  const skinTone = "#ffdcc4";
+  const scene = `
+  <svg class="journey-scene ${blocked ? "paused" : ""}" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="jsky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${biome.sky[0]}"/><stop offset="1" stop-color="${biome.sky[1]}"/>
+      </linearGradient>
+    </defs>
+    <rect width="400" height="150" fill="url(#jsky)"/>
+    <circle cx="345" cy="28" r="14" fill="#fff6d8" opacity=".95"/>
+    <g class="pl-far">
+      <g>${biomeDeco(bi, "far")}</g>
+      <g transform="translate(400 0)">${biomeDeco(bi, "far")}</g>
+    </g>
+    <rect y="100" width="400" height="50" fill="${biome.ground}"/>
+    <rect y="112" width="400" height="12" rx="6" fill="${biome.path}" opacity=".9"/>
+    <g class="pl-near">
+      <g>${biomeDeco(bi, "near")}</g>
+      <g transform="translate(400 0)">${biomeDeco(bi, "near")}</g>
+    </g>
+    ${blocked && next ? `
+      <g class="ob-shake"><text x="205" y="118" font-size="${next.big ? 40 : 32}" text-anchor="middle">${next.emoji}</text></g>
+      <g><circle cx="228" cy="66" r="9" fill="#fff" stroke="${accent.c}" stroke-width="1.5"/>
+      <text x="228" y="70.5" font-size="11" text-anchor="middle" fill="${accent.c}" font-weight="bold">!</text></g>` : ""}
+    <g transform="translate(118 76) scale(1.3)"><g class="hiker-bob">
+      <ellipse cx="0" cy="36" rx="13" ry="3.5" fill="rgba(0,0,0,.18)"/>
+      <g class="legB"><rect x="1" y="19" width="4.5" height="16" rx="2.2" fill="#6b5540"/></g>
+      <g class="legF"><rect x="-5" y="19" width="4.5" height="16" rx="2.2" fill="#7d6549"/></g>
+      <rect x="-14" y="1" width="9" height="14" rx="3.5" fill="#a5714a"/>
+      <rect x="-8.5" y="-2" width="17" height="24" rx="7.5" fill="${accent.c}"/>
+      <g class="armF"><rect x="-1" y="2" width="4.5" height="13" rx="2.2" fill="${accent.g}"/></g>
+      <circle cx="1" cy="-11" r="8.5" fill="${skinTone}"/>
+      <path d="M-7.5 -12 Q -8 -21 1 -20.5 Q 9.5 -21 9 -13 Q 5 -17.5 1 -17 Q -4 -17.5 -7.5 -12 Z" fill="#5a3b26"/>
+      <path d="M-7 -14 Q -13 -10 -11 -2 Q -8 -4 -7.5 -9 Z" fill="#5a3b26"/>
+      <circle cx="5" cy="-11.5" r="1.3" fill="#3a2b28"/>
+      <path d="M6.5 -6.5 Q 8 -5.5 9 -6.5" stroke="#b06a5a" stroke-width="1" fill="none" stroke-linecap="round"/>
+    </g></g>
+  </svg>`;
+
+  let panel;
+  if (blocked && next) {
+    const reqs = next.reqs || [];
+    const allReqsOk = reqs.every(reqMet);
+    const canPass = allReqsOk && (!next.sport || sportOk);
+    panel = `
+    <div class="ob-panel">
+      <div class="ob-head"><span>${next.emoji} ${next.name}</span><span class="ob-xp">+${next.xp} XP</span></div>
+      ${reqs.length ? `<div class="req-chips">${reqs.map(r =>
+        `<span class="req-chip ${reqMet(r) ? "ok" : ""}">${reqMet(r) ? "✓ " : ""}${reqLabel(r)}${reqMet(r) ? "" : " · " + reqCur(r) + "/" + r.n}</span>`).join("")}</div>` : ""}
+      ${next.sport ? `<button class="ob-sport ${sportOk ? "done" : ""}" id="obSport">${sportOk ? "✓ Défi relevé : " : "💪 Petit défi : "}${next.sport}${sportOk ? "" : " — appuie quand c'est fait !"}</button>` : ""}
+      <button class="ob-pass" id="obPass" ${canPass ? "" : "disabled"}>${canPass ? "Franchir l'obstacle ✨" : "Encore un petit effort…"}</button>
+    </div>`;
+  } else if (!next) {
+    panel = `<div class="ob-none">🌍 Tour du monde terminé, incroyable ! De nouveaux horizons arrivent bientôt…</div>`;
+  } else {
+    panel = `<div class="ob-none">👟 Prochain obstacle dans <b>${next.pos - pos}</b> pas — chaque habitude cochée fait avancer d'un pas.</div>`;
+  }
+
+  $("journeyCard").innerHTML = scene + `
+    <div class="journey-info">
+      <span class="ji-biome">${biome.flag} ${biome.name}${tour > 0 ? " · Tour " + (tour + 1) : ""}</span>
+      <span class="ji-steps">${pos} pas parcourus</span>
+    </div>` + panel;
+
+  const sp = $("obSport");
+  if (sp) sp.onclick = () => {
+    if (sportDone.has(next.id)) sportDone.delete(next.id); else sportDone.add(next.id);
+    if (navigator.vibrate) navigator.vibrate(12);
+    journeyMemo = ""; renderJourney();
+  };
+  const pb = $("obPass");
+  if (pb) pb.onclick = () => {
+    if (pb.disabled) return;
+    passObstacle(next);
+  };
+}
+
+function passObstacle(ob) {
+  S.passedObstacles.push(ob.id);
+  S.xp += ob.xp;
+  sportDone.delete(ob.id);
+  save();
+  journeyMemo = "";
+  render();
+  confetti();
+  if (ob.big) {
+    const nb = BIOMES[Math.floor(ob.pos / BIOME_LEN) % BIOMES.length];
+    showAlert(nb.flag, "Nouveau paysage : " + nb.name + " !", "« " + ob.name + " » franchi ! Bienvenue en " + nb.name + ". +" + ob.xp + " XP d'exploration.");
+  } else {
+    showAlert(ob.emoji, "Obstacle franchi !", "« " + ob.name + " » est derrière toi. +" + ob.xp + " XP — la route continue !");
   }
 }
 

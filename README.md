@@ -23,6 +23,24 @@ quotidiennes, garder un bon rythme de vie… et gagner de l'XP comme dans un jeu
   parfaites, niveau 20…
 - Décocher retire l'XP correspondante — pas de triche 😉
 
+### 🥾 Ton voyage (scène animée sur l'accueil)
+Une petite randonneuse marche en continu dans un paysage qui défile en
+parallaxe. **Chaque habitude cochée = 1 pas.**
+
+- **16 obstacles** jalonnent la route. Quand elle en atteint un, elle
+  s'arrête et il faut le franchir :
+  - **Petits défis sportifs immédiats** au début (« 10 squats sur chaise »,
+    « 30 s de cercles de bras »), à valider d'un tap
+  - Puis des **exigences de progression** (niveau, série, nombre de coches)
+  - Et enfin des **combinaisons corsées** pour les grands passages
+    (« 30 s de gainage + 20 squats » *et* niveau 11 *et* série de 7 jours)
+- Les **grands obstacles ouvrent un nouveau paysage** :
+  🏔️ Montagne → ⛩️ Japon → 🌴 Jungle → 🦘 Australie → 🏛️ Grèce (puis ça boucle)
+- Chaque obstacle franchi rapporte de l'XP (+15 à +60)
+- Décor, ciel, sol et sentier changent à chaque région, avec un premier plan
+  qui défile plus vite que l'arrière-plan
+- La randonneuse porte la couleur de ton thème
+
 ### Motivation saine (engageante, jamais toxique)
 - **Gels de série ❄️** : chaque journée parfaite offre un gel (max 3) qui
   protège automatiquement la série en cas de jour manqué
