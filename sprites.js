@@ -171,12 +171,20 @@ function draw(ctx, x, y, height, look, state, env, dt) {
   const name = resolve(state.anim, state, dt || .016);
   const time = state.anim.queue ? state.anim.t : state.t;
 
+  /* Élévation : les planches de saut et de joie montrent une pose en l'air,
+     c'est le moteur qui fournit la hauteur — et un léger balancement pendant
+     la marche, sans quoi une image fixe qui glisse paraît figée. */
+  let lift = 0;
+  if (state.jump > .02)  lift -= Math.sin(state.jump * Math.PI) * height * .55;
+  if (state.cheer > .02) lift -= Math.abs(Math.sin(state.cheer * Math.PI * 2)) * height * .30;
+  if (state.walk > .02)  lift -= Math.abs(Math.sin((state.phase || 0) * .5)) * height * .022;
+
   /* zone de travail généreuse : cape et monture débordent du corps */
   const pad = height * .9;
   const w = Math.ceil(height * 2.2), h = Math.ceil(height * 1.8);
   const b = ensureBuf(w, h);
   const ox = w * .5, oy = h - pad * .18;
-  for (const a of layers) drawLayer(b, a, name, time, ox, oy, height);
+  for (const a of layers) drawLayer(b, a, name, time, ox, oy + lift, height);
 
   /* teinte ambiante en multiplication + liseré solaire */
   const amb = env.amb || [1, 1, 1];
@@ -185,7 +193,7 @@ function draw(ctx, x, y, height, look, state, env, dt) {
     b.fillStyle = "rgb(" + (amb[0] * 255 | 0) + "," + (amb[1] * 255 | 0) + "," + (amb[2] * 255 | 0) + ")";
     b.fillRect(0, 0, w, h);
     b.globalCompositeOperation = "destination-in";
-    for (const a of layers) drawLayer(b, a, name, time, ox, oy, height);
+    for (const a of layers) drawLayer(b, a, name, time, ox, oy + lift, height);
     b.globalCompositeOperation = "source-over";
   }
   /* voile solaire — « source-atop » pour ne teinter que le sprite :

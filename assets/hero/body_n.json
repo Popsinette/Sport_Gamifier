@@ -6,15 +6,16 @@
   "anchorY": 0.94,
   "heightRatio": 0.86,
   "z": 30,
+  "_rows": ["idle", "walk", "jump", "cheer"],
   "animations": {
     "idle":     { "row": 0, "frames": 1, "fps": 1, "loop": true },
-    "walk":     { "row": 0, "frames": 1, "fps": 1, "loop": true },
-    "run":      { "row": 0, "frames": 1, "fps": 1, "loop": true },
-    "jump":     { "row": 0, "frames": 1, "fps": 1, "loop": false },
-    "cheer":    { "row": 0, "frames": 1, "fps": 1, "loop": false },
     "look":     { "row": 0, "frames": 1, "fps": 1, "loop": false },
     "sit":      { "row": 0, "frames": 1, "fps": 1, "loop": true },
     "sleep":    { "row": 0, "frames": 1, "fps": 1, "loop": true },
-    "interact": { "row": 0, "frames": 1, "fps": 1, "loop": false }
+    "interact": { "row": 0, "frames": 1, "fps": 1, "loop": false },
+    "walk":     { "row": 1, "frames": 1, "fps": 1, "loop": true },
+    "run":      { "row": 1, "frames": 1, "fps": 1, "loop": true },
+    "jump":     { "row": 2, "frames": 1, "fps": 1, "loop": false },
+    "cheer":    { "row": 3, "frames": 1, "fps": 1, "loop": false }
   }
 }
