@@ -1210,12 +1210,15 @@ function createScene(canvas, opts) {
     /* le Héros — sprites HD si disponibles, rendu vectoriel sinon */
     if (opts.look) {
       const mounted = opts.look.mount && opts.look.mount !== "none";
-      const hx2 = heroX, hy2 = gy + H * .080, hh = H * (mounted ? .30 : .27);
+      const spriteMode = global.Sprites && global.Sprites.ready;
+      /* les sprites illustrés méritent plus de place que la silhouette vectorielle */
+      const hx2 = heroX, hy2 = gy + H * .080,
+            hh = H * (mounted ? .30 : (spriteMode ? .345 : .27));
       const hState = { t, walk: (walking && !blocked) ? 1 : 0, run: false,
                        phase: walkPhase, jump, cheer,
                        resting: blocked && !walking, sleeping: false, anim: heroAnim };
       const hEnv = { sun: g.sun, amb: g.amb, night: g.star, wind: .5 + Math.sin(t * .3) * .3 };
-      const done = global.Sprites && global.Sprites.ready
+      const done = spriteMode
         && global.Sprites.draw(ctx, hx2, hy2, hh, opts.look, hState, hEnv, dt);
       heroAnim = hState.anim;
       if (!done && global.Hero) global.Hero.draw(ctx, hx2, hy2, hh, opts.look,

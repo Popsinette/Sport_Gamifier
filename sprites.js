@@ -37,7 +37,13 @@ function loadImage(src) {
   });
 }
 
+function resolveId(id) {
+  const al = manifest && manifest.aliases;
+  return (al && al[id]) || id;
+}
+
 async function loadAtlas(id) {
+  id = resolveId(id);
   if (atlases.has(id)) return atlases.get(id);
   const meta = await fetch(BASE + id + ".json").then(r => {
     if (!r.ok) throw new Error("atlas absent : " + id);
@@ -87,7 +93,14 @@ function slotIds(look) {
   add("hairFront", "hair_" + (look.hair || "wavy") + "_front");
   add("scarf", look.scarf ? "scarf_" + look.scarf : null);
   add("capeFront", look.cape && look.cape !== "none" ? "cape_" + look.cape + "_front" : null);
-  return out.sort((a, b) => (SLOT_Z[a.slot] || 50) - (SLOT_Z[b.slot] || 50));
+  /* `available` évite de solliciter des atlas qu'on sait absents */
+  const avail = manifest && manifest.available;
+  const keep = avail
+    ? out.filter(o => avail.indexOf(resolveId(o.id)) !== -1)
+    : out;
+  return keep
+    .map(o => ({ slot: o.slot, id: resolveId(o.id) }))
+    .sort((a, b) => (SLOT_Z[a.slot] || 50) - (SLOT_Z[b.slot] || 50));
 }
 
 /* ---------------------------------------------------------
@@ -175,8 +188,10 @@ function draw(ctx, x, y, height, look, state, env, dt) {
     for (const a of layers) drawLayer(b, a, name, time, ox, oy, height);
     b.globalCompositeOperation = "source-over";
   }
+  /* voile solaire — « source-atop » pour ne teinter que le sprite :
+     en « lighter », la passe colorerait aussi le fond transparent. */
   const sun = env.sun || [255, 245, 220];
-  b.globalCompositeOperation = "lighter";
+  b.globalCompositeOperation = "source-atop";
   b.globalAlpha = .10;
   b.fillStyle = "rgb(" + (sun[0] | 0) + "," + (sun[1] | 0) + "," + (sun[2] | 0) + ")";
   b.fillRect(0, 0, w, h);

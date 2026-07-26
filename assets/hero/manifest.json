@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "sets": ["explorateur"],
+  "frameW": 512,
+  "frameH": 512,
+  "anchorX": 0.5,
+  "anchorY": 0.94,
+  "heightRatio": 0.86,
+  "available": ["body_n"],
+  "aliases": { "body_f": "body_n", "body_m": "body_n" }
+}
