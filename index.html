@@ -21,10 +21,11 @@
     --sep: rgba(60, 60, 67, .12);
     --fill: #e9e9eb;
     --tint: #007aff;
+    --tint2: #5ac8fa;
     --green: #34c759;
     --orange: #ff9500;
     --red: #ff3b30;
-    --purple: #af52de;
+    --cyan: #32ade6;
     --tab-bg: rgba(249, 249, 249, .88);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
@@ -59,7 +60,7 @@
   }
 
   /* ---------- Grands titres iOS ---------- */
-  .big-header { padding: 14px 0 6px; }
+  .big-header { padding: 14px 0 8px; }
   .big-header .date-line {
     font-size: .8rem; font-weight: 600;
     color: var(--sub);
@@ -68,23 +69,13 @@
     margin-bottom: 2px;
   }
   .big-header .row { display: flex; align-items: center; justify-content: space-between; }
-  .big-header h1 { font-size: 2.1rem; font-weight: 800; letter-spacing: -.5px; }
-  .pill {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: var(--card);
-    border-radius: 999px;
-    padding: 7px 13px;
-    font-weight: 700; font-size: .9rem;
-    font-variant-numeric: tabular-nums;
-    box-shadow: 0 1px 2px rgba(0,0,0,.05);
-  }
+  .big-header h1 { font-size: 2.05rem; font-weight: 800; letter-spacing: -.5px; }
   .icon-btn {
     width: 32px; height: 32px;
     border: none; border-radius: 50%;
     background: var(--tint);
     color: #fff;
     font-size: 1.35rem; line-height: 1;
-    font-weight: 500;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     padding-bottom: 2px;
@@ -100,12 +91,11 @@
   }
   .card {
     background: var(--card);
-    border-radius: 14px;
+    border-radius: 16px;
     overflow: hidden;
   }
   .card + .card { margin-top: 12px; }
 
-  /* ---------- Écrans ---------- */
   .screen { display: none; animation: fadeIn .2s ease; }
   .screen.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
@@ -136,24 +126,68 @@
   nav button svg { width: 26px; height: 26px; }
   nav button.active { color: var(--tint); }
 
-  /* ---------- Anneau du jour ---------- */
-  .today-card { padding: 18px 16px; display: flex; align-items: center; gap: 18px; }
-  .ring-wrap { position: relative; width: 108px; height: 108px; flex-shrink: 0; }
+  /* ---------- Carte héro (dégradé) ---------- */
+  .hero-card {
+    background: linear-gradient(135deg, var(--tint) 0%, var(--tint2) 100%);
+    border-radius: 20px;
+    padding: 18px 16px 14px;
+    color: #fff;
+    box-shadow: 0 8px 24px -8px var(--tint);
+  }
+  .hero-top { display: flex; align-items: center; gap: 18px; }
+  .ring-wrap { position: relative; width: 104px; height: 104px; flex-shrink: 0; }
   .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-wrap circle { transition: stroke-dashoffset .6s cubic-bezier(.22,1,.36,1); }
   .ring-center {
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
   }
   .ring-center b { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-  .ring-center span { font-size: .68rem; color: var(--sub); font-weight: 600; }
-  .today-info { flex: 1; }
-  .today-info .ti-line { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; }
-  .today-info .ti-line + .ti-line { border-top: .5px solid var(--sep); }
-  .today-info .ti-label { font-size: .82rem; color: var(--sub); font-weight: 600; }
-  .today-info .ti-value { font-size: .95rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .today-info .ti-value.green { color: var(--green); }
-  .today-info .ti-value.orange { color: var(--orange); }
+  .ring-center span { font-size: .64rem; opacity: .85; font-weight: 600; }
+  .hero-info { flex: 1; min-width: 0; }
+  .hero-hello { font-size: 1.05rem; font-weight: 800; margin-bottom: 2px; }
+  .hero-sub { font-size: .78rem; opacity: .9; font-weight: 600; margin-bottom: 10px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    background: rgba(255,255,255,.22);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: .76rem; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+  }
+  .hero-quote {
+    margin-top: 13px;
+    padding-top: 11px;
+    border-top: .5px solid rgba(255,255,255,.3);
+    font-size: .8rem;
+    font-style: italic;
+    opacity: .92;
+    line-height: 1.45;
+  }
+
+  /* ---------- Défi de la semaine ---------- */
+  .challenge { padding: 14px 16px; display: flex; align-items: center; gap: 13px; }
+  .ch-ico {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--tint) 14%, transparent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  @supports not (background: color-mix(in srgb, red 10%, blue)) { .ch-ico { background: var(--fill); } }
+  .ch-body { flex: 1; min-width: 0; }
+  .ch-name { font-size: .92rem; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; }
+  .ch-name .ch-xp { font-size: .72rem; font-weight: 800; color: var(--tint); }
+  .ch-desc { font-size: .74rem; color: var(--sub); font-weight: 500; margin: 2px 0 7px; }
+  .ch-bar { height: 7px; background: var(--fill); border-radius: 999px; overflow: hidden; }
+  .ch-fill { height: 100%; background: linear-gradient(90deg, var(--tint), var(--tint2)); border-radius: 999px; transition: width .5s ease; }
+  .ch-count { font-size: .68rem; color: var(--sub); font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .challenge.won .ch-fill { background: var(--green); }
+  .challenge.won .ch-name .ch-xp { color: var(--green); }
 
   /* ---------- Ligne d'habitude ---------- */
   .habit-row {
@@ -165,11 +199,10 @@
   .habit-row:active { background: var(--fill); }
   .habit-row + .habit-row { border-top: .5px solid var(--sep); }
   .h-emoji {
-    width: 38px; height: 38px;
-    background: var(--fill);
-    border-radius: 10px;
+    width: 40px; height: 40px;
+    border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     flex-shrink: 0;
   }
   .h-body { flex: 1; min-width: 0; }
@@ -188,9 +221,9 @@
   .habit-row.done .check {
     background: var(--green);
     border-color: var(--green);
-    animation: popCheck .25s cubic-bezier(.22,1.6,.36,1);
+    animation: popCheck .3s cubic-bezier(.22,1.6,.36,1);
   }
-  @keyframes popCheck { 0% { transform: scale(.6); } 100% { transform: scale(1); } }
+  @keyframes popCheck { 0% { transform: scale(.5) rotate(-12deg); } 100% { transform: scale(1); } }
   .check svg { width: 14px; height: 14px; opacity: 0; }
   .habit-row.done .check svg { opacity: 1; }
   .habit-row.done .h-name { color: var(--sub); text-decoration: line-through; text-decoration-color: rgba(138,138,142,.6); }
@@ -208,10 +241,7 @@
   }
 
   /* ---------- Suggestions ---------- */
-  .sugg-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 11px 16px;
-  }
+  .sugg-row { display: flex; align-items: center; gap: 12px; padding: 11px 16px; }
   .sugg-row + .sugg-row { border-top: .5px solid var(--sep); }
   .sugg-row .h-body { flex: 1; }
   .sugg-add {
@@ -230,13 +260,14 @@
   .level-card { padding: 18px 16px; }
   .level-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
   .level-num {
-    width: 56px; height: 56px;
+    width: 58px; height: 58px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #5ac8fa, var(--tint));
+    background: linear-gradient(135deg, var(--tint), var(--tint2));
     color: #fff;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     font-weight: 800;
     flex-shrink: 0;
+    box-shadow: 0 4px 14px -4px var(--tint);
   }
   .level-num small { font-size: .5rem; font-weight: 700; letter-spacing: .5px; opacity: .85; }
   .level-num b { font-size: 1.3rem; line-height: 1.05; }
@@ -245,36 +276,69 @@
   .xp-bar { height: 10px; background: var(--fill); border-radius: 999px; overflow: hidden; }
   .xp-fill {
     height: 100%;
-    background: linear-gradient(90deg, #5ac8fa, var(--tint));
+    background: linear-gradient(90deg, var(--tint), var(--tint2));
     border-radius: 999px;
     transition: width .5s cubic-bezier(.22,1,.36,1);
   }
 
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; }
-  .stat {
-    padding: 14px;
-    text-align: center;
+  .next-trophy { padding: 14px 16px; display: flex; align-items: center; gap: 13px; }
+  .nt-ico {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--fill);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
   }
+  .nt-body { flex: 1; }
+  .nt-name { font-size: .9rem; font-weight: 700; }
+  .nt-sub { font-size: .72rem; color: var(--sub); font-weight: 600; margin: 2px 0 6px; }
+  .nt-bar { height: 6px; background: var(--fill); border-radius: 999px; overflow: hidden; }
+  .nt-fill { height: 100%; background: linear-gradient(90deg, #ffd60a, var(--orange)); border-radius: 999px; }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .stat { padding: 14px; text-align: center; }
   .stat:nth-child(2n) { border-left: .5px solid var(--sep); }
   .stat:nth-child(n+3) { border-top: .5px solid var(--sep); }
   .stat b { display: block; font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
   .stat span { font-size: .68rem; color: var(--sub); font-weight: 600; }
 
+  /* ---------- Graphique 7 jours ---------- */
   .week-card { padding: 16px; }
   .week-bars { display: flex; gap: 10px; align-items: flex-end; height: 96px; }
   .wb { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; }
   .wb .wb-track {
     flex: 1; width: 100%;
     background: var(--fill);
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex; align-items: flex-end;
     overflow: hidden;
   }
-  .wb .wb-fill { width: 100%; background: var(--green); border-radius: 8px; transition: height .4s ease; }
+  .wb .wb-fill { width: 100%; background: var(--tint); border-radius: 4px 4px 0 0; transition: height .4s ease; min-height: 0; }
   .wb .wb-label { font-size: .68rem; color: var(--sub); font-weight: 700; }
   .wb.today .wb-label { color: var(--tint); }
 
-  .trophy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  /* ---------- Calendrier de chaleur ---------- */
+  .heat-card { padding: 16px; }
+  .heat-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .heat-month { font-size: .9rem; font-weight: 700; text-transform: capitalize; }
+  .heat-legend { display: flex; align-items: center; gap: 3px; font-size: .62rem; color: var(--sub); font-weight: 600; }
+  .heat-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .heat-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .heat-dow { font-size: .6rem; color: var(--sub); font-weight: 700; text-align: center; padding-bottom: 2px; }
+  .heat-cell {
+    aspect-ratio: 1;
+    border-radius: 7px;
+    background: var(--fill);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .58rem; font-weight: 700; color: transparent;
+  }
+  .heat-cell.future { background: transparent; border: 1px dashed var(--sep); }
+  .heat-cell.today { outline: 2px solid var(--tint); outline-offset: 1px; }
+  .heat-cell.blank { background: transparent; }
+
+  /* ---------- Trophées ---------- */
+  .trophy-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
   .trophy {
     padding: 14px 4px 12px;
     display: flex; flex-direction: column; align-items: center; gap: 5px;
@@ -287,11 +351,29 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 1.35rem;
   }
-  .trophy.won .t-ico { background: linear-gradient(135deg, #ffd60a, var(--orange)); }
+  .trophy.won .t-ico { background: linear-gradient(135deg, #ffd60a, var(--orange)); box-shadow: 0 3px 10px -3px var(--orange); }
   .trophy.locked { opacity: .4; }
   .trophy.locked .t-ico { filter: grayscale(1); }
   .trophy small { font-size: .58rem; color: var(--sub); font-weight: 600; line-height: 1.25; }
 
+  /* ---------- Personnalisation ---------- */
+  .accent-card { padding: 14px 16px; }
+  .accent-label { font-size: .88rem; font-weight: 600; margin-bottom: 10px; }
+  .accent-row { display: flex; gap: 12px; }
+  .accent-dot {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+  .accent-dot.sel::after {
+    content: "";
+    position: absolute; inset: -7px;
+    border: 2.5px solid var(--tint);
+    border-radius: 50%;
+  }
   .danger-row {
     width: 100%;
     background: var(--card);
@@ -299,12 +381,12 @@
     color: var(--red);
     font-family: inherit; font-weight: 600; font-size: .95rem;
     padding: 13px;
-    border-radius: 14px;
+    border-radius: 16px;
     cursor: pointer;
     margin-top: 12px;
   }
 
-  /* ---------- Feuille modale (sheet) ---------- */
+  /* ---------- Feuille modale ---------- */
   .sheet-backdrop {
     position: fixed; inset: 0;
     background: rgba(0,0,0,.4);
@@ -323,13 +405,7 @@
     animation: sheetUp .3s cubic-bezier(.22,1,.36,1);
   }
   @keyframes sheetUp { from { transform: translateY(60%); } to { transform: none; } }
-  .grabber {
-    width: 38px; height: 5px;
-    background: #c7c7cc;
-    border-radius: 999px;
-    margin: 4px auto 12px;
-    opacity: .6;
-  }
+  .grabber { width: 38px; height: 5px; background: #c7c7cc; border-radius: 999px; margin: 4px auto 12px; opacity: .6; }
   .sheet h3 { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 14px; }
   .field-label { font-size: .74rem; font-weight: 600; color: var(--sub); text-transform: uppercase; letter-spacing: .4px; margin: 16px 4px 6px; }
   .text-input {
@@ -350,12 +426,10 @@
     cursor: pointer;
   }
   .emoji-cell.sel { background: var(--fill); box-shadow: inset 0 0 0 2px var(--tint); }
-  .segmented {
-    display: flex;
-    background: var(--fill);
-    border-radius: 9px;
-    padding: 2px;
-  }
+  .color-row { display: flex; gap: 10px; background: var(--card); border-radius: 12px; padding: 12px; flex-wrap: wrap; }
+  .color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; position: relative; }
+  .color-dot.sel::after { content: ""; position: absolute; inset: -6px; border: 2.5px solid var(--tint); border-radius: 50%; }
+  .segmented { display: flex; background: var(--fill); border-radius: 9px; padding: 2px; }
   .segmented button {
     flex: 1;
     border: none; background: none;
@@ -410,7 +484,7 @@
   .alert-backdrop.show { display: flex; }
   .alert {
     background: var(--card);
-    border-radius: 14px;
+    border-radius: 16px;
     width: 100%; max-width: 280px;
     text-align: center;
     overflow: hidden;
@@ -446,26 +520,36 @@
   <section class="screen active" id="screen-today">
     <div class="big-header">
       <div class="date-line" id="dateLine">Samedi 26 juillet</div>
-      <div class="row">
-        <h1>Aujourd'hui</h1>
-        <span class="pill">🔥 <span id="streakCount">0</span></span>
-      </div>
+      <div class="row"><h1>Aujourd'hui</h1></div>
     </div>
 
-    <div class="card today-card">
-      <div class="ring-wrap">
-        <svg width="108" height="108">
-          <circle cx="54" cy="54" r="46" fill="none" stroke="var(--fill)" stroke-width="11"/>
-          <circle id="ringFill" cx="54" cy="54" r="46" fill="none" stroke="var(--green)" stroke-width="11"
-                  stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289"/>
-        </svg>
-        <div class="ring-center"><b id="ringCount">0/0</b><span>terminées</span></div>
+    <div class="hero-card">
+      <div class="hero-top">
+        <div class="ring-wrap">
+          <svg width="104" height="104">
+            <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="11"/>
+            <circle id="ringFill" cx="52" cy="52" r="44" fill="none" stroke="#ffffff" stroke-width="11"
+                    stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="276.5"/>
+          </svg>
+          <div class="ring-center"><b id="ringCount">0/0</b><span>terminées</span></div>
+        </div>
+        <div class="hero-info">
+          <div class="hero-hello" id="heroHello">Bonjour 👋</div>
+          <div class="hero-sub" id="heroSub">Prête pour tes habitudes ?</div>
+          <div class="chip-row">
+            <span class="chip">🔥 <span id="streakCount">0</span></span>
+            <span class="chip">❄️ <span id="freezeCount">0</span></span>
+            <span class="chip">⭐ Niv <span id="levelChip">1</span></span>
+            <span class="chip">+<span id="xpToday">0</span> XP</span>
+          </div>
+        </div>
       </div>
-      <div class="today-info">
-        <div class="ti-line"><span class="ti-label">XP du jour</span><span class="ti-value green" id="xpToday">+0</span></div>
-        <div class="ti-line"><span class="ti-label">Série</span><span class="ti-value orange" id="streakLine">0 jours</span></div>
-        <div class="ti-line"><span class="ti-label">Niveau</span><span class="ti-value" id="levelLine">1</span></div>
-      </div>
+      <div class="hero-quote" id="heroQuote">« Chaque petit pas compte. »</div>
+    </div>
+
+    <div class="section-title">Défi de la semaine</div>
+    <div class="card">
+      <div class="challenge" id="challengeCard"></div>
     </div>
 
     <div class="section-title">Mes habitudes</div>
@@ -504,9 +588,23 @@
       <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
     </div>
 
+    <div class="section-title">Prochain trophée</div>
+    <div class="card">
+      <div class="next-trophy" id="nextTrophy"></div>
+    </div>
+
     <div class="section-title">7 derniers jours</div>
     <div class="card week-card">
       <div class="week-bars" id="weekBars"></div>
+    </div>
+
+    <div class="section-title">Ce mois-ci</div>
+    <div class="card heat-card">
+      <div class="heat-head">
+        <div class="heat-month" id="heatMonth"></div>
+        <div class="heat-legend">moins <i style="background:var(--fill)"></i><i id="hl1"></i><i id="hl2"></i><i id="hl3"></i><i id="hl4"></i> plus</div>
+      </div>
+      <div class="heat-grid" id="heatGrid"></div>
     </div>
 
     <div class="section-title">Statistiques</div>
@@ -519,6 +617,12 @@
 
     <div class="section-title">Trophées</div>
     <div class="card trophy-grid" id="trophyGrid"></div>
+
+    <div class="section-title">Personnalisation</div>
+    <div class="card accent-card">
+      <div class="accent-label">Couleur de l'application</div>
+      <div class="accent-row" id="accentRow"></div>
+    </div>
 
     <button class="danger-row" id="resetBtn">Réinitialiser toutes les données</button>
   </section>
@@ -557,6 +661,8 @@
     <input type="text" class="text-input" id="fName" maxlength="40" placeholder="Ex : Boire 1,5 L d'eau">
     <div class="field-label">Icône</div>
     <div class="emoji-grid" id="fEmoji"></div>
+    <div class="field-label">Couleur</div>
+    <div class="color-row" id="fColor"></div>
     <div class="field-label">Difficulté</div>
     <div class="segmented" id="fDiff">
       <button data-v="1">Facile · 5 XP</button>
@@ -586,8 +692,10 @@
 "use strict";
 
 /* =========================================================
-   Rituels — suivi d'habitudes quotidiennes gamifié.
-   Habitudes personnalisées + XP, niveaux, séries, trophées.
+   Rituels — habitudes quotidiennes gamifiées, version 2.
+   Nouveautés : gels de série (anti-toxique), paliers de série,
+   défi hebdomadaire, citation du jour, couleurs par habitude,
+   thème personnalisable, calendrier de chaleur mensuel.
    Données 100 % locales (localStorage).
    ========================================================= */
 
@@ -596,8 +704,36 @@ const STORE_KEY = "rituels.v1";
 
 const XP_BY_DIFF = { 1: 5, 2: 10, 3: 15 };
 const PERFECT_BONUS = 25;
+const MAX_FREEZES = 3;
+const STREAK_MILESTONES = { 3: 15, 7: 25, 14: 40, 30: 75, 50: 100, 100: 150 };
 const DAY_LABELS = ["L", "M", "M", "J", "V", "S", "D"];
 const EMOJIS = ["💧","🚶‍♀️","🏃‍♀️","🧘‍♀️","💪","🚴‍♀️","🥗","🍎","😴","🛌","📖","✍️","🦷","🚿","🌞","🌙","💊","📵","🧹","🎹","🗣️","☕","🐶","❤️"];
+const HABIT_COLORS = ["#007aff", "#34c759", "#ff9500", "#ff2d55", "#af52de", "#32ade6", "#ffcc00", "#8e8e93"];
+const ACCENTS = [
+  { c: "#007aff", g: "#5ac8fa" },
+  { c: "#af52de", g: "#da8fff" },
+  { c: "#ff2d55", g: "#ff8fa3" },
+  { c: "#ff9500", g: "#ffcc66" },
+  { c: "#34c759", g: "#8ee6a8" },
+  { c: "#00c7be", g: "#66e0da" },
+];
+
+const QUOTES = [
+  "Chaque petit pas compte.",
+  "La régularité bat l'intensité.",
+  "Un jour à la fois.",
+  "Tu construis la personne que tu deviens.",
+  "Mieux vaut 1 % chaque jour que 100 % un jour.",
+  "Ton rythme, pas celui des autres.",
+  "Se reposer fait aussi partie du rythme.",
+  "Les habitudes sont des votes pour ton futur toi.",
+  "Rater un jour n'efface pas tes progrès.",
+  "Sois fière du chemin déjà parcouru.",
+  "Petit aujourd'hui, immense dans un an.",
+  "La douceur est plus durable que la discipline.",
+  "Le plus dur, c'est de commencer — et c'est fait.",
+  "Prends soin de toi comme d'une amie.",
+];
 
 const SUGGESTIONS = [
   { emoji:"💧", name:"Boire 1,5 L d'eau", diff:1 },
@@ -613,30 +749,35 @@ const SUGGESTIONS = [
 ];
 
 const LEVEL_TITLES = [
-  [20, "Icône du bien-être"],
-  [16, "Maître du rythme"],
-  [12, "Inarrêtable"],
-  [8,  "Discipliné·e"],
-  [5,  "Assidu·e"],
-  [3,  "Motivé·e"],
-  [1,  "Débutant·e"],
+  [20, "Icône du bien-être"], [16, "Maître du rythme"], [12, "Inarrêtable"],
+  [8, "Discipliné·e"], [5, "Assidu·e"], [3, "Motivé·e"], [1, "Débutant·e"],
 ];
 
+/* Trophées : stat + objectif → progression affichable */
 const TROPHIES = [
-  { ico:"🌱", name:"Premier pas",       test: t => t.totalDone >= 1 },
-  { ico:"✅", name:"10 coches",         test: t => t.totalDone >= 10 },
-  { ico:"💯", name:"100 coches",        test: t => t.totalDone >= 100 },
-  { ico:"🏆", name:"500 coches",        test: t => t.totalDone >= 500 },
-  { ico:"🔥", name:"3 jours de suite",  test: t => t.bestStreak >= 3 },
-  { ico:"⚡", name:"7 jours de suite",  test: t => t.bestStreak >= 7 },
-  { ico:"🌟", name:"30 jours de suite", test: t => t.bestStreak >= 30 },
-  { ico:"💎", name:"1 journée parfaite",test: t => t.perfectDays >= 1 },
-  { ico:"🗓️", name:"7 j. parfaites",    test: t => t.perfectDays >= 7 },
-  { ico:"👑", name:"30 j. parfaites",   test: t => t.perfectDays >= 30 },
-  { ico:"🚀", name:"Niveau 5",          test: t => t.level >= 5 },
-  { ico:"🎖️", name:"Niveau 10",         test: t => t.level >= 10 },
-  { ico:"🏅", name:"Niveau 20",         test: t => t.level >= 20 },
-  { ico:"📚", name:"5 habitudes",       test: t => t.habitCount >= 5 },
+  { ico:"🌱", name:"Premier pas",       stat:"totalDone",   goal:1 },
+  { ico:"✅", name:"10 coches",         stat:"totalDone",   goal:10 },
+  { ico:"💯", name:"100 coches",        stat:"totalDone",   goal:100 },
+  { ico:"🏆", name:"500 coches",        stat:"totalDone",   goal:500 },
+  { ico:"🔥", name:"3 jours de suite",  stat:"bestStreak",  goal:3 },
+  { ico:"⚡", name:"7 jours de suite",  stat:"bestStreak",  goal:7 },
+  { ico:"🌟", name:"30 jours de suite", stat:"bestStreak",  goal:30 },
+  { ico:"💎", name:"1 journée parfaite",stat:"perfectDays", goal:1 },
+  { ico:"🗓️", name:"7 j. parfaites",    stat:"perfectDays", goal:7 },
+  { ico:"👑", name:"30 j. parfaites",   stat:"perfectDays", goal:30 },
+  { ico:"🚀", name:"Niveau 5",          stat:"level",       goal:5 },
+  { ico:"🎖️", name:"Niveau 10",         stat:"level",       goal:10 },
+  { ico:"🏅", name:"Niveau 20",         stat:"level",       goal:20 },
+  { ico:"📚", name:"5 habitudes",       stat:"habitCount",  goal:5 },
+  { ico:"❄️", name:"3 gels en réserve", stat:"freezes",     goal:3 },
+  { ico:"🏁", name:"5 défis réussis",   stat:"challengesWon", goal:5 },
+];
+
+/* Défis hebdomadaires (rotation) */
+const CHALLENGES = [
+  { ico:"📅", name:"Semaine régulière", desc:"Coche au moins une habitude 5 jours différents cette semaine", goal:5, xp:40, kind:"activeDays" },
+  { ico:"💎", name:"Perfectionniste",   desc:"Réussis 3 journées parfaites cette semaine", goal:3, xp:50, kind:"perfectDays" },
+  { ico:"🌟", name:"Collectionneuse",   desc:"Coche 15 habitudes cette semaine", goal:15, xp:40, kind:"checks" },
 ];
 
 /* ---------- État ---------- */
@@ -646,8 +787,16 @@ function defaultState() {
     totalDone: 0,
     perfectDays: 0,
     bestStreak: 0,
-    habits: [],           // {id, name, emoji, diff, days:[0..6]}
-    completions: {},      // "YYYY-MM-DD" -> [habitId, ...]
+    freezes: 1,            // on démarre avec 1 gel offert
+    freezeDays: [],        // jours protégés (gel ou aucun programme)
+    processedUntil: null,  // dernier jour traité pour les gels
+    milestones: [],        // paliers de série déjà récompensés
+    challenges: {},        // weekKey -> true (défi validé)
+    accent: 0,
+    kindReset: false,
+    freezeNotice: 0,       // nb de gels consommés à annoncer
+    habits: [],            // {id, name, emoji, color, diff, days:[0..6]}
+    completions: {},       // "YYYY-MM-DD" -> [habitId, ...]
   };
 }
 let S = load();
@@ -655,7 +804,11 @@ let S = load();
 function load() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return Object.assign(defaultState(), JSON.parse(raw));
+    if (raw) {
+      const s = Object.assign(defaultState(), JSON.parse(raw));
+      s.habits.forEach((h, i) => { if (!h.color) h.color = HABIT_COLORS[i % HABIT_COLORS.length]; });
+      return s;
+    }
   } catch (e) {}
   return defaultState();
 }
@@ -665,8 +818,11 @@ function save() { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
 function dayKey(d = new Date()) {
   return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
+function fromKey(k) { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); }
 function weekday(d = new Date()) { return (d.getDay() + 6) % 7; } /* 0 = lundi */
 function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function mondayOf(d = new Date()) { return addDays(d, -weekday(d)); }
+function weekKey(d = new Date()) { return dayKey(mondayOf(d)); }
 
 /* ---------- Niveaux ---------- */
 function xpForLevel(lvl) { return 40 + (lvl - 1) * 20; }
@@ -677,7 +833,7 @@ function levelFromXp(xp) {
 }
 function levelTitle(lvl) {
   for (const [min, t] of LEVEL_TITLES) if (lvl >= min) return t;
-  return LEVEL_TITLES[LEVEL_TITLES.length - 1][1];
+  return "Débutant·e";
 }
 
 /* ---------- Logique habitudes ---------- */
@@ -693,16 +849,46 @@ function isPerfect(d) {
   return hs.every(h => done.includes(h.id));
 }
 
-/* série globale : jours consécutifs avec ≥ 1 coche (aujourd'hui compte s'il a une coche) */
+/* Gels : au premier lancement du jour, protège (ou clôt) les jours manqués */
+function processMissedDays() {
+  const today = dayKey();
+  if (!S.processedUntil) { S.processedUntil = today; save(); return; }
+  if (S.processedUntil >= today) return;
+  let d = addDays(fromKey(S.processedUntil), 1);
+  while (dayKey(d) < today) {
+    const k = dayKey(d);
+    if (doneOn(k).length === 0 && !S.freezeDays.includes(k)) {
+      if (habitsFor(d).length === 0) {
+        if (S.habits.length > 0) S.freezeDays.push(k); /* rien de prévu : la série passe */
+      } else if (S.freezes > 0) {
+        S.freezes--;
+        S.freezeDays.push(k);
+        S.freezeNotice++;
+      } else if (S.totalDone > 0) {
+        S.kindReset = true; /* série cassée : message bienveillant, jamais de malus */
+      }
+    }
+    d = addDays(d, 1);
+  }
+  if (S.freezeDays.length > 400) S.freezeDays = S.freezeDays.slice(-400);
+  S.processedUntil = today;
+  save();
+}
+
+/* Série : les jours gelés/sans programme passent sans compter */
 function globalStreak() {
   let streak = 0;
   let d = new Date();
   if (doneOn(dayKey(d)).length === 0) d = addDays(d, -1);
-  while (doneOn(dayKey(d)).length > 0) { streak++; d = addDays(d, -1); }
+  for (let i = 0; i < 1000; i++) {
+    const k = dayKey(d);
+    if (doneOn(k).length > 0) streak++;
+    else if (!S.freezeDays.includes(k)) break;
+    d = addDays(d, -1);
+  }
   return streak;
 }
 
-/* série d'une habitude : jours planifiés consécutifs cochés */
 function habitStreak(h) {
   let streak = 0;
   let d = new Date();
@@ -710,7 +896,7 @@ function habitStreak(h) {
   for (let i = 0; i < 730; i++) {
     if (scheduledOn(h, d)) {
       if (isDone(h, dayKey(d))) streak++;
-      else break;
+      else if (!S.freezeDays.includes(dayKey(d))) break;
     }
     d = addDays(d, -1);
   }
@@ -719,11 +905,29 @@ function habitStreak(h) {
 
 function countPerfectDays() {
   let n = 0;
-  for (const k of Object.keys(S.completions)) {
-    const [y, m, dd] = k.split("-").map(Number);
-    if (isPerfect(new Date(y, m - 1, dd))) n++;
-  }
+  for (const k of Object.keys(S.completions)) if (isPerfect(fromKey(k))) n++;
   return n;
+}
+
+/* ---------- Défi de la semaine ---------- */
+function currentChallenge() {
+  const weeksSinceEpoch = Math.floor(mondayOf().getTime() / (7 * 86400000));
+  return CHALLENGES[weeksSinceEpoch % CHALLENGES.length];
+}
+function challengeProgress(ch) {
+  const mon = mondayOf();
+  let activeDays = 0, perfect = 0, checks = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(mon, i);
+    if (dayKey(d) > dayKey()) break;
+    const n = doneOn(dayKey(d)).length;
+    if (n > 0) activeDays++;
+    checks += n;
+    if (isPerfect(d)) perfect++;
+  }
+  if (ch.kind === "activeDays") return activeDays;
+  if (ch.kind === "perfectDays") return perfect;
+  return checks;
 }
 
 /* ---------- Cocher / décocher ---------- */
@@ -733,6 +937,8 @@ function toggleHabit(h) {
   const list = S.completions[k] || (S.completions[k] = []);
   const prevLvl = levelFromXp(S.xp).lvl;
   const wasPerfect = isPerfect(today);
+  const ch = currentChallenge();
+  const chDoneBefore = S.challenges[weekKey()] === true;
   const xp = XP_BY_DIFF[h.diff] || 10;
 
   const idx = list.indexOf(h.id);
@@ -751,25 +957,53 @@ function toggleHabit(h) {
   }
 
   const nowPerfect = isPerfect(today);
-  if (!wasPerfect && nowPerfect) S.xp += PERFECT_BONUS;
-  if (wasPerfect && !nowPerfect) S.xp = Math.max(0, S.xp - PERFECT_BONUS);
+  let freezeEarned = false;
+  if (!wasPerfect && nowPerfect) {
+    S.xp += PERFECT_BONUS;
+    if (S.freezes < MAX_FREEZES) { S.freezes++; freezeEarned = true; }
+  }
+  if (wasPerfect && !nowPerfect) {
+    S.xp = Math.max(0, S.xp - PERFECT_BONUS);
+    if (S.freezes > 0) S.freezes--;
+  }
 
   const gs = globalStreak();
   if (gs > S.bestStreak) S.bestStreak = gs;
   S.perfectDays = countPerfectDays();
 
+  /* palier de série (jamais retiré : la générosité n'est pas toxique) */
+  let milestoneHit = null;
+  if (checked && STREAK_MILESTONES[gs] && !S.milestones.includes(gs)) {
+    S.milestones.push(gs);
+    S.xp += STREAK_MILESTONES[gs];
+    milestoneHit = gs;
+  }
+
+  /* défi hebdo validé ? */
+  let challengeWon = false;
+  if (checked && !chDoneBefore && challengeProgress(ch) >= ch.goal) {
+    S.challenges[weekKey()] = true;
+    S.xp += ch.xp;
+    challengeWon = true;
+  }
+
   save();
   render();
 
-  if (checked) {
-    const newLvl = levelFromXp(S.xp).lvl;
-    if (newLvl > prevLvl) {
-      confetti();
-      showAlert("🎉", "Niveau " + newLvl + " !", "Tu deviens « " + levelTitle(newLvl) + " ». Continue comme ça !");
-    } else if (!wasPerfect && nowPerfect) {
-      confetti();
-      showAlert("💎", "Journée parfaite !", "Toutes tes habitudes du jour sont cochées. +" + PERFECT_BONUS + " XP bonus !");
-    }
+  if (!checked) return;
+  const newLvl = levelFromXp(S.xp).lvl;
+  if (newLvl > prevLvl) {
+    confetti();
+    showAlert("🎉", "Niveau " + newLvl + " !", "Tu deviens « " + levelTitle(newLvl) + " ». Continue comme ça !");
+  } else if (milestoneHit) {
+    confetti();
+    showAlert("🔥", milestoneHit + " jours d'affilée !", "Quelle régularité ! +" + STREAK_MILESTONES[milestoneHit] + " XP bonus.");
+  } else if (challengeWon) {
+    confetti();
+    showAlert(ch.ico, "Défi réussi !", "« " + ch.name + " » validé. +" + ch.xp + " XP bonus !");
+  } else if (!wasPerfect && nowPerfect) {
+    confetti();
+    showAlert("💎", "Journée parfaite !", "Tout est coché. +" + PERFECT_BONUS + " XP" + (freezeEarned ? " et +1 gel de série ❄️ !" : " bonus !"));
   }
 }
 
@@ -779,37 +1013,75 @@ function toggleHabit(h) {
 const $ = id => document.getElementById(id);
 const CHECK_SVG = `<svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.2 7.4l3.2 3.2 6.4-6.8"/></svg>`;
 
+function applyAccent() {
+  const a = ACCENTS[S.accent] || ACCENTS[0];
+  document.documentElement.style.setProperty("--tint", a.c);
+  document.documentElement.style.setProperty("--tint2", a.g);
+}
+
 function fmtDays(days) {
   if (days.length === 7) return "Tous les jours";
   const full = ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"];
   return days.slice().sort((a, b) => a - b).map(d => full[d]).join(" · ");
 }
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 5) return "Bonsoir 🌙";
+  if (h < 12) return "Bonjour ☀️";
+  if (h < 18) return "Bon après-midi 👋";
+  return "Bonsoir 🌙";
+}
 
 function render() {
+  processMissedDays();
+  applyAccent();
   const today = new Date();
   const k = dayKey(today);
   const { lvl, into, need } = levelFromXp(S.xp);
   const gs = globalStreak();
 
-  /* --- header --- */
+  /* --- header + héro --- */
   const ds = today.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
   $("dateLine").textContent = ds.charAt(0).toUpperCase() + ds.slice(1);
-  $("streakCount").textContent = gs;
-
-  /* --- anneau du jour --- */
+  $("heroHello").textContent = greeting();
   const todays = habitsFor(today);
   const doneCount = todays.filter(h => isDone(h, k)).length;
+  const remaining = todays.length - doneCount;
+  $("heroSub").textContent =
+    todays.length === 0 ? "Rien de prévu aujourd'hui — repos !" :
+    remaining === 0 ? "Tout est fait, savoure ✨" :
+    remaining === 1 ? "Plus qu'une habitude, tu y es presque !" :
+    remaining + " habitudes t'attendent en douceur.";
   const pct = todays.length ? doneCount / todays.length : 0;
-  $("ringFill").style.strokeDashoffset = 289 * (1 - pct);
-  $("ringFill").style.stroke = pct >= 1 ? "var(--green)" : (pct > 0 ? "var(--green)" : "var(--fill)");
+  $("ringFill").style.strokeDashoffset = 276.5 * (1 - pct);
   $("ringCount").textContent = doneCount + "/" + todays.length;
+  $("streakCount").textContent = gs;
+  $("freezeCount").textContent = S.freezes;
+  $("levelChip").textContent = lvl;
   const xpToday = doneOn(k).reduce((sum, id) => {
     const h = S.habits.find(x => x.id === id);
     return sum + (h ? XP_BY_DIFF[h.diff] : 0);
   }, 0) + (isPerfect(today) ? PERFECT_BONUS : 0);
-  $("xpToday").textContent = "+" + xpToday;
-  $("streakLine").textContent = gs + (gs > 1 ? " jours" : " jour");
-  $("levelLine").textContent = lvl + " · " + levelTitle(lvl);
+  $("xpToday").textContent = xpToday;
+  const qi = Math.floor(today.getTime() / 86400000) % QUOTES.length;
+  $("heroQuote").textContent = "« " + QUOTES[qi] + " »";
+
+  /* --- défi de la semaine --- */
+  const ch = currentChallenge();
+  const prog = Math.min(challengeProgress(ch), ch.goal);
+  const won = S.challenges[weekKey()] === true;
+  $("challengeCard").className = "challenge" + (won ? " won" : "");
+  $("challengeCard").innerHTML = `
+    <div class="ch-ico">${ch.ico}</div>
+    <div class="ch-body">
+      <div class="ch-name"><span>${ch.name}</span><span class="ch-xp">${won ? "✔ +" + ch.xp + " XP" : "+" + ch.xp + " XP"}</span></div>
+      <div class="ch-desc">${ch.desc}</div>
+      <div class="ch-bar"><div class="ch-fill" style="width:${Math.round(prog / ch.goal * 100)}%"></div></div>
+      <div class="ch-count">${prog} / ${ch.goal}${won ? " — défi validé, bravo !" : ""}</div>
+    </div>`;
 
   /* --- liste du jour --- */
   if (todays.length === 0) {
@@ -825,7 +1097,7 @@ function render() {
       const done = isDone(h, k);
       const hs = habitStreak(h);
       return `<div class="habit-row ${done ? "done" : ""}" data-id="${h.id}">
-        <div class="h-emoji">${h.emoji}</div>
+        <div class="h-emoji" style="background:${h.color}26">${h.emoji}</div>
         <div class="h-body">
           <div class="h-name">${esc(h.name)}</div>
           <div class="h-sub">+${XP_BY_DIFF[h.diff]} XP${hs > 1 ? ` · <span class="hs-streak">🔥 ${hs}</span>` : ""}</div>
@@ -847,7 +1119,7 @@ function render() {
   } else {
     $("habitList").innerHTML = S.habits.map(h => `
       <div class="habit-row" data-id="${h.id}">
-        <div class="h-emoji">${h.emoji}</div>
+        <div class="h-emoji" style="background:${h.color}26">${h.emoji}</div>
         <div class="h-body">
           <div class="h-name">${esc(h.name)}</div>
           <div class="h-sub">${fmtDays(h.days)} · +${XP_BY_DIFF[h.diff]} XP · 🔥 ${habitStreak(h)}</div>
@@ -863,7 +1135,7 @@ function render() {
   $("suggList").innerHTML = SUGGESTIONS.map((s, i) => {
     const exists = S.habits.some(h => h.name === s.name);
     return `<div class="sugg-row">
-      <div class="h-emoji">${s.emoji}</div>
+      <div class="h-emoji" style="background:${HABIT_COLORS[i % HABIT_COLORS.length]}26">${s.emoji}</div>
       <div class="h-body">
         <div class="h-name">${s.name}</div>
         <div class="h-sub">+${XP_BY_DIFF[s.diff]} XP · tous les jours</div>
@@ -874,7 +1146,7 @@ function render() {
   document.querySelectorAll(".sugg-add:not([disabled])").forEach(btn => {
     btn.onclick = () => {
       const s = SUGGESTIONS[+btn.dataset.i];
-      S.habits.push({ id: uid(), name: s.name, emoji: s.emoji, diff: s.diff, days: [0,1,2,3,4,5,6] });
+      S.habits.push({ id: uid(), name: s.name, emoji: s.emoji, color: HABIT_COLORS[+btn.dataset.i % HABIT_COLORS.length], diff: s.diff, days: [0,1,2,3,4,5,6] });
       save(); render();
     };
   });
@@ -885,47 +1157,114 @@ function render() {
   $("xpLabel").textContent = into + " / " + need + " XP avant le niveau " + (lvl + 1);
   $("xpFill").style.width = Math.round(into / need * 100) + "%";
 
+  const tstate = {
+    totalDone: S.totalDone, bestStreak: S.bestStreak, perfectDays: S.perfectDays,
+    level: lvl, habitCount: S.habits.length, freezes: S.freezes,
+    challengesWon: Object.values(S.challenges).filter(Boolean).length,
+  };
+
+  /* prochain trophée (le plus proche en % de progression) */
+  const locked = TROPHIES.filter(t => tstate[t.stat] < t.goal);
+  if (locked.length === 0) {
+    $("nextTrophy").innerHTML = `<div class="nt-ico">🏆</div><div class="nt-body">
+      <div class="nt-name">Tous les trophées sont débloqués !</div>
+      <div class="nt-sub">Chapeau bas, championne.</div></div>`;
+  } else {
+    locked.sort((a, b) => (tstate[b.stat] / b.goal) - (tstate[a.stat] / a.goal));
+    const nt = locked[0];
+    const cur = tstate[nt.stat];
+    $("nextTrophy").innerHTML = `
+      <div class="nt-ico">${nt.ico}</div>
+      <div class="nt-body">
+        <div class="nt-name">${nt.name}</div>
+        <div class="nt-sub">${cur} / ${nt.goal} — plus que ${nt.goal - cur} !</div>
+        <div class="nt-bar"><div class="nt-fill" style="width:${Math.round(cur / nt.goal * 100)}%"></div></div>
+      </div>`;
+  }
+
+  /* barres 7 jours (une seule teinte, valeur au survol) */
   let bars = "";
   for (let i = 6; i >= 0; i--) {
     const d = addDays(today, -i);
     const hs = habitsFor(d);
     const done = doneOn(dayKey(d)).filter(id => hs.some(h => h.id === id)).length;
     const p = hs.length ? Math.round(done / hs.length * 100) : 0;
-    bars += `<div class="wb ${i === 0 ? "today" : ""}">
+    const label = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric" }) + " : " + done + "/" + hs.length + " (" + p + " %)";
+    bars += `<div class="wb ${i === 0 ? "today" : ""}" title="${label}">
       <div class="wb-track"><div class="wb-fill" style="height:${p}%"></div></div>
       <div class="wb-label">${DAY_LABELS[weekday(d)]}</div>
     </div>`;
   }
   $("weekBars").innerHTML = bars;
 
+  renderHeatmap(today);
+
   $("statTotal").textContent = S.totalDone;
   $("statXp").textContent = S.xp;
   $("statBest").textContent = S.bestStreak;
   $("statPerfect").textContent = S.perfectDays;
 
-  const tstate = { totalDone: S.totalDone, bestStreak: S.bestStreak, perfectDays: S.perfectDays, level: lvl, habitCount: S.habits.length };
   $("trophyGrid").innerHTML = TROPHIES.map(t => {
-    const won = t.test(tstate);
-    return `<div class="trophy ${won ? "won" : "locked"}">
+    const won2 = tstate[t.stat] >= t.goal;
+    return `<div class="trophy ${won2 ? "won" : "locked"}">
       <div class="t-ico">${t.ico}</div><small>${t.name}</small>
     </div>`;
   }).join("");
+
+  /* accent */
+  $("accentRow").innerHTML = ACCENTS.map((a, i) =>
+    `<div class="accent-dot ${S.accent === i ? "sel" : ""}" data-i="${i}" style="background:linear-gradient(135deg,${a.c},${a.g})"></div>`).join("");
+  document.querySelectorAll(".accent-dot").forEach(el => {
+    el.onclick = () => { S.accent = +el.dataset.i; save(); render(); };
+  });
+
+  /* annonces différées : gel consommé / série repartie (bienveillance) */
+  if (S.freezeNotice > 0) {
+    const n = S.freezeNotice;
+    S.freezeNotice = 0; save();
+    showAlert("❄️", "Ta série est protégée", (n > 1 ? n + " gels ont" : "Un gel a") + " couvert ton absence — ta série de " + gs + " continue. Il te reste " + S.freezes + " gel" + (S.freezes > 1 ? "s" : "") + ".");
+  } else if (S.kindReset) {
+    S.kindReset = false; save();
+    showAlert("🌱", "Nouvelle page", "Tu as fait une pause, et c'est ok — tes progrès et ton XP sont intacts. Chaque journée parfaite offre un gel ❄️ pour protéger ta prochaine série.");
+  }
 }
 
-function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+/* Calendrier de chaleur : une seule teinte verte, du clair au foncé */
+function renderHeatmap(today) {
+  const HEAT = ["#34c75940", "#34c7597a", "#34c759b8", "#34c759"];
+  ["hl1","hl2","hl3","hl4"].forEach((id, i) => { $(id).style.background = HEAT[i]; });
+  const y = today.getFullYear(), m = today.getMonth();
+  $("heatMonth").textContent = today.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+  const first = new Date(y, m, 1);
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  let html = DAY_LABELS.map(l => `<div class="heat-dow">${l}</div>`).join("");
+  for (let i = 0; i < weekday(first); i++) html += `<div class="heat-cell blank"></div>`;
+  for (let dd = 1; dd <= daysInMonth; dd++) {
+    const d = new Date(y, m, dd);
+    const k = dayKey(d);
+    const isToday = k === dayKey(today);
+    if (k > dayKey(today)) { html += `<div class="heat-cell future"></div>`; continue; }
+    const hs = habitsFor(d);
+    const done = doneOn(k).filter(id => hs.some(h => h.id === id)).length;
+    const ratio = hs.length ? done / hs.length : 0;
+    const col = done === 0 ? "var(--fill)" : HEAT[Math.min(3, Math.floor(ratio * 4))];
+    const label = d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) + " : " + done + " coche" + (done > 1 ? "s" : "") + (hs.length ? " / " + hs.length : "");
+    html += `<div class="heat-cell ${isToday ? "today" : ""}" style="background:${col}" title="${label}"></div>`;
+  }
+  $("heatGrid").innerHTML = html;
+}
 
 /* =========================================================
    Feuille ajout / édition
    ========================================================= */
-let editing = null; /* habitude en cours d'édition, null = création */
-let fState = { emoji: "💧", diff: 2, days: [0,1,2,3,4,5,6] };
+let editing = null;
+let fState = { emoji: "💧", color: HABIT_COLORS[0], diff: 2, days: [0,1,2,3,4,5,6] };
 
 function openSheet(h) {
   editing = h;
   fState = h
-    ? { emoji: h.emoji, diff: h.diff, days: [...h.days] }
-    : { emoji: "💧", diff: 2, days: [0,1,2,3,4,5,6] };
+    ? { emoji: h.emoji, color: h.color, diff: h.diff, days: [...h.days] }
+    : { emoji: "💧", color: HABIT_COLORS[S.habits.length % HABIT_COLORS.length], diff: 2, days: [0,1,2,3,4,5,6] };
   $("sheetTitle").textContent = h ? "Modifier l'habitude" : "Nouvelle habitude";
   $("fName").value = h ? h.name : "";
   $("fDelete").style.display = h ? "" : "none";
@@ -939,6 +1278,11 @@ function renderSheet() {
     `<div class="emoji-cell ${fState.emoji === e ? "sel" : ""}" data-e="${e}">${e}</div>`).join("");
   document.querySelectorAll(".emoji-cell").forEach(el => {
     el.onclick = () => { fState.emoji = el.dataset.e; renderSheet(); };
+  });
+  $("fColor").innerHTML = HABIT_COLORS.map(c =>
+    `<div class="color-dot ${fState.color === c ? "sel" : ""}" data-c="${c}" style="background:${c}"></div>`).join("");
+  document.querySelectorAll(".color-dot").forEach(el => {
+    el.onclick = () => { fState.color = el.dataset.c; renderSheet(); };
   });
   document.querySelectorAll("#fDiff button").forEach(b => {
     b.classList.toggle("sel", +b.dataset.v === fState.diff);
@@ -961,12 +1305,9 @@ $("fSave").onclick = () => {
   const name = $("fName").value.trim();
   if (!name) { $("fName").focus(); return; }
   if (editing) {
-    editing.name = name;
-    editing.emoji = fState.emoji;
-    editing.diff = fState.diff;
-    editing.days = [...fState.days].sort((a, b) => a - b);
+    Object.assign(editing, { name, emoji: fState.emoji, color: fState.color, diff: fState.diff, days: [...fState.days].sort((a,b) => a-b) });
   } else {
-    S.habits.push({ id: uid(), name, emoji: fState.emoji, diff: fState.diff, days: [...fState.days].sort((a, b) => a - b) });
+    S.habits.push({ id: uid(), name, emoji: fState.emoji, color: fState.color, diff: fState.diff, days: [...fState.days].sort((a,b) => a-b) });
   }
   save(); closeSheet(); render();
 };
@@ -996,7 +1337,7 @@ function showAlert(emoji, title, text) {
 $("aBtn").onclick = () => $("alertBack").classList.remove("show");
 
 function confetti() {
-  const glyphs = ["🎉", "✨", "⭐", "💙", "🟢"];
+  const glyphs = ["🎉", "✨", "⭐", "💫", "🌟"];
   for (let i = 0; i < 18; i++) {
     const c = document.createElement("div");
     c.className = "confetti";

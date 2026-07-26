@@ -23,11 +23,23 @@ quotidiennes, garder un bon rythme de vie… et gagner de l'XP comme dans un jeu
   parfaites, niveau 20…
 - Décocher retire l'XP correspondante — pas de triche 😉
 
+### Motivation saine (engageante, jamais toxique)
+- **Gels de série ❄️** : chaque journée parfaite offre un gel (max 3) qui
+  protège automatiquement la série en cas de jour manqué
+- **Message bienveillant** si la série casse : aucune XP perdue, jamais de
+  culpabilisation
+- **Paliers de série** récompensés : 3, 7, 14, 30, 50, 100 jours → bonus XP
+- **Défi de la semaine** tournant avec barre de progression et récompense
+- **Citation du jour** encourageante (dont des rappels que le repos fait
+  partie du rythme)
+
 ### Suivi
-- Écran **Aujourd'hui** : anneau de progression (façon Activité), XP du jour,
-  liste à cocher
-- Écran **Progrès** : niveau + barre d'XP, graphique des 7 derniers jours,
-  statistiques, trophées
+- Écran **Aujourd'hui** : carte héro en dégradé avec salutation selon l'heure,
+  anneau de progression (façon Activité), puces 🔥/❄️/niveau/XP
+- Écran **Progrès** : niveau + barre d'XP, **prochain trophée** avec
+  progression, graphique des 7 derniers jours, **calendrier de chaleur du
+  mois**, statistiques, 16 trophées
+- **Personnalisation** : couleur par habitude + 6 thèmes d'accent pour l'app
 
 ### Design Apple
 - Grands titres iOS, cartes arrondies, séparateurs fins, contrôle segmenté,

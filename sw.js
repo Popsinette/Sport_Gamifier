@@ -1,5 +1,5 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "rituels-v1";
+const CACHE = "rituels-v2";
 const ASSETS = [
   "./",
   "./index.html",
