@@ -876,6 +876,7 @@ function createScene(canvas, opts) {
   let cheer = 0, jump = 0, walkPhase = 0;
   let particles = [], birds = [], clouds = [];
   let biomeIndex = 0, prevBiome = -1, fadeT = 1;
+  let heroAnim = null;
   const reduce = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const STEP_PX = 26;      /* distance parcourue par pas */
@@ -1206,12 +1207,19 @@ function createScene(canvas, opts) {
       ctx.restore();
     }
 
-    /* le Héros */
-    if (global.Hero && opts.look) {
+    /* le Héros — sprites HD si disponibles, rendu vectoriel sinon */
+    if (opts.look) {
       const mounted = opts.look.mount && opts.look.mount !== "none";
-      global.Hero.draw(ctx, heroX, gy + H * .080, H * (mounted ? .30 : .27), opts.look,
-        { t, walk: (walking && !blocked) ? 1 : 0, phase: walkPhase, jump, cheer },
-        { sun: g.sun, amb: g.amb, night: g.star, wind: .5 + Math.sin(t * .3) * .3 });
+      const hx2 = heroX, hy2 = gy + H * .080, hh = H * (mounted ? .30 : .27);
+      const hState = { t, walk: (walking && !blocked) ? 1 : 0, run: false,
+                       phase: walkPhase, jump, cheer,
+                       resting: blocked && !walking, sleeping: false, anim: heroAnim };
+      const hEnv = { sun: g.sun, amb: g.amb, night: g.star, wind: .5 + Math.sin(t * .3) * .3 };
+      const done = global.Sprites && global.Sprites.ready
+        && global.Sprites.draw(ctx, hx2, hy2, hh, opts.look, hState, hEnv, dt);
+      heroAnim = hState.anim;
+      if (!done && global.Hero) global.Hero.draw(ctx, hx2, hy2, hh, opts.look,
+        { t, walk: hState.walk, phase: walkPhase, jump, cheer }, hEnv);
     }
 
     /* particules */
@@ -1297,7 +1305,10 @@ function createScene(canvas, opts) {
     phaseLabel() {
       return gradeAt(opts.hour != null ? opts.hour : new Date().getHours() + new Date().getMinutes() / 60).label;
     },
-    setLook(l) { opts.look = l; },
+    setLook(l) {
+      opts.look = l;
+      if (global.Sprites) global.Sprites.preload(l).catch(() => {});
+    },
     STEP_PX,
   };
   resize();

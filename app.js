@@ -333,6 +333,7 @@ let scene = null;
 
 function boot3D() {
   scene = Odyssey.createScene($("stage"), { look: S.look });
+  if (window.Sprites) Sprites.preload(S.look).catch(() => {});
   scene.setSteps(journey().pos, true);
   scene.start();
   window.addEventListener("resize", () => scene.resize());
