@@ -68,11 +68,35 @@ Nom, icône (24 pictogrammes maison), couleur, difficulté, jours de la semaine.
 - Mode sombre automatique
 - Données 100 % locales (`localStorage`), rien n'est envoyé en ligne
 
-## Installation
+## Test en local
 
-PWA : ouvrir le site sur le téléphone, puis **« Ajouter à l'écran d'accueil »**
-(Android/Chrome) ou **Partager → « Sur l'écran d'accueil »** (iPhone/Safari).
+⚠️ **Ne pas ouvrir `index.html` par double-clic.** En `file://`, le navigateur
+bloque `fetch()` et le service worker : le monde ne s'affiche pas. Il faut
+servir le dossier en HTTP.
 
 ```bash
-npx http-server .   # test local
+cd Sport_Gamifier
+npx http-server . -p 8080 -c-1
 ```
+
+Puis ouvrir <http://localhost:8080>.
+
+Autres options équivalentes :
+
+```bash
+python3 -m http.server 8080      # Python
+php -S localhost:8080            # PHP
+```
+
+**Tester depuis le téléphone sur le même Wi-Fi** : relever l'adresse locale de
+l'ordinateur (`ipconfig` sous Windows, `ifconfig | grep inet` sous macOS) et
+ouvrir `http://<adresse>:8080` sur le mobile.
+
+> Le `404` sur `assets/hero/manifest.json` dans la console est **normal** :
+> c'est la sonde du pipeline de sprites, qui bascule sur le rendu vectoriel
+> tant qu'aucun asset n'est déposé.
+
+## Installation sur le téléphone
+
+PWA : ouvrir le site publié, puis **« Ajouter à l'écran d'accueil »**
+(Android/Chrome) ou **Partager → « Sur l'écran d'accueil »** (iPhone/Safari).
