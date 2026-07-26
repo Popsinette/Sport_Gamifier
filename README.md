@@ -1,30 +1,39 @@
-# 👑 Royaume d'Astria — Sport doux en monde fantastique
+# ✅ Rituels — Habitudes quotidiennes gamifiées
 
-Une application mobile pour faire du **sport doux quotidiennement**, présentée
-comme un jeu de rôle fantastique : chaque exercice réel est une **quête** du
-Royaume Étoilé, et ton **héroïne personnalisable** gagne des talents et des
-équipements magiques au fil de tes séances.
+Une application mobile au **design Apple (iOS)** pour suivre tes habitudes
+quotidiennes, garder un bon rythme de vie… et gagner de l'XP comme dans un jeu.
 
 ## ✨ Fonctionnalités
 
-- **Héroïne 100 % personnalisable** : peau (5 teintes), coiffure (longs,
-  couettes, chignon, tresse), couleur de cheveux (8), yeux (5), robe (6),
-  et son prénom
-- **Elle évolue selon TES exercices** — 4 talents nourris par 4 familles
-  d'exercices :
-  - ⚔️ **Force** (squats, gainage, pont fessier…) → gants, épaulières, épée de lumière → *Guerrière*
-  - 🥾 **Endurance** (marche, montées de genoux…) → bottes, cape d'exploratrice, cape céleste → *Exploratrice*
-  - 🦋 **Grâce** (étirements, yoga…) → rubans, ailes de fée, ailes de papillon → *Danseuse féérique*
-  - ✨ **Magie** (respiration, relaxation, équilibre…) → pendentif de lune, bâton des étoiles, aura → *Enchanteresse*
-- Son **titre** reflète son talent dominant et son niveau global
-  (« Guerrière novice » → « Enchanteresse légendaire »), et le niveau global
-  débloque diadème, couronne royale et aura légendaire
-- **3 quêtes par jour** (toujours 3 familles différentes), habillées en
-  aventures : « Traverser la Forêt d'Émeraude », « Bâtir le Pont de Lune »,
-  « L'épreuve de la fée funambule »…
-- **Minuteur guidé** pour chaque quête, vibration à la fin
-- **Flamme quotidienne (🔥 streak)**, trophées, chroniques hebdomadaires,
-  quête bonus surprise
+### Habitudes personnalisées
+- Crée tes propres habitudes : **nom, icône (24 emojis), difficulté, jours de
+  la semaine** (ex. seulement lun/mer/ven)
+- 10 **suggestions** prêtes à ajouter en un tap (eau, marche, lecture,
+  coucher avant 23 h, pas d'écran au lit…)
+- Modification et suppression à tout moment
+
+### Progression type jeu vidéo
+- **XP par coche** selon la difficulté : facile +5, moyenne +10, difficile +15
+- **Bonus « journée parfaite » +25 XP** quand toutes les habitudes du jour
+  sont cochées
+- **Niveaux** avec titres (Débutant·e → Motivé·e → Assidu·e → Discipliné·e →
+  Inarrêtable → Maître du rythme → Icône du bien-être)
+- **Séries (🔥 streaks)** : série globale + série par habitude
+- **14 trophées** : premiers pas, 100 coches, 7 jours de suite, 30 journées
+  parfaites, niveau 20…
+- Décocher retire l'XP correspondante — pas de triche 😉
+
+### Suivi
+- Écran **Aujourd'hui** : anneau de progression (façon Activité), XP du jour,
+  liste à cocher
+- Écran **Progrès** : niveau + barre d'XP, graphique des 7 derniers jours,
+  statistiques, trophées
+
+### Design Apple
+- Grands titres iOS, cartes arrondies, séparateurs fins, contrôle segmenté,
+  feuilles modales avec poignée, alertes iOS, tab bar translucide (flou)
+- **Mode sombre automatique** selon le réglage du téléphone
+- Légère vibration à chaque coche
 
 ## 📱 Installation sur ton téléphone
 
@@ -35,8 +44,8 @@ C'est une **PWA** : pas besoin d'app store.
 2. Ouvre l'adresse dans le navigateur du téléphone
 3. Menu → **« Ajouter à l'écran d'accueil »** (Android/Chrome) ou
    **Partager → « Sur l'écran d'accueil »** (iPhone/Safari)
-4. L'app s'ouvre en plein écran, fonctionne **hors-ligne** et garde ta
-   progression sur le téléphone (localStorage — rien n'est envoyé en ligne)
+4. L'app s'ouvre en plein écran, fonctionne **hors-ligne** et garde tes
+   données sur le téléphone (localStorage — rien n'est envoyé en ligne)
 
 ## 🧪 Tester en local
 
@@ -49,7 +58,7 @@ npx http-server .
 
 | Fichier | Rôle |
 |---|---|
-| `index.html` | Toute l'application (interface + logique du jeu + avatar SVG) |
+| `index.html` | Toute l'application (interface + logique) |
 | `manifest.webmanifest` | Métadonnées d'installation PWA |
 | `sw.js` | Service worker (fonctionnement hors-ligne) |
 | `icon.svg` / `icon-512.png` | Icônes de l'application |

@@ -1,34 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4b2a86"/>
-      <stop offset="1" stop-color="#1e1240"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5ac8fa"/>
+      <stop offset="1" stop-color="#007aff"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b7f5c8"/>
+      <stop offset="1" stop-color="#34c759"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="112" fill="url(#sky)"/>
-  <text x="80" y="110" font-size="30" fill="#fff" opacity=".8">✦</text>
-  <text x="410" y="150" font-size="22" fill="#fff" opacity=".7">✦</text>
-  <text x="120" y="420" font-size="20" fill="#fff" opacity=".6">✦</text>
-  <text x="400" y="400" font-size="26" fill="#fff" opacity=".7">✦</text>
-  <circle cx="410" cy="90" r="34" fill="#f7ecc9" opacity=".95"/>
-  <!-- cheveux arrière -->
-  <path d="M256 96 C 148 104 140 230 156 320 C 164 380 180 420 220 440 Q 256 452 292 440 C 332 420 348 380 356 320 C 372 230 364 104 256 96 Z" fill="#5a3b26"/>
-  <!-- tête -->
-  <ellipse cx="256" cy="216" rx="98" ry="100" fill="#ffe3cc"/>
-  <!-- yeux -->
-  <circle cx="206" cy="238" r="19" fill="#5a768c"/>
-  <circle cx="306" cy="238" r="19" fill="#5a768c"/>
-  <circle cx="206" cy="238" r="9" fill="#221826"/>
-  <circle cx="306" cy="238" r="9" fill="#221826"/>
-  <circle cx="212" cy="231" r="6" fill="#fff"/>
-  <circle cx="312" cy="231" r="6" fill="#fff"/>
-  <!-- joues + bouche -->
-  <ellipse cx="178" cy="270" rx="18" ry="10" fill="#ff9eb5" opacity=".6"/>
-  <ellipse cx="334" cy="270" rx="18" ry="10" fill="#ff9eb5" opacity=".6"/>
-  <path d="M238 288 Q 256 304 274 288" stroke="#8a4a58" stroke-width="7" fill="none" stroke-linecap="round"/>
-  <!-- frange -->
-  <path d="M156 222 Q 148 122 256 114 Q 364 122 356 222 Q 348 172 318 166 Q 300 200 278 170 Q 260 204 236 170 Q 214 200 196 166 Q 166 172 156 222 Z" fill="#5a3b26"/>
-  <!-- diadème -->
-  <path d="M212 138 Q 256 118 300 138" stroke="#f5c96b" stroke-width="10" fill="none" stroke-linecap="round"/>
-  <circle cx="256" cy="126" r="10" fill="#9fe8ff" stroke="#f5c96b" stroke-width="4"/>
+  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="42"/>
+  <path d="M 256 106 A 150 150 0 1 1 126 181" fill="none" stroke="url(#ring)" stroke-width="42" stroke-linecap="round"/>
+  <path d="M 196 262 L 240 306 L 326 210" fill="none" stroke="#ffffff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

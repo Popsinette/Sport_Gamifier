@@ -1,5 +1,5 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "astria-v1";
+const CACHE = "rituels-v1";
 const ASSETS = [
   "./",
   "./index.html",
