@@ -100,7 +100,7 @@ const BIOMES = [
     layers:[
       { t:"ridge",  y:.50, a:.17, seg:6, jag:.5, c:"#7a90a6", f:.72, s:.08 },
       { t:"struct", y:.62, kind:"pagoda", c:"#6b5a56", f:.42, s:.20 },
-      { t:"hills",  y:.71, a:.05, seg:9, c:"#7ba054", f:.20, s:.42 },
+      { t:"hills",  y:.72, a:.09, seg:7, c:"#5f8442", f:.16, s:.42 },
     ]},
   { id:"sakura", name:"Cerisiers en Fleurs",
     sky:["#9cc0e4","#ffeaf0"], fog:"#eadde2", ground:"#7f9c62", path:"#bda57e", amb:"petals",
@@ -124,11 +124,11 @@ const BIOMES = [
       { t:"mesa",   y:.72, a:.14, seg:4, c:"#6b3428", f:.12, s:.46 },
     ]},
   { id:"jungle", name:"Jungle Tropicale",
-    sky:["#7fb8a8","#dff0dc"], fog:"#b8d8bc", ground:"#3f6b3a", path:"#8a7a4a", amb:"mist",
+    sky:["#6fb0a4","#e4f2dc"], fog:"#bcdcc0", ground:"#3a6336", path:"#8a7a4a", amb:"mist",
     layers:[
-      { t:"hills",  y:.52, a:.13, seg:6, c:"#5f8a72", f:.72, s:.08 },
-      { t:"forest", y:.64, h:.17, n:10, kind:"round", c:"#3d7350", f:.42, s:.22 },
-      { t:"forest", y:.76, h:.16, n:9,  kind:"palm",  c:"#1f4a33", f:.10, s:.48 },
+      { t:"hills",  y:.50, a:.14, seg:6, c:"#5f8a72", f:.74, s:.08 },
+      { t:"forest", y:.64, h:.15, n:8,  kind:"round", c:"#3f8058", f:.44, s:.22 },
+      { t:"forest", y:.78, h:.15, n:7,  kind:"palm",  c:"#153c2a", f:.06, s:.50 },
     ]},
   { id:"falaises", name:"Falaises Océanes",
     sky:["#7fb4dc","#e0f0f8"], fog:"#c8e0ee", ground:"#6f8a5e", path:"#b4a582", amb:"spray",
@@ -170,7 +170,7 @@ const BIOMES = [
     layers:[
       { t:"ridge",  y:.40, a:.30, seg:5, jag:1, c:"#7482a8", f:.74, s:.06, snow:.30 },
       { t:"struct", y:.62, kind:"temple", c:"#8a6a62", f:.40, s:.20 },
-      { t:"forest", y:.76, h:.10, n:11, kind:"bamboo", c:"#3f5a44", f:.12, s:.46 },
+      { t:"forest", y:.77, h:.17, n:8,  kind:"bamboo", c:"#33513c", f:.10, s:.46 },
     ]},
   { id:"village", name:"Village Médiéval",
     sky:["#c88a72","#ffdcb0"], fog:"#e8c4a0", ground:"#7a8a5a", path:"#b09468", amb:"dust",
@@ -333,32 +333,44 @@ function drawTree(p, x, base, h, kind, rng) {
     p.lineTo(x + w * .12, base);
     p.closePath();
   } else if (kind === "palm") {
-    const t = h * .06;
+    const t = Math.max(1.2, h * .045);
+    const lean = h * .16;
+    /* stipe incurvé */
     p.moveTo(x - t, base);
-    p.quadraticCurveTo(x - t + h * .12, base - h * .55, x + h * .13, base - h * .86);
-    p.lineTo(x + h * .13 + t * 1.4, base - h * .84);
-    p.quadraticCurveTo(x + t + h * .1, base - h * .5, x + t, base);
+    p.quadraticCurveTo(x - t + lean * .5, base - h * .5, x + lean, base - h * .84);
+    p.lineTo(x + lean + t * 1.5, base - h * .83);
+    p.quadraticCurveTo(x + t + lean * .5, base - h * .5, x + t, base);
     p.closePath();
-    const cx = x + h * .14, cy = base - h * .88;
-    for (let i = 0; i < 6; i++) {
-      const a = Math.PI + (i / 5) * Math.PI;
-      const rx = Math.cos(a) * h * .46, ry = Math.sin(a) * h * .30;
+    const cx = x + lean + t * .5, cy = base - h * .86;
+    /* palmes retombantes */
+    for (let i = 0; i < 7; i++) {
+      const a = Math.PI * (1.06 + (i / 6) * .88);
+      const ex = cx + Math.cos(a) * h * .50;
+      const ey = cy + Math.abs(Math.sin(a)) * -h * .16 + h * .20;
       p.moveTo(cx, cy);
-      p.quadraticCurveTo(cx + rx * .55, cy + ry * .55 - h * .13, cx + rx, cy + ry + h * .05);
-      p.quadraticCurveTo(cx + rx * .5, cy + ry * .5 + h * .03, cx, cy + h * .03);
+      p.quadraticCurveTo(cx + (ex - cx) * .55, cy - h * .19, ex, ey);
+      p.quadraticCurveTo(cx + (ex - cx) * .48, cy - h * .04, cx, cy + h * .04);
       p.closePath();
     }
   } else if (kind === "bamboo") {
-    const w = h * .07;
+    const w = Math.max(1.1, h * .045);
     for (let k = 0; k < 3; k++) {
-      const bx = x + (k - 1) * w * 2.4;
-      const bh = h * (.7 + rng() * .5);
-      p.rect(bx - w / 2, base - bh, w, bh);
+      const bx = x + (k - 1) * w * 3.4;
+      const bh = h * (.78 + rng() * .5);
+      const tilt = (rng() - .5) * h * .06;
+      p.moveTo(bx - w / 2, base);
+      p.lineTo(bx - w / 2 + tilt, base - bh);
+      p.lineTo(bx + w / 2 + tilt, base - bh);
+      p.lineTo(bx + w / 2, base);
+      p.closePath();
+      /* feuilles fines en haut de chaque tige */
       for (let j = 0; j < 3; j++) {
-        const ly = base - bh * (.55 + j * .16);
-        p.moveTo(bx, ly);
-        p.quadraticCurveTo(bx + w * 3, ly - h * .1, bx + w * 5, ly - h * .04);
-        p.quadraticCurveTo(bx + w * 3, ly + h * .02, bx, ly + w * .5);
+        const ly = base - bh * (.72 + j * .11);
+        const dir = j % 2 ? 1 : -1;
+        const lx = bx + tilt * (ly / base);
+        p.moveTo(lx, ly);
+        p.quadraticCurveTo(lx + dir * h * .13, ly - h * .06, lx + dir * h * .24, ly - h * .11);
+        p.quadraticCurveTo(lx + dir * h * .12, ly - h * .02, lx, ly + w * .6);
         p.closePath();
       }
     }
