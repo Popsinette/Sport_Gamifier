@@ -1,10 +1,11 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "odyssee-v1";
+const CACHE = "odyssee-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./icons.js",
+  "./hero.js",
   "./world.js",
   "./app.js",
   "./manifest.webmanifest",

@@ -73,6 +73,17 @@
     <div class="glass rows" id="todayRows"></div>
   </section>
 
+
+  <!-- ===================== HÉROS ===================== -->
+  <section class="screen" id="sc-hero">
+    <header><div><div class="eyebrow">Ton héros</div><h1>Garde-robe</h1></div></header>
+    <div class="glass hero-stage"><canvas id="heroCanvas"></canvas></div>
+    <div class="sec">Prochain déblocage</div>
+    <div class="glass next" id="heroNext"></div>
+    <div class="sec">Apparence</div>
+    <div class="glass wardrobe" id="wardrobe"></div>
+  </section>
+
   <!-- ===================== HABITUDES ===================== -->
   <section class="screen" id="sc-habits">
     <header>
@@ -136,6 +147,7 @@
 
   <nav>
     <button class="on" data-sc="today"><span class="ic"></span>Voyage</button>
+    <button data-sc="hero"><span class="ic"></span>Héros</button>
     <button data-sc="habits"><span class="ic"></span>Habitudes</button>
     <button data-sc="progress"><span class="ic"></span>Progrès</button>
   </nav>
@@ -176,6 +188,7 @@
 </div>
 
 <script src="icons.js"></script>
+<script src="hero.js"></script>
 <script src="world.js"></script>
 <script src="app.js"></script>
 </body>

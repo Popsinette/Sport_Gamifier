@@ -138,36 +138,41 @@ pluie · aurore`, plus vols d'oiseaux et bancs de nuages.
 
 ---
 
-## 5. Le personnage — « le Voyageur »
+## 5. Le Héros — la mascotte
 
-Pas de bonhomme, pas de visage cartoon. **Un voyageur encapuchonné**, lu par
-sa silhouette : c'est le choix qui tient à toutes les échelles et qui laisse
-l'utilisateur y projeter qui il veut (référence : le Vagabond de *Journey*,
-la lisibilité Ghibli).
+Le personnage n'est pas un pion : c'est **le héros du joueur**, créé puis
+enrichi tout au long du voyage. C'est le levier d'attachement principal.
 
-**Anatomie** (≈ 46 px de haut) : cape drapée en bézier, capuche, sac de voyage,
-écharpe flottante à deux pans, jambes articulées.
+**Style** : proportions Nintendo — la tête fait environ un tiers de la
+silhouette. Visage expressif dessiné (yeux avec reflet, sourcils, cils, nez,
+bouche, joues rosées), vêtements en couches avec plis et ceinture, liseré de
+lumière solaire sur tout le côté exposé.
 
-**Lumière** : liseré de lumière (*rim light*) sur le côté exposé au soleil,
-teinté de la couleur de lumière du grade en cours. La nuit, une petite lanterne
-projette un halo chaud. C'est ce liseré qui « décolle » le personnage du décor
-et signe le rendu haut de gamme.
+**Création** — silhouette (fine / neutre / robuste), teint, coiffure, tenue,
+cape, sac, compagnon, monture, plus quatre nuanciers (peau, cheveux, vêtement,
+cape). Tout est modifiable à tout moment depuis l'onglet *Héros*.
 
-**États d'animation**
+**Progression de garde-robe** — la plupart des pièces se **débloquent en
+avançant**, chacune liée à un jalon différent pour varier les objectifs :
 
-| État | Description |
+| Type | Débloqué par |
 |---|---|
-| `walk` | cycle de marche 0,62 s, balancement des jambes, cape et écharpe en retard d'une frame (inertie) |
-| `idle` | respiration 3,4 s, léger report de poids |
-| `look` | tourne la tête vers le décor toutes les 6-9 s |
-| `jump` | franchissement d'obstacle : anticipation, envol, réception amortie |
-| `cheer` | habitude validée : saut de joie, poussière au sol, étincelles |
+| Coiffures | niveau, nombre de pas |
+| Tenues | niveau, obstacles franchis, paysages découverts |
+| Capes | niveau, série, obstacles, paysages |
+| Sacs | niveau, pas, obstacles |
+| Compagnons | série, niveau, journées parfaites |
+| Montures | niveau, paysages découverts |
 
-Principes d'animation appliqués : **anticipation**, **suivi et chevauchement**
-(l'écharpe suit le corps avec retard), **arcs** (aucune trajectoire rectiligne),
-**accompagnement** (`cubic-bezier(.22,1,.36,1)` partout).
+L'écran *Héros* affiche en permanence **le prochain déblocage et sa
+progression** — le joueur sait toujours ce qu'il gagnera en continuant.
 
----
+**Animation** — cape en chaîne de 7 segments parcourue par une onde de vent
+(chaque segment est en retard sur le précédent), jambes à deux articulations,
+bras en contre-balancement, cheveux et écharpe à inertie, respiration au repos,
+expression de joie à chaque habitude validée, saut au franchissement
+d'obstacle. Compagnon qui trottine à côté, monture avec démarche à quatre
+temps.
 
 ## 6. Les obstacles — de vraies scènes
 

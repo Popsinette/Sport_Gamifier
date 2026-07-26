@@ -171,6 +171,7 @@ function blank() {
     milestones: [], challenges: {},
     theme: 0,
     notice: 0, softReset: false,
+    look: Hero.defaultLook(),
     habits: [], log: {},
   };
 }
@@ -206,6 +207,8 @@ function fromRituels(p) {
   return s;
 }
 function migrate(s) {
+  if (!s.look) s.look = Hero.defaultLook();
+  else s.look = Object.assign(Hero.defaultLook(), s.look);
   s.habits.forEach((h, i) => {
     if (!h.icon) h.icon = ICON_SET[i % ICON_SET.length];
     if (!h.hue) h.hue = HUES[i % HUES.length];
@@ -329,7 +332,7 @@ const ic = (n, o) => Icons.svg(n, o);
 let scene = null;
 
 function boot3D() {
-  scene = Odyssey.createScene($("stage"), { cloak: CLOAKS[S.theme] || CLOAKS[0] });
+  scene = Odyssey.createScene($("stage"), { look: S.look });
   scene.setSteps(journey().pos, true);
   scene.start();
   window.addEventListener("resize", () => scene.resize());
@@ -346,7 +349,7 @@ function applyTheme() {
   const t = THEMES[S.theme] || THEMES[0];
   document.documentElement.style.setProperty("--a1", t.a1);
   document.documentElement.style.setProperty("--a2", t.a2);
-  if (scene) scene.setCloak(CLOAKS[S.theme] || CLOAKS[0]);
+  if (scene) scene.setLook(S.look);
 }
 
 const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -388,6 +391,7 @@ function render() {
   $("wRing").textContent = doneN + "/" + todays.length;
   $("wXp").style.width = Math.round(L.into / L.need * 100) + "%";
 
+  renderHeroScreen(L, st, J);
   renderObstacle(J);
   renderChallenge();
   renderToday(todays, k);
@@ -537,6 +541,13 @@ function renderHabits() {
 }
 
 /* ---------- progrès ---------- */
+/* jalons servant aux déblocages du héros */
+function unlockStats(L, st, J) {
+  return { level: L.l, steps: J.pos, streak: st, perfect: S.perf,
+           obstacles: S.passed.length,
+           biomes: Math.min(Odyssey.BIOMES.length, Math.floor(J.pos / SEG) + 1) };
+}
+
 function renderProgress(L, st, J) {
   $("pOrb").textContent = L.l;
   $("pTitle").textContent = title(L.l);
@@ -697,6 +708,122 @@ function renderNotices(st) {
   }
 }
 
+
+/* =========================================================
+   Écran Héros — création et garde-robe
+   ========================================================= */
+const WARDROBE = [
+  { key:"body",   label:"Silhouette" },
+  { key:"hair",   label:"Coiffure" },
+  { key:"outfit", label:"Tenue" },
+  { key:"cape",   label:"Cape" },
+  { key:"pack",   label:"Sac" },
+  { key:"pet",    label:"Compagnon" },
+  { key:"mount",  label:"Monture" },
+];
+const SWATCHES = [
+  { key:"skin",        label:"Peau",     list:() => Hero.SKINS },
+  { key:"hairColor",   label:"Cheveux",  list:() => Hero.HAIRS },
+  { key:"outfitColor", label:"Vêtement", list:() => Hero.CLOTH },
+  { key:"capeColor",   label:"Cape",     list:() => Hero.CAPES },
+];
+let heroPreview = null;
+
+function renderHeroScreen(L, st, J) {
+  const U = unlockStats(L, st, J);
+  const box = $("wardrobe");
+  if (!box) return;
+
+  let html = "";
+  for (const grp of WARDROBE) {
+    const items = Hero.CATALOG[grp.key];
+    if (grp.key === "capeColor") continue;
+    html += '<div class="fl-l">' + grp.label + "</div><div class=\"opts\">";
+    for (const it of items) {
+      const ok = Hero.unlocked(it.req, U);
+      const on = S.look[grp.key] === it.id;
+      html += '<button class="opt' + (on ? " on" : "") + (ok ? "" : " lk") + '"' +
+        (ok ? ' data-k="' + grp.key + '" data-v="' + it.id + '"' : " disabled") + ">" +
+        (ok ? "" : Icons.svg("shield", { size: 12 })) +
+        "<span>" + it.name + "</span>" +
+        (ok ? "" : '<em>' + reqText(it.req) + "</em>") + "</button>";
+    }
+    html += "</div>";
+  }
+  for (const s of SWATCHES) {
+    html += '<div class="fl-l">' + s.label + '</div><div class="hues">' +
+      s.list().map(c => '<div class="hue' + (S.look[s.key] === c ? " on" : "") +
+        '" data-k="' + s.key + '" data-v="' + c + '" style="background:' + c + '"></div>').join("") +
+      "</div>";
+  }
+  box.innerHTML = html;
+  box.querySelectorAll("[data-k]").forEach(el => {
+    el.onclick = () => {
+      S.look[el.dataset.k] = el.dataset.v;
+      save();
+      if (scene) scene.setLook(S.look);
+      render();
+      if (navigator.vibrate) navigator.vibrate(8);
+    };
+  });
+
+  /* aperçu animé */
+  if (!heroPreview) {
+    const cv = $("heroCanvas");
+    if (cv) {
+      const cx = cv.getContext("2d");
+      heroPreview = { cv, cx, t: 0, ph: 0 };
+      const loop = () => {
+        const p = heroPreview;
+        if (!document.hidden && $("sc-hero").classList.contains("on")) {
+          const r = p.cv.getBoundingClientRect();
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          if (p.cv.width !== Math.round(r.width * dpr)) {
+            p.cv.width = Math.round(r.width * dpr);
+            p.cv.height = Math.round(r.height * dpr);
+          }
+          p.cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          p.t += .016; p.ph += .10;
+          p.cx.clearRect(0, 0, r.width, r.height);
+          const mounted = S.look.mount && S.look.mount !== "none";
+          Hero.draw(p.cx, r.width * .5, r.height * .92, r.height * (mounted ? .62 : .74),
+            S.look, { t: p.t, walk: 1, phase: p.ph, jump: 0, cheer: 0 },
+            { sun: [255, 240, 214], amb: [1, 1, 1], night: 0, wind: .7 });
+        }
+        requestAnimationFrame(loop);
+      };
+      loop();
+    }
+  }
+
+  /* prochains déblocages */
+  const pend = [];
+  for (const grp of WARDROBE) {
+    for (const it of Hero.CATALOG[grp.key]) {
+      if (!Hero.unlocked(it.req, U)) pend.push({ it, grp, cur: U[it.req.t] || 0 });
+    }
+  }
+  pend.sort((a, b) => (b.cur / b.it.req.n) - (a.cur / a.it.req.n));
+  const nx = $("heroNext");
+  if (nx) {
+    nx.innerHTML = pend.length === 0
+      ? '<div class="next-i">' + Icons.svg("trophy", { size: 22 }) + '</div><div class="next-b">' +
+        '<div class="next-n">Garde-robe complète</div><div class="next-s">Tu as tout débloqué.</div></div>'
+      : pend.slice(0, 1).map(p =>
+        '<div class="next-i">' + Icons.svg("spark", { size: 22 }) + '</div><div class="next-b">' +
+        '<div class="next-n">' + p.it.name + '</div>' +
+        '<div class="next-s">' + reqText(p.it.req) + " · " + p.cur + " / " + p.it.req.n + "</div>" +
+        '<div class="bar"><i style="width:' + Math.round(Math.min(1, p.cur / p.it.req.n) * 100) + '%"></i></div></div>').join("");
+  }
+}
+
+function reqText(r) {
+  if (!r) return "";
+  return { level: "Niveau " + r.n, steps: r.n + " pas", streak: "Série de " + r.n + " j",
+           perfect: r.n + " jours parfaits", obstacles: r.n + " obstacles",
+           biomes: r.n + " paysages" }[r.t] || "";
+}
+
 /* =========================================================
    Feuille de création / édition
    ========================================================= */
@@ -797,7 +924,7 @@ function go(name) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("nav button").forEach((b, i) => {
-  b.querySelector(".ic").innerHTML = ic(["compass", "list", "chart"][i], { size: 23 });
+  b.querySelector(".ic").innerHTML = ic(["compass", "heart", "list", "chart"][i], { size: 23 });
   b.onclick = () => go(b.dataset.sc);
 });
 

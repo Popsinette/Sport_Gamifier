@@ -596,3 +596,28 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- écran Héros ---------- */
+.hero-stage {
+  padding: 0; overflow: hidden;
+  background: linear-gradient(170deg, rgba(126,166,220,.30), rgba(126,166,220,.06) 55%, transparent);
+}
+.hero-stage canvas { display: block; width: 100%; height: 34vh; min-height: 210px; max-height: 300px; }
+.wardrobe { padding: 6px 16px 18px; }
+.wardrobe .fl-l { margin: 16px 2px 8px; }
+.opts { display: flex; flex-wrap: wrap; gap: 7px; }
+.opt {
+  border: 1px solid var(--glass-line);
+  background: var(--glass-2);
+  color: var(--ink-2);
+  font-family: inherit; font-size: .78rem; font-weight: 620;
+  padding: 9px 13px; border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: transform .14s, background .2s, color .2s;
+}
+.opt:active { transform: scale(.94); }
+.opt.on { background: linear-gradient(120deg, var(--a1), var(--a2)); color: #fff; border-color: transparent; }
+.opt.lk { opacity: .5; cursor: default; }
+.opt.lk em { font-style: normal; font-size: .68rem; opacity: .8; }
+.wardrobe .hues { border: 1px solid var(--glass-line); }

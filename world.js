@@ -1129,6 +1129,17 @@ function createScene(canvas, opts) {
           }
           ctx.restore();
         }
+        /* Liseré solaire le long de l'arête : c'est cet accroche-lumière
+           qui « décolle » chaque plan et donne le rendu peint. */
+        if (L.f < .6) {
+          ctx.save();
+          ctx.clip(p);
+          const rimC = mixRgb(g.sun, [255, 255, 255], .25);
+          ctx.strokeStyle = css(rimC, .30 * (1 - L.f));
+          ctx.lineWidth = 2.2;
+          ctx.stroke(p);
+          ctx.restore();
+        }
         ctx.restore();
       }
       /* voile de brouillard entre les couches */
@@ -1157,6 +1168,36 @@ function createScene(canvas, opts) {
     ctx.quadraticCurveTo(W * .5, gy + H * .092, 0, gy + H * .105);
     ctx.closePath(); ctx.fill();
 
+    /* Premier plan : silhouettes sombres défilant vite, juste devant le
+       sentier. C'est la couche qui crée la sensation de profondeur. */
+    if (!reduce) {
+      const fgOff = -(camX * 1.55) % 220;
+      ctx.fillStyle = css(mixRgb(ground, [10, 14, 22], .58), .9);
+      for (let ti = -1; ti <= 2; ti++) {
+        const ox = fgOff + ti * 220;
+        const rngF = mulberry32(seedOf(B.id + "fg" + (Math.floor((camX * 1.55) / 220) + ti)));
+        for (let i = 0; i < 5; i++) {
+          const px = ox + rngF() * 220;
+          const s = (.5 + rngF() * .9) * H * .055;
+          const sway = Math.sin(t * 1.7 + px * .05) * s * .16;
+          ctx.beginPath();
+          if (rngF() > .45) {
+            /* touffe d'herbe */
+            for (let b = -2; b <= 2; b++) {
+              ctx.moveTo(px + b * s * .13, gy + H * .105);
+              ctx.quadraticCurveTo(px + b * s * .2 + sway * .5, gy + H * .105 - s * .6,
+                                   px + b * s * .30 + sway, gy + H * .105 - s);
+              ctx.quadraticCurveTo(px + b * s * .16, gy + H * .105 - s * .5, px + b * s * .13 + s * .06, gy + H * .105);
+            }
+          } else {
+            /* caillou */
+            ctx.ellipse(px, gy + H * .10, s * .45, s * .26, 0, Math.PI, 0);
+          }
+          ctx.fill();
+        }
+      }
+    }
+
     /* obstacle */
     const heroX = W * HERO_X;
     if (blocked && obstacle && OB_DRAW[obstacle]) {
@@ -1165,10 +1206,13 @@ function createScene(canvas, opts) {
       ctx.restore();
     }
 
-    /* le Voyageur */
-    drawTraveler(ctx, heroX, gy + H * .072, H * .150,
-      { phase: walkPhase, walking: walking && !blocked, jump, cheer, t },
-      g, opts.cloak || ["#5b7fd4", "#3a5599", "#e8836b"]);
+    /* le Héros */
+    if (global.Hero && opts.look) {
+      const mounted = opts.look.mount && opts.look.mount !== "none";
+      global.Hero.draw(ctx, heroX, gy + H * .080, H * (mounted ? .30 : .27), opts.look,
+        { t, walk: (walking && !blocked) ? 1 : 0, phase: walkPhase, jump, cheer },
+        { sun: g.sun, amb: g.amb, night: g.star, wind: .5 + Math.sin(t * .3) * .3 });
+    }
 
     /* particules */
     if (particles.length) {
@@ -1253,7 +1297,7 @@ function createScene(canvas, opts) {
     phaseLabel() {
       return gradeAt(opts.hour != null ? opts.hour : new Date().getHours() + new Date().getMinutes() / 60).label;
     },
-    setCloak(c) { opts.cloak = c; },
+    setLook(l) { opts.look = l; },
     STEP_PX,
   };
   resize();
