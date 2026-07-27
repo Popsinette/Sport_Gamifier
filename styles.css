@@ -1336,3 +1336,12 @@ nav button svg { width: 21px; height: 21px; }
   display: block; font-size: .56rem; font-weight: 680;
   letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3);
 }
+
+/* pas mis en réserve devant un obstacle */
+.banked {
+  margin-top: 12px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: .74rem; font-weight: 600; color: var(--ink-3); line-height: 1.4;
+}
+.banked svg { flex: none; width: 14px; height: 14px; color: var(--gold); }
+.banked b { color: var(--ink-2); font-weight: 780; }

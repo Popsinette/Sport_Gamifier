@@ -174,16 +174,13 @@ const OBSTACLES = (function () {
     [9, 17].forEach((off, j) => {
       const i = out.length;
       const P = OB_POOL[(s * 2 + j) % OB_POOL.length];
-      const o = { id: "o" + s + "_" + j, pos: base + off, xp: 15 + Math.floor(i / 5) * 5,
-                  scene: P.scene, icon: P.icon, name: P.name, reqs: [] };
-      const mode = i < 2 ? 0 : i % 3;
-      if (mode !== 1) o.task = TASKS[i % TASKS.length];
-      if (mode !== 0) {
-        o.reqs.push(i % 2
-          ? { t: "streak", n: Math.min(2 + Math.floor(s / 2), 10) }
-          : { t: "done",   n: 20 + s * 12 });
-      }
-      out.push(o);
+      /* Un petit obstacle se franchit toujours le jour même : un défi
+         physique, rien d'autre. Le bloquer derrière un niveau ou une série
+         qu'on ne peut pas atteindre aujourd'hui rendait l'effort invisible
+         — on cochait sans que le voyageur avance d'un pas. */
+      out.push({ id: "o" + s + "_" + j, pos: base + off, xp: 15 + Math.floor(i / 5) * 5,
+                 scene: P.scene, icon: P.icon, name: P.name, reqs: [],
+                 task: TASKS[i % TASKS.length] });
     });
     const B = OB_BIG[s % OB_BIG.length];
     const big = {
@@ -439,10 +436,14 @@ function marksOf(idx) {
       out.push({ kind: "obstacle", id: o.id, pos: o.pos, icon: o.icon, name: o.name, ob: o });
   });
 
-  /* deux découvertes, glissées dans les intervalles laissés libres */
-  const slots = [3, 6, 12, 14, 20, 22];
-  for (let n = 0; n < 2; n++) {
-    const s = slots.splice((rng() * slots.length) | 0, 1)[0];
+  /* Trois découvertes, placées AU MILIEU des trois intervalles laissés par
+     les obstacles (9, 17, 25) plutôt que tirées au hasard. Un tirage libre
+     produisait des trous de neuf pas — trois jours sans rien pour qui coche
+     trois habitudes. Le léger décalage évite l'effet métronome. */
+  const bands = [[3, 5], [12, 14], [19, 21]];
+  for (let n = 0; n < 3; n++) {
+    const band = bands[n];
+    const s = band[0] + ((rng() * (band[1] - band[0] + 1)) | 0);
     const chest = rng() < .34;
     if (chest) {
       out.push({ kind: "chest", id: "c" + idx + "_" + n, pos: start + s,
@@ -772,7 +773,20 @@ function renderObstacle(J) {
         '<span class="tk">' + ic("check", { size: 12 }) + "</span>" +
         "<span>" + (tOk ? "Fait : " : "Défi à relever : ") + o.task + "</span></button>" : "") +
       '<button class="go" id="obGo"' + (can ? "" : " disabled") + ">" +
-        (can ? "Franchir l'obstacle" : "Il te manque encore un peu") + "</button>" +
+        /* Dire ce qui manque exactement. « Il te manque encore un peu »
+           devant un défi qu'on peut relever tout de suite laisse croire à
+           un blocage alors qu'il suffit de bouger. */
+        (can ? "Franchir l'obstacle"
+             : !tOk && ok ? "Relève le défi pour passer"
+             : "Il te manque encore un peu") + "</button>" +
+      /* Devant un passage majeur, les habitudes cochées ne font plus
+         avancer le voyageur. Le dire, et les compter : un effort mis en
+         réserve reste un effort, un effort invisible décourage. */
+      (S.steps > J.pos
+        ? '<div class="banked">' + ic("boot", { size: 14 }) +
+          "<span><b>" + (S.steps - J.pos) + " pas</b> en réserve, " +
+          "dépensés dès l'obstacle franchi.</span></div>"
+        : "") +
     "</div>";
 
   const tb = $("obTask");
