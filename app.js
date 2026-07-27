@@ -1293,10 +1293,7 @@ function renderHeroScreen(L, st, J) {
   const wardEmpty = !html.trim();
   box.hidden = wardEmpty;
   $("heroWardSec").hidden = wardEmpty;
-  /* on ne touche au titre que si l'onglet Personnage est à l'écran, sinon
-     il écraserait celui du campement à chaque rendu */
-  if (!$("campPane") || $("campPane").hidden)
-    $("heroH1").textContent = wardEmpty ? "Ton personnage" : "Garde-robe";
+  $("heroH1").textContent = wardEmpty ? "Ton personnage" : "Garde-robe";
   box.querySelectorAll("[data-k]").forEach(el => {
     el.onclick = () => {
       S.look[el.dataset.k] = el.dataset.v;
@@ -1316,12 +1313,10 @@ function renderHeroScreen(L, st, J) {
       heroPreview = { cv, cx, t: 0, ph: 0 };
       const loop = () => {
         const p = heroPreview;
-        /* Le panneau Personnage peut être replié au profit du campement :
-           son canvas mesure alors zéro, et dessiner dedans lève une erreur
-           au lieu de ne rien faire. */
-        if (!document.hidden && $("sc-hero").classList.contains("on") &&
-            !$("heroPane").hidden) {
+        if (!document.hidden && $("sc-hero").classList.contains("on")) {
           const r = p.cv.getBoundingClientRect();
+          /* écran encore replié : dessiner dans un canvas de taille nulle
+             lève une erreur au lieu de ne rien faire */
           if (r.width < 8 || r.height < 8) { requestAnimationFrame(loop); return; }
           const dpr = Math.min(window.devicePixelRatio || 1, 2);
           if (p.cv.width !== Math.round(r.width * dpr)) {
@@ -1671,7 +1666,7 @@ function startCamp() {
   campView = { cv, cx, t: 0, anim: null };
   const loop = () => {
     const v = campView;
-    if (!document.hidden && !$("campPane").hidden && $("sc-hero").classList.contains("on")) {
+    if (!document.hidden && $("sc-camp").classList.contains("on")) {
       const r = v.cv.getBoundingClientRect();
       /* Le panneau peut être encore replié au premier tour : dessiner dans
          un canvas de taille nulle jette une erreur au lieu de ne rien faire. */
@@ -2009,10 +2004,12 @@ function go(name) {
   /* l'observateur ne se déclenche qu'au défilement : on masque nous-mêmes
      en quittant l'onglet, sinon le bandeau survit sur les autres écrans */
   if (name !== "today") $("miniBar").hidden = true;
+  /* la scène du camp ne tourne que lorsqu'on la regarde */
+  if (name === "camp") startCamp();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("nav button").forEach((b, i) => {
-  b.querySelector(".ic").innerHTML = ic(["compass", "heart", "list", "chart", "shield"][i], { size: 23 });
+  b.querySelector(".ic").innerHTML = ic(["compass", "heart", "home", "list", "chart", "shield"][i], { size: 23 });
   b.onclick = () => go(b.dataset.sc);
 });
 
@@ -2039,19 +2036,6 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
   /* on y touche pour remonter voir le voyageur en grand */
   bar.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
 })();
-
-/* bascule Personnage / Campement dans l'onglet Héros */
-$("heroTabs").querySelectorAll("button").forEach(b => {
-  b.onclick = () => {
-    $("heroTabs").querySelectorAll("button").forEach(o => o.classList.toggle("on", o === b));
-    const camp = b.dataset.v === "camp";
-    $("heroPane").hidden = camp;
-    $("campPane").hidden = !camp;
-    $("heroH1").textContent = camp ? "Campement" : "Ton personnage";
-    if (camp) startCamp();
-    buzz(8);
-  };
-});
 
 applyPrefs();
 wireProfile();

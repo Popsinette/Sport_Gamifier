@@ -103,7 +103,7 @@ Campement, Halte, Tente, Cabane, Maison, Domaine.
 Le camp est dessiné dans le même monde que le voyage — même ciel, même
 heure, mêmes arbres — et le héros s'y tient dès que le feu est allumé.
 Rien ne se débloque avec le temps : tout se construit avec ce qui a été
-fait. Onglet **Héros → Campement**.
+fait. Onglet **Camp**.
 
 ## Les obstacles
 

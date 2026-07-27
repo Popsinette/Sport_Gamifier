@@ -1106,9 +1106,16 @@ nav button.on .ic { transform: translateY(-2px) scale(1.06); }
 /* segment intégré dans une carte */
 .seg-in { margin: 0 17px 17px; }
 
-/* ---------- barre d'onglets à cinq entrées ---------- */
-nav button { font-size: .56rem; letter-spacing: .03em; }
-nav button svg { width: 21px; height: 21px; }
+/* ---------- barre d'onglets à six entrées ---------- */
+/* Six entrées sur un écran de 360 px laissent 52 px chacune : on resserre
+   l'espacement et la graisse plutôt que de tronquer les libellés. */
+nav { gap: 2px; padding-left: 8px; padding-right: 8px; }
+nav button {
+  font-size: .53rem; letter-spacing: .01em;
+  padding: 8px 0 7px; gap: 3px;
+  min-width: 0;
+}
+nav button svg { width: 20px; height: 20px; }
 
 /* =========================================================
    Carte de route — le composant signature
@@ -1349,8 +1356,6 @@ nav button svg { width: 21px; height: 21px; }
 /* =========================================================
    Campement
    ========================================================= */
-.seg-top { margin: 0 0 16px; }
-
 .camp-stage {
   padding: 0; overflow: hidden; position: relative;
   background: linear-gradient(170deg, rgba(126,166,220,.28), rgba(126,166,220,.05));

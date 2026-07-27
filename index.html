@@ -90,12 +90,6 @@
   <section class="screen" id="sc-hero">
     <header><div><div class="eyebrow">Ton héros</div><h1 id="heroH1">Garde-robe</h1></div></header>
 
-    <div class="seg seg-top" id="heroTabs">
-      <button data-v="perso" class="on">Personnage</button>
-      <button data-v="camp">Campement</button>
-    </div>
-
-    <div id="heroPane">
     <div class="glass hero-stage">
       <canvas id="heroCanvas"></canvas>
       <div class="hero-id">
@@ -109,10 +103,13 @@
     <div class="glass next" id="heroNext"></div>
     <div class="sec" id="heroWardSec">Apparence</div>
     <div class="glass wardrobe" id="wardrobe"></div>
-    </div>
+  </section>
 
-    <!-- ---------- campement ---------- -->
-    <div id="campPane" hidden>
+
+  <!-- ===================== CAMPEMENT ===================== -->
+  <section class="screen" id="sc-camp">
+    <header><div><div class="eyebrow">Ta base</div><h1>Campement</h1></div></header>
+    <div id="campPane">
       <div class="glass camp-stage">
         <canvas id="campCanvas"></canvas>
         <div class="camp-id">
@@ -277,6 +274,7 @@
   <nav>
     <button class="on" data-sc="today"><span class="ic"></span>Voyage</button>
     <button data-sc="hero"><span class="ic"></span>Héros</button>
+    <button data-sc="camp"><span class="ic"></span>Camp</button>
     <button data-sc="habits"><span class="ic"></span>Habitudes</button>
     <button data-sc="progress"><span class="ic"></span>Progrès</button>
     <button data-sc="profile"><span class="ic"></span>Profil</button>
