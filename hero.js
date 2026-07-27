@@ -28,10 +28,14 @@ const shd = (c, k) => mix(c, BLACK, k);
 
 /* ---------- catalogue ---------- */
 const CATALOG = {
+  /* Les cinq aventuriers de la planche de référence. Le choix du héros
+     relève de l'identité, pas de la récompense : tous sont disponibles. */
   body: [
-    { id:"f", name:"Silhouette fine",     req:null },
-    { id:"n", name:"Silhouette neutre",   req:null },
-    { id:"m", name:"Silhouette robuste",  req:null },
+    { id:"explorateur", name:"L'Explorateur",     req:null },
+    { id:"brumes",      name:"Voyageur des Brumes", req:null },
+    { id:"gardienne",   name:"Gardienne de Lumière", req:null },
+    { id:"saisons",     name:"Aventurière des Saisons", req:null },
+    { id:"reveur",      name:"Le Petit Rêveur",   req:null },
   ],
   hair: [
     { id:"short",  name:"Courts",            req:null },
@@ -86,7 +90,7 @@ const CAPES  = ["#c8453f","#2f6fb8","#3a8a5c","#8a4fb0","#d68a2e","#2b3a52","#c9
 CLOTH[7] = "#5a6478";
 
 function defaultLook() {
-  return { body:"n", skin:SKINS[0], hair:"wavy", hairColor:HAIRS[1],
+  return { body:"explorateur", skin:SKINS[0], hair:"wavy", hairColor:HAIRS[1],
            outfit:"tunic", outfitColor:CLOTH[0], cape:"none", capeColor:CAPES[0],
            pack:"satchel", pet:"none", mount:"none" };
 }
@@ -109,7 +113,7 @@ function draw(ctx, x, y, S, look, st, env) {
   const capeC = T(hx(look.capeColor));
   const sunC = rgb(sun, .85);
   const body = look.body || "n";
-  const W = body === "m" ? 1.13 : body === "f" ? .92 : 1;    /* largeur d'épaules */
+  const W = body === "brumes" ? 1.08 : body === "gardienne" ? .93 : 1;    /* largeur d'épaules */
   const wind = .35 + (env.wind || 0) * .65;
 
   const ph = st.phase || 0;

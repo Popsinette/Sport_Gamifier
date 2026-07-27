@@ -24,6 +24,21 @@ Chaque habitude cochée fait avancer **le Voyageur** à travers un monde vivant 
   plateaux, forêts, mers, architecture, îles flottantes) × palettes = un
   catalogue extensible à l'infini, jamais dessiné à la main.
 
+## Les personnages
+
+Cinq héros illustrés à la main, conformes à la planche de référence :
+**L'Explorateur**, **le Voyageur des Brumes**, **la Gardienne de Lumière**,
+**l'Aventurière des Saisons** et **le Petit Rêveur**.
+
+Chacun est livré en **planche de sprites** (512 × 4608 px, neuf poses :
+repos, marche, course, saut, joie, regard, assis, sommeil, interaction).
+Le moteur choisit la pose selon la situation — le héros marche quand tu
+coches, s'assoit devant un obstacle, saute quand tu le franchis, exulte
+quand tu boucles ta journée. Le grade lumineux du biome est appliqué au
+personnage comme au décor : il appartient vraiment au paysage.
+
+Le rendu vectoriel de `hero.js` reste en secours si une planche manque.
+
 ## Les obstacles
 
 Le monde s'arrête devant un **événement mis en scène** : éboulement, rivière en
@@ -55,6 +70,8 @@ Nom, icône (24 pictogrammes maison), couleur, difficulté, jours de la semaine.
 | Fichier | Rôle |
 |---|---|
 | `world.js` | Moteur de rendu : biomes, silhouettes procédurales, grade jour/nuit, particules, Voyageur, obstacles |
+| `sprites.js` | Pipeline de sprites : chargement des atlas, ordre z, machine d'états d'animation, intégration lumineuse |
+| `hero.js` | Catalogue des personnages et de la garde-robe · rendu vectoriel de secours |
 | `icons.js` | Jeu d'icônes SVG maison (grille 24, trait 1,6) |
 | `styles.css` | Système d'interface : verre, typographie, espacements, animations |
 | `app.js` | État, logique de progression, rendu de l'interface |
@@ -92,9 +109,8 @@ php -S localhost:8080            # PHP
 l'ordinateur (`ipconfig` sous Windows, `ifconfig | grep inet` sous macOS) et
 ouvrir `http://<adresse>:8080` sur le mobile.
 
-> Le `404` sur `assets/hero/manifest.json` dans la console est **normal** :
-> c'est la sonde du pipeline de sprites, qui bascule sur le rendu vectoriel
-> tant qu'aucun asset n'est déposé.
+> Les planches de héros sont dans `assets/hero/` (~8,8 Mo). Le moteur ne
+> charge que celle du personnage sélectionné.
 
 ## Installation sur le téléphone
 

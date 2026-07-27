@@ -1,11 +1,18 @@
 {
-  "version": 1,
-  "sets": ["explorateur"],
+  "version": 2,
+  "sets": ["explorateur", "brumes", "gardienne", "saisons", "reveur"],
   "frameW": 512,
   "frameH": 512,
   "anchorX": 0.5,
   "anchorY": 0.94,
   "heightRatio": 0.86,
-  "available": ["body_n"],
-  "aliases": { "body_f": "body_n", "body_m": "body_n" }
+  "available": [
+    "body_explorateur", "body_brumes", "body_gardienne",
+    "body_saisons", "body_reveur"
+  ],
+  "aliases": {
+    "body_n": "body_explorateur",
+    "body_f": "body_gardienne",
+    "body_m": "body_brumes"
+  }
 }

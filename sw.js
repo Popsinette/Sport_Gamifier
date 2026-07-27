@@ -1,5 +1,5 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "odyssee-v3";
+const CACHE = "odyssee-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,8 +11,12 @@ const ASSETS = [
   "./app.js",
   "./manifest.webmanifest",
   "./icon.svg",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./assets/hero/manifest.json"
 ];
+/* Les planches de héros pèsent ~1,8 Mo pièce : on ne les précharge pas
+   toutes. Le cache d'exécution ci-dessous garde celle du personnage
+   réellement utilisé, ce qui suffit pour le mode hors-ligne. */
 
 self.addEventListener("install", (e) => {
   e.waitUntil(

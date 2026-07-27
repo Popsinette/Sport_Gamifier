@@ -1,95 +1,92 @@
-# Assets du héros — dépôt des sprites
+# Assets du héros — planches de sprites
 
-Ce dossier est **vide par conception**. Tant qu'il ne contient pas de
-`manifest.json`, l'application affiche le héros en rendu vectoriel
-(`hero.js`). Dès qu'un manifeste valide apparaît ici, le moteur bascule
-automatiquement sur les sprites, sans aucune modification de code.
+Ce dossier contient les **cinq personnages** de la direction artistique
+officielle (voir **[../../DESIGN.md](../../DESIGN.md) §7**). Dès qu'un
+`manifest.json` valide est présent ici, le moteur bascule sur les sprites ;
+sinon il retombe silencieusement sur le rendu vectoriel (`hero.js`).
+L'application ne casse jamais.
 
-La spécification complète est dans **[../../DESIGN.md](../../DESIGN.md) §7**.
+## Ce qui est livré
 
----
+| Personnage | Fichier | Poids |
+|---|---|---|
+| L'Explorateur | `body_explorateur.png` + `.json` | ~1,6 Mo |
+| Voyageur des Brumes | `body_brumes.png` + `.json` | ~1,8 Mo |
+| Gardienne de Lumière | `body_gardienne.png` + `.json` | ~2,1 Mo |
+| Aventurière des Saisons | `body_saisons.png` + `.json` | ~1,8 Mo |
+| Le Petit Rêveur | `body_reveur.png` + `.json` | ~1,8 Mo |
 
-## Ce qu'il faut produire
+Chaque planche fait **512 × 4608 px** : une colonne, neuf lignes.
 
-Pour chaque pièce (tenue, cape, coiffure, sac…), une **planche PNG** où
-chaque **ligne est une animation** et chaque **colonne une image**.
+## Format des planches
 
-Animations attendues, dans cet ordre de ligne :
+Chaque **ligne est une animation**, chaque **colonne une image**. Les
+poses actuelles sont des illustrations fixes (1 image par ligne) ; le
+format accepte sans changement de code des lignes multi-images.
 
-| Ligne | Animation | Images | FPS | Boucle |
-|---|---|---|---|---|
-| 0 | `idle` | 8 | 12 | oui |
-| 1 | `walk` | 12 | 12 | oui |
-| 2 | `run` | 10 | 16 | oui |
-| 3 | `jump` | 9 | 12 | non |
-| 4 | `cheer` | 12 | 12 | non |
-| 5 | `look` | 10 | 10 | non |
-| 6 | `sit` | 6 | 8 | oui |
-| 7 | `sleep` | 6 | 5 | oui |
-| 8 | `interact` | 10 | 12 | non |
+| Ligne | Animation | Boucle |
+|---|---|---|
+| 0 | `idle` | oui |
+| 1 | `walk` | oui |
+| 2 | `run` | oui |
+| 3 | `jump` | non |
+| 4 | `cheer` | non |
+| 5 | `look` | non |
+| 6 | `sit` | oui |
+| 7 | `sleep` | oui |
+| 8 | `interact` | non |
 
-Une planche complète fait donc **12 colonnes × 9 lignes**, soit
-`3072 × 2304 px` en 256 px par image.
-
-> Une pièce peut ne fournir que `idle` et `walk` : le moteur retombe sur
-> `idle` pour toute animation manquante.
+Le moteur retombe sur `idle` pour toute animation manquante, et fournit
+lui-même l'élévation des poses en l'air (`jump`, `cheer`) : les
+illustrations montrent la pose, le moteur donne la hauteur.
 
 ## Règles impératives
 
-- **Toutes les couches d'un même personnage doivent partager** `frameW`,
-  `frameH`, `anchorX`, `anchorY` et `heightRatio`. Sinon elles ne se
-  superposent pas.
-- Le sujet doit occuper **exactement la même position** dans la case sur
-  toutes les lignes : aucun recadrage entre animations.
-- 8 px de marge transparente autour du sujet.
-- PNG 32 bits avec canal alpha.
-- Fournir `@1x` et `@2x` (`outfit_tunic.png` et `outfit_tunic@2x.png`).
-
-## Fichiers attendus
-
-```
-manifest.json
-body_f.png        body_f.json          (silhouette fine)
-body_n.png        body_n.json          (neutre)
-body_m.png        body_m.json          (robuste)
-head_f|n|m.png    …
-hair_<id>_back.png    hair_<id>_front.png
-outfit_<id>.png
-cape_<id>_back.png    cape_<id>_front.png
-pack_<id>.png
-boots_<id>.png    scarf_<id>.png
-pet_<id>.png      mount_<id>.png
-```
-
-Les `<id>` doivent correspondre au catalogue de `hero.js`
-(`hair`: short, wavy, long, pony, bun, curly, braids · `outfit`: tunic, coat,
-robe, winter, desert · `cape`: simple, long, feather, star, aurora ·
-`pack`: satchel, pack, bedroll, lantern · `pet`: cat, fox, bird, spirit ·
-`mount`: horse, stag, dragon).
+- Toutes les couches d'un même personnage partagent `frameW`, `frameH`,
+  `anchorX`, `anchorY` et `heightRatio` — sinon elles ne se superposent pas.
+- Le sujet touche le sol **au même point** sur toutes les lignes : aucun
+  recadrage entre animations. C'est ce que garantit le montage des planches
+  (alignement sur le centre des pieds, normalisation par pose).
+- PNG 32 bits avec canal alpha, fond entièrement détouré.
 
 ## manifest.json
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "sets": ["explorateur", "brumes", "gardienne", "saisons", "reveur"],
-  "frameW": 256,
-  "frameH": 256,
-  "anchorX": 0.5,
-  "anchorY": 0.94,
-  "heightRatio": 0.86
+  "frameW": 512, "frameH": 512,
+  "anchorX": 0.5, "anchorY": 0.94, "heightRatio": 0.86,
+  "available": ["body_explorateur", "…"],
+  "aliases": { "body_n": "body_explorateur", "…": "…" }
 }
 ```
 
-Le moteur ne charge que les couches correspondant au look courant : ajouter
-des pièces n'alourdit pas le démarrage.
+- `available` liste les atlas réellement présents. Le moteur n'essaie que
+  ceux-là, et la garde-robe masque les emplacements sans illustration :
+  aucune requête perdue, aucune option vide à l'écran.
+- `aliases` assure la reprise des anciennes silhouettes (`n`, `f`, `m`)
+  vers les personnages nommés.
 
-## Vérifier une livraison
+## Ajouter des pièces
 
-1. Déposer les fichiers ici.
-2. Recharger l'application.
-3. Le héros doit s'afficher en sprites — sans saut de position ni
-   clignotement entre animations.
+Pour les couches d'équipement (capes, coiffures, sacs, montures), suivre
+la nomenclature attendue par `sprites.js` :
 
-En cas de fichier manquant ou de JSON invalide, le moteur revient
-silencieusement au rendu vectoriel : l'application ne casse jamais.
+```
+hair_<id>_back.png    hair_<id>_front.png
+outfit_<id>.png       boots_<id>.png     scarf_<id>.png
+cape_<id>_back.png    cape_<id>_front.png
+pack_<id>.png         pet_<id>.png       mount_<id>.png
+```
+
+Déposer les fichiers, les ajouter à `available`, recharger : le moteur les
+compose automatiquement dans l'ordre z défini par `SLOT_Z`.
+
+## Sources
+
+Les illustrations d'origine sont conservées dans **`../../raw/`**
+(45 planches, 5 personnages × 9 poses). Le montage des atlas se refait à
+partir de là — détourage par diffusion depuis les bords à tolérance
+adaptative, normalisation de hauteur par pose, alignement sur le point de
+contact au sol.

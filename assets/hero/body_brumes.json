@@ -1,0 +1,76 @@
+{
+  "image": "body_brumes.png",
+  "frameW": 512,
+  "frameH": 512,
+  "anchorX": 0.5,
+  "anchorY": 0.94,
+  "heightRatio": 0.86,
+  "z": 30,
+  "_rows": [
+    "idle",
+    "walk",
+    "run",
+    "jump",
+    "cheer",
+    "look",
+    "sit",
+    "sleep",
+    "interact"
+  ],
+  "animations": {
+    "idle": {
+      "row": 0,
+      "frames": 1,
+      "fps": 1,
+      "loop": true
+    },
+    "walk": {
+      "row": 1,
+      "frames": 1,
+      "fps": 1,
+      "loop": true
+    },
+    "run": {
+      "row": 2,
+      "frames": 1,
+      "fps": 1,
+      "loop": true
+    },
+    "jump": {
+      "row": 3,
+      "frames": 1,
+      "fps": 1,
+      "loop": false
+    },
+    "cheer": {
+      "row": 4,
+      "frames": 1,
+      "fps": 1,
+      "loop": false
+    },
+    "look": {
+      "row": 5,
+      "frames": 1,
+      "fps": 1,
+      "loop": false
+    },
+    "sit": {
+      "row": 6,
+      "frames": 1,
+      "fps": 1,
+      "loop": true
+    },
+    "sleep": {
+      "row": 7,
+      "frames": 1,
+      "fps": 1,
+      "loop": true
+    },
+    "interact": {
+      "row": 8,
+      "frames": 1,
+      "fps": 1,
+      "loop": false
+    }
+  }
+}

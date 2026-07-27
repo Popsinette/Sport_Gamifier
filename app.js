@@ -163,6 +163,11 @@ const OBSTACLES = (function () {
 /* ---------------------------------------------------------
    État
    --------------------------------------------------------- */
+/* Anciennes silhouettes → personnages nommés. Déclaré ici, avant
+   `load()` : une constante déclarée plus bas serait dans sa zone morte
+   temporelle au moment de la migration. */
+const BODY_MIGRATION = { n: "explorateur", f: "gardienne", m: "brumes" };
+
 function blank() {
   return {
     xp: 0, done: 0, perf: 0, best: 0,
@@ -178,10 +183,20 @@ function blank() {
 let S = load();
 const taskDone = new Set();   /* défis physiques validés, session courante */
 
+/* Un échec de migration ne doit JAMAIS effacer les habitudes : on retombe
+   sur les données brutes, jamais sur un état vierge. */
 function load() {
+  let raw = null;
+  try { raw = localStorage.getItem(KEY); } catch (e) {}
+  if (raw) {
+    let parsed = null;
+    try { parsed = Object.assign(blank(), JSON.parse(raw)); } catch (e) {}
+    if (parsed) {
+      try { return migrate(parsed); }
+      catch (e) { console.warn("Odyssée : migration impossible, données conservées", e); return parsed; }
+    }
+  }
   try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) return migrate(Object.assign(blank(), JSON.parse(raw)));
     const old = localStorage.getItem("rituels.v1");
     if (old) return migrate(fromRituels(JSON.parse(old)));
   } catch (e) {}
@@ -209,6 +224,7 @@ function fromRituels(p) {
 function migrate(s) {
   if (!s.look) s.look = Hero.defaultLook();
   else s.look = Object.assign(Hero.defaultLook(), s.look);
+  if (BODY_MIGRATION[s.look.body]) s.look.body = BODY_MIGRATION[s.look.body];
   s.habits.forEach((h, i) => {
     if (!h.icon) h.icon = ICON_SET[i % ICON_SET.length];
     if (!h.hue) h.hue = HUES[i % HUES.length];
@@ -333,7 +349,11 @@ let scene = null;
 
 function boot3D() {
   scene = Odyssey.createScene($("stage"), { look: S.look });
-  if (window.Sprites) Sprites.preload(S.look).catch(() => {});
+  /* Le préchargement est asynchrone : on redessine une fois les planches
+     disponibles, sinon la garde-robe reste figée sur l'état vectoriel. */
+  if (window.Sprites) {
+    Sprites.preload(S.look).then(ok => { if (ok) render(); }).catch(() => {});
+  }
   scene.setSteps(journey().pos, true);
   scene.start();
   window.addEventListener("resize", () => scene.resize());
@@ -714,7 +734,7 @@ function renderNotices(st) {
    Écran Héros — création et garde-robe
    ========================================================= */
 const WARDROBE = [
-  { key:"body",   label:"Silhouette" },
+  { key:"body",   label:"Ton héros" },
   { key:"hair",   label:"Coiffure" },
   { key:"outfit", label:"Tenue" },
   { key:"cape",   label:"Cape" },
@@ -735,10 +755,17 @@ function renderHeroScreen(L, st, J) {
   const box = $("wardrobe");
   if (!box) return;
 
+  /* En mode sprites, on masque les emplacements sans planche : mieux vaut
+     moins d'options que des options qui ne changent rien à l'écran. */
+  const sprite = window.Sprites && Sprites.ready;
+  const avail = sprite && Sprites.manifest ? Sprites.manifest.available || [] : null;
+  const hasArt = (key, id) => !avail || avail.indexOf(key + "_" + id) !== -1;
+
   let html = "";
   for (const grp of WARDROBE) {
     const items = Hero.CATALOG[grp.key];
     if (grp.key === "capeColor") continue;
+    if (avail && !items.some(it => hasArt(grp.key, it.id))) continue;
     html += '<div class="fl-l">' + grp.label + "</div><div class=\"opts\">";
     for (const it of items) {
       const ok = Hero.unlocked(it.req, U);
@@ -752,6 +779,7 @@ function renderHeroScreen(L, st, J) {
     html += "</div>";
   }
   for (const s of SWATCHES) {
+    if (avail) break;   /* les nuanciers ne pilotent que le rendu vectoriel */
     html += '<div class="fl-l">' + s.label + '</div><div class="hues">' +
       s.list().map(c => '<div class="hue' + (S.look[s.key] === c ? " on" : "") +
         '" data-k="' + s.key + '" data-v="' + c + '" style="background:' + c + '"></div>').join("") +
@@ -764,6 +792,7 @@ function renderHeroScreen(L, st, J) {
       save();
       if (scene) scene.setLook(S.look);
       render();
+      if (window.Sprites) Sprites.preload(S.look).then(ok => { if (ok) render(); }).catch(() => {});
       if (navigator.vibrate) navigator.vibrate(8);
     };
   });
@@ -787,9 +816,19 @@ function renderHeroScreen(L, st, J) {
           p.t += .016; p.ph += .10;
           p.cx.clearRect(0, 0, r.width, r.height);
           const mounted = S.look.mount && S.look.mount !== "none";
-          Hero.draw(p.cx, r.width * .5, r.height * .92, r.height * (mounted ? .62 : .74),
-            S.look, { t: p.t, walk: 1, phase: p.ph, jump: 0, cheer: 0 },
-            { sun: [255, 240, 214], amb: [1, 1, 1], night: 0, wind: .7 });
+          const spriteMode = window.Sprites && Sprites.ready;
+          /* même arbitrage que le monde : les sprites priment, le vectoriel
+             ne sert que de secours. La pose au repos se prête mieux à
+             l'essayage qu'une marche figée. */
+          const hh = r.height * (mounted ? .62 : (spriteMode ? .90 : .74));
+          const st = { t: p.t, walk: 0, run: false, phase: p.ph, jump: 0, cheer: 0,
+                       resting: false, sleeping: false, anim: p.anim };
+          const env = { sun: [255, 240, 214], amb: [1, 1, 1], night: 0, wind: .7 };
+          const done = spriteMode
+            && Sprites.draw(p.cx, r.width * .5, r.height * .92, hh, S.look, st, env, .016);
+          p.anim = st.anim;
+          if (!done) Hero.draw(p.cx, r.width * .5, r.height * .92, hh, S.look,
+            { t: p.t, walk: 1, phase: p.ph, jump: 0, cheer: 0 }, env);
         }
         requestAnimationFrame(loop);
       };
