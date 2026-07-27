@@ -65,7 +65,10 @@ const MARGIN = 6;
       let spread = 0;
       samples.forEach(i => { spread += Math.abs(D[i] - mr) + Math.abs(D[i + 1] - mg) + Math.abs(D[i + 2] - mb); });
       spread /= samples.length;
-      const T = Math.max(10, Math.min(28, spread * 2.6 + 8));
+      /* Plafond haut : sur une planche de décor le fond est un blanc cassé
+         franc, très éloigné des verts du feuillage. Un seuil trop serré
+         laisse un voile qui relie les objets entre eux. */
+      const T = Math.max(10, Math.min(46, spread * 2.6 + 12));
       const dist = i => Math.abs(D[i] - mr) + Math.abs(D[i + 1] - mg) + Math.abs(D[i + 2] - mb);
 
       const gone = new Uint8Array(W * H);
@@ -116,8 +119,11 @@ const MARGIN = 6;
       if (area >= MIN_AREA) boxes.push({ x0, y0, x1, y1, area });
     }
 
-    /* --- 4. fusion des groupes qui se chevauchent : un tronc peint en
-       deux masses distinctes ne doit pas donner deux fichiers --- */
+    /* --- 4. rattrapage des miettes : une touffe de feuillage peinte en
+       masses détachées ne doit pas donner plusieurs fichiers. On ne fusionne
+       qu'une PETITE composante avec une grande voisine — jamais deux objets
+       de taille comparable, sinon toute une rangée d'arbres s'agglomère de
+       proche en proche en un seul bloc. --- */
     let merged = true;
     while (merged) {
       merged = false;
@@ -126,7 +132,9 @@ const MARGIN = 6;
           const a = boxes[i], b2 = boxes[j];
           const gapX = Math.max(a.x0, b2.x0) - Math.min(a.x1, b2.x1);
           const gapY = Math.max(a.y0, b2.y0) - Math.min(a.y1, b2.y1);
-          if (gapX < 12 && gapY < 12) {
+          const petite = Math.min(a.area, b2.area);
+          const grande = Math.max(a.area, b2.area);
+          if (gapX < 8 && gapY < 8 && petite < grande * .12) {
             a.x0 = Math.min(a.x0, b2.x0); a.y0 = Math.min(a.y0, b2.y0);
             a.x1 = Math.max(a.x1, b2.x1); a.y1 = Math.max(a.y1, b2.y1);
             a.area += b2.area;

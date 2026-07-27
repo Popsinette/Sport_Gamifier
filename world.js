@@ -339,10 +339,15 @@ const TREE_MAX = 1.36;
 /* Sommet géométrique réel d'une couche. Le dégradé de remplissage part de
    là : s'il démarre plus bas que la cime, tout ce qui dépasse se peint avec
    la couleur de tête du dégradé et les arbres virent au blanc laiteux. */
-function layerTopY(L, H, HV) {
+function layerTopY(L, HV) {
   if (L.t === "forest")
-    return L.y * HV - (L.h || .12) * H * treeMul(L) * TREE_MAX;
+    return L.y * HV - (L.h || .12) * HV * treeMul(L) * TREE_MAX;
   return (L.y - (L.a || L.h || .1)) * HV;
+}
+
+/* essence de complément, pour ne pas aligner des arbres identiques */
+function altKind(k) {
+  return k === "conifer" ? "round" : k === "round" ? "conifer" : k;
 }
 
 function drawTree(p, x, base, h, kind, rng) {
@@ -967,7 +972,11 @@ function createScene(canvas, opts) {
     if (jump > 0)  jump  = Math.max(0, jump  - dt * 1.1);
 
     const bi = Math.floor(Math.max(0, camX / STEP_PX) / 25) % BIOMES.length;
-    if (bi !== biomeIndex) { prevBiome = biomeIndex; biomeIndex = bi; fadeT = 0; seedAmbience(); }
+    if (bi !== biomeIndex) {
+      prevBiome = biomeIndex; biomeIndex = bi; fadeT = 0; seedAmbience();
+      /* on ne garde en mémoire que le paysage traversé */
+      if (global.Scenery) global.Scenery.preload(BIOMES[bi].id).catch(() => {});
+    }
     if (fadeT < 1) fadeT = Math.min(1, fadeT + dt / 1.4);
 
     draw(dt, walking);
@@ -1110,7 +1119,7 @@ function createScene(canvas, opts) {
       /* Volume + dissolution du plan au sol.
          Sans ce fondu, les couches s'empilent en bandes horizontales dures :
          c'est ce qui distingue un décor peint d'un empilement de rectangles. */
-      const topY = layerTopY(L, H, HV);
+      const topY = layerTopY(L, HV);
       const baseY = L.y * HV;
       const fadeEnd = baseY + Math.max(8, gy - baseY) * 1.25 + H * .04;
       const lg = ctx.createLinearGradient(0, topY, 0, fadeEnd);
@@ -1121,7 +1130,45 @@ function createScene(canvas, opts) {
       lg.addColorStop(lerp(kBase, 1, .52), css(mixRgb(fill, fog, .5), .18));
       lg.addColorStop(1, css(mixRgb(fill, fog, .6), 0));
       ctx.fillStyle = lg;
-      for (let ti = -1; ti <= 1; ti++) {
+
+      /* ---- décor illustré, quand les planches sont livrées ----
+         Le plan au sol reste peint par le moteur : c'est lui qui fond la
+         couche dans la suivante. Seule la silhouette devient une image. */
+      const SC = global.Scenery;
+      const bandIm = SC && SC.ready ? SC.band(B.id, li) : null;
+      const propIm = SC && SC.ready && L.t === "forest" && SC.usesProps(B.id)
+        ? SC.props(L.kind) : null;
+      if (bandIm || propIm) {
+        ctx.fillRect(0, baseY - 1, W, HV * 3 - baseY);
+        if (bandIm) {
+          const bh = (L.a || L.h || .12) * HV * 1.9;
+          SC.drawBand(ctx, SC.tinted(bandIm, g.amb, fog, L.f * .8, .22),
+            baseY, bh, camX * L.s, W);
+        } else {
+          const altIm = SC.props(altKind(L.kind));
+          const th0 = (L.h || .12) * HV * treeMul(L);
+          for (let ti = -1; ti <= 1; ti++) {
+            const tileIndex = Math.floor((camX * L.s) / tileW) + ti;
+            const rng = mulberry32(seedOf(B.id + "|" + li + "|" + tileIndex +
+              "|" + (tileW | 0) + "x" + (HV | 0)));
+            const n = L.n || 12;
+            for (let i = 0; i < n; i++) {
+              const px = (i + .5) / n * tileW + (rng() - .5) * (tileW / n) * .62;
+              const s = .62 + rng() * .74;
+              const useAlt = rng() > .74 && altIm;
+              const pool = useAlt ? altIm : propIm;
+              const im = pool[(rng() * pool.length) | 0];
+              const dy = (rng() - .5) * th0 * .12;
+              const th = th0 * s, tw = im.width * (th / im.height);
+              const tim = SC.tinted(im, g.amb, fog, L.f * .8);
+              ctx.drawImage(tim, off + ti * tileW + px - tw / 2,
+                baseY + dy - th, tw, th);
+            }
+          }
+        }
+      }
+
+      for (let ti = -1; ti <= 1 && !(bandIm || propIm); ti++) {
         const tileIndex = Math.floor((camX * L.s) / tileW) + ti;
         const p = tilePath(B.id, li, L, tileIndex, tileW, HV);
         ctx.save();
@@ -1280,6 +1327,8 @@ function createScene(canvas, opts) {
        il reste posé au-dessus de toute l'image au lieu d'être dedans. */
     if (!reduce) {
       const nOff = -(camX * 2.3) % 300;
+      const SCf = global.Scenery;
+      const grassIm = SCf && SCf.ready && SCf.usesProps(B.id) ? SCf.prop("grass") : null;
       ctx.fillStyle = css(mixRgb(ground, [8, 12, 20], .72), .95);
       for (let ti = -1; ti <= 2; ti++) {
         const ox = nOff + ti * 300;
@@ -1290,6 +1339,15 @@ function createScene(canvas, opts) {
           /* Enraciné juste sous le sentier : les brins doivent croiser les
              bottes du héros, sinon la couche ne recouvre rien. */
           const by = gy + H * .112;
+          if (grassIm) {
+            /* au premier plan, on assombrit franchement : c'est le contraste
+               de valeur qui crée la profondeur, pas le détail */
+            const gh = s, gw = grassIm.width * (gh / grassIm.height);
+            ctx.drawImage(SCf.tinted(grassIm,
+              [g.amb[0] * .62, g.amb[1] * .64, g.amb[2] * .68], fog, 0),
+              px - gw / 2, by - gh, gw, gh);
+            continue;
+          }
           const sway = Math.sin(t * 1.4 + px * .04) * s * .10;
           ctx.beginPath();
           for (let b = -3; b <= 3; b++) {

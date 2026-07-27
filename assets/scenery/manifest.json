@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "props": [
+    "tree_a",
+    "tree_b",
+    "tree_c",
+    "conifer",
+    "bush",
+    "rock",
+    "grass"
+  ],
+  "bands": {
+    "vallee": [
+      "montagnes",
+      "collines"
+    ]
+  },
+  "propBiomes": [
+    "vallee"
+  ],
+  "kinds": {
+    "round": [
+      "tree_a",
+      "tree_b",
+      "tree_c"
+    ],
+    "conifer": [
+      "conifer"
+    ]
+  },
+  "sizes": {
+    "band_vallee_montagnes": {
+      "w": 1529,
+      "h": 218
+    },
+    "band_vallee_collines": {
+      "w": 1525,
+      "h": 93
+    },
+    "prop_tree_a": {
+      "w": 278,
+      "h": 357
+    },
+    "prop_conifer": {
+      "w": 187,
+      "h": 354
+    },
+    "prop_tree_b": {
+      "w": 255,
+      "h": 340
+    },
+    "prop_tree_c": {
+      "w": 230,
+      "h": 327
+    },
+    "prop_grass": {
+      "w": 194,
+      "h": 265
+    },
+    "prop_bush": {
+      "w": 199,
+      "h": 177
+    },
+    "prop_rock": {
+      "w": 205,
+      "h": 174
+    }
+  }
+}

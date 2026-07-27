@@ -87,6 +87,7 @@ Nom, icône (24 pictogrammes maison), couleur, difficulté, jours de la semaine.
 |---|---|
 | `world.js` | Moteur de rendu : biomes, silhouettes procédurales, grade jour/nuit, particules, Voyageur, obstacles |
 | `sprites.js` | Pipeline de sprites : chargement des atlas, ordre z, machine d'états d'animation, intégration lumineuse |
+| `scenery.js` | Décors illustrés : bandes de paysage répétées en miroir, objets semés, teinte de distance |
 | `hero.js` | Catalogue des personnages et de la garde-robe · rendu vectoriel de secours |
 | `icons.js` | Jeu d'icônes SVG maison (grille 24, trait 1,6) |
 | `styles.css` | Système d'interface : verre, typographie, espacements, animations |

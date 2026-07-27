@@ -393,6 +393,11 @@ function boot3D() {
   if (window.Sprites) {
     Sprites.preload(S.look).then(ok => { if (ok) render(); }).catch(() => {});
   }
+  /* Décors illustrés : on ne charge que le biome courant. */
+  if (window.Scenery) {
+    const bi = Odyssey.BIOMES[Math.floor(journey().pos / SEG) % Odyssey.BIOMES.length];
+    Scenery.preload(bi.id).catch(() => {});
+  }
   scene.setSteps(journey().pos, true);
   scene.start();
   window.addEventListener("resize", () => scene.resize());
