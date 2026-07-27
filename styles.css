@@ -1345,3 +1345,97 @@ nav button svg { width: 21px; height: 21px; }
 }
 .banked svg { flex: none; width: 14px; height: 14px; color: var(--gold); }
 .banked b { color: var(--ink-2); font-weight: 780; }
+
+/* =========================================================
+   Campement
+   ========================================================= */
+.seg-top { margin: 0 0 16px; }
+
+.camp-stage {
+  padding: 0; overflow: hidden; position: relative;
+  background: linear-gradient(170deg, rgba(126,166,220,.28), rgba(126,166,220,.05));
+}
+.camp-stage canvas { display: block; width: 100%; height: 34vh; min-height: 220px; max-height: 300px; }
+.camp-id {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 30px 18px 14px;
+  background: linear-gradient(transparent, rgba(8, 12, 18, .55));
+  pointer-events: none;
+}
+.camp-t {
+  font-size: 1.06rem; font-weight: 800; letter-spacing: -.02em;
+  color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.45);
+}
+.camp-s {
+  margin-top: 2px; font-size: .73rem; font-weight: 600;
+  color: rgba(255,255,255,.82); text-shadow: 0 1px 8px rgba(0,0,0,.45);
+}
+
+/* ---------- matériaux ---------- */
+.res { display: grid; grid-template-columns: repeat(3, 1fr); padding: 14px; gap: 10px; }
+.res-c { text-align: center; }
+.res-i {
+  display: grid; place-items: center;
+  width: 38px; height: 38px; margin: 0 auto 7px;
+  border-radius: 12px;
+}
+.res-i svg { width: 19px; height: 19px; }
+/* Chaque matériau a sa couleur : on reconnaît son stock sans lire. */
+.res-i.bois   { background: color-mix(in srgb, #a9702f 20%, transparent); color: #b07a36; }
+.res-i.pierre { background: color-mix(in srgb, #7d8894 20%, transparent); color: #7f8a96; }
+.res-i.tissu  { background: color-mix(in srgb, #c2748f 20%, transparent); color: #c2748f; }
+.res-c b {
+  display: block; font-size: 1.24rem; font-weight: 800;
+  letter-spacing: -.022em; font-variant-numeric: tabular-nums;
+}
+.res-l {
+  display: block; margin-top: 1px;
+  font-size: .62rem; font-weight: 660; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.float-gain.res { color: #c08a45; }
+
+/* ---------- pièces à construire ---------- */
+.row.part { cursor: default; }
+.row.part:active { transform: none; background: none; }
+@media (hover: hover) { .row.part:hover { background: none; } }
+.lvdots { display: inline-flex; gap: 3px; align-items: center; }
+.lvdots i {
+  width: 13px; height: 4px; border-radius: 999px;
+  background: var(--fill-2);
+}
+.lvdots i.on { background: linear-gradient(90deg, var(--a1), var(--a2)); }
+.part-go {
+  flex: none;
+  border: 1px solid var(--sep); background: var(--glass-2);
+  border-radius: 999px; padding: 7px 11px;
+  font-family: inherit; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: transform .16s var(--spring), background .22s, box-shadow .22s;
+}
+/* Le coût est toujours lisible, même quand on ne peut pas payer : savoir
+   ce qui manque vaut mieux qu'un bouton grisé et muet. */
+.part-go:disabled { cursor: default; opacity: .78; }
+.part-go.ok {
+  background: linear-gradient(120deg, var(--a1), var(--a2));
+  border-color: transparent;
+  box-shadow: 0 6px 16px -8px var(--a1);
+}
+.part-go.ok .cost { color: #fff; }
+.part-go.ok:active { transform: scale(.94); }
+.cost {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: .76rem; font-weight: 760;
+  color: var(--bad);
+  font-variant-numeric: tabular-nums;
+}
+.cost.ok { color: var(--ink-2); }
+.cost svg { width: 13px; height: 13px; }
+.part-max {
+  flex: none; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: linear-gradient(150deg, var(--gold-2), var(--gold));
+  color: #4a3208;
+}
+.part-max svg { width: 15px; height: 15px; }
+.row.max .row-n { color: var(--ink-2); }

@@ -83,6 +83,28 @@ plutôt que huit. Il n'affiche que la route parcourue et celle en cours :
 étaler les lieux du monde entier donnerait un mur de cases vides, et
 éventerait la surprise des paysages à venir.
 
+## Le campement
+
+Le voyage avait une route ; il lui fallait un point d'attache. Chaque
+habitude cochée rapporte **un matériau**, selon ce qu'elle demande :
+
+| Matériau | Vient de |
+|---|---|
+| **Bois** | ce qu'on fait dehors et pour le corps — marche, sport, jardin |
+| **Pierre** | ce qui demande de la constance — lecture, écriture, respiration |
+| **Tissu** | le soin de soi et du foyer — sommeil, repas, lit fait, ménage |
+
+Six pièces à trois niveaux — feu, couchage, abri, réserve, table, potager —
+que le joueur **choisit** d'améliorer dans l'ordre qu'il veut. Le premier
+niveau est presque gratuit pour que la construction démarre tout de suite,
+le troisième se mérite. La somme des niveaux donne un rang : Bivouac,
+Campement, Halte, Tente, Cabane, Maison, Domaine.
+
+Le camp est dessiné dans le même monde que le voyage — même ciel, même
+heure, mêmes arbres — et le héros s'y tient dès que le feu est allumé.
+Rien ne se débloque avec le temps : tout se construit avec ce qui a été
+fait. Onglet **Héros → Campement**.
+
 ## Les obstacles
 
 Le monde s'arrête devant un **événement mis en scène** : éboulement, rivière en

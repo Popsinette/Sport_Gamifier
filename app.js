@@ -59,6 +59,11 @@ const SUGGEST = [
   { icon:"write",    name:"Noter 3 gratitudes",     diff:1 },
   { icon:"broom",    name:"10 min de rangement",    diff:1 },
   { icon:"strength", name:"5 min de renforcement",  diff:2 },
+  /* Les gestes du foyer : ce sont eux qui rapportent le tissu, et ils
+     donnent au campement sa raison d'être. */
+  { icon:"bed",      name:"Faire mon lit",          diff:1 },
+  { icon:"broom",    name:"Faire la vaisselle",     diff:1 },
+  { icon:"shower",   name:"Aérer les pièces",       diff:1 },
 ];
 
 /* Objectifs proposés au premier lancement. Chacun amorce deux ou trois
@@ -92,7 +97,8 @@ const GOALS = [
     habits:[{ icon:"book", name:"Lire 10 pages", diff:2 }] },
   { id:"home",   icon:"broom",    name:"Un intérieur clair",
     line:"Dix minutes suffisent",
-    habits:[{ icon:"broom", name:"10 min de rangement", diff:1 }] },
+    habits:[{ icon:"broom", name:"10 min de rangement", diff:1 },
+            { icon:"bed", name:"Faire mon lit", diff:1 }] },
 ];
 const goalById = id => GOALS.find(g => g.id === id);
 
@@ -215,6 +221,8 @@ function blank() {
     goals: [], onboarded: false,
     gold: 0,
     found: [],
+    res: { bois: 0, pierre: 0, tissu: 0 },
+    base: { fire: 0, bed: 0, shelter: 0, store: 0, table: 0, garden: 0 },
     name: "",
     prefs: { appearance: "auto", haptics: true, sound: true, motion: false },
     habits: [], log: {},
@@ -271,6 +279,9 @@ function migrate(s) {
   if (typeof s.gold !== "number") s.gold = (s.done || 0) * 3 + (s.perf || 0) * 10;
   if (typeof s.name !== "string") s.name = "";
   if (!Array.isArray(s.found)) s.found = [];
+  s.res = Object.assign({ bois: 0, pierre: 0, tissu: 0 }, s.res || {});
+  s.base = Object.assign({ fire: 0, bed: 0, shelter: 0, store: 0, table: 0, garden: 0 },
+    s.base || {});
   /* on complète les préférences plutôt que de les remplacer : une clé
      ajoutée plus tard ne doit pas effacer les choix déjà faits */
   s.prefs = Object.assign({ appearance: "auto", haptics: true, sound: true, motion: false },
@@ -609,6 +620,7 @@ function render() {
   renderMini(J);
   renderObstacle(J);
   renderCarnet(J);
+  renderCamp();
   renderChallenge();
   renderToday(todays, k);
   renderHabits();
@@ -999,6 +1011,72 @@ function heatmap(today) {
 }
 
 /* ---------- cocher ---------- */
+/* =========================================================
+   LE CAMPEMENT
+   Le voyage a une destination ; il lui fallait un point
+   d'attache. Les habitudes rapportent des matériaux, et
+   c'est le joueur qui décide où les mettre.
+
+   L'arbitrage est le cœur du module : les ressources sont
+   assez rares pour qu'un choix en soit un, jamais assez pour
+   qu'on doive attendre sans rien faire.
+   ========================================================= */
+const RES = [
+  { k: "bois",   icon: "wood",  label: "Bois" },
+  { k: "pierre", icon: "stone", label: "Pierre" },
+  { k: "tissu",  icon: "cloth", label: "Tissu" },
+];
+
+/* Quelle habitude rapporte quoi. Le lien doit se comprendre sans être
+   expliqué : ce qu'on fait dehors donne du bois, ce qui demande de la
+   constance donne de la pierre, ce qui prend soin de soi donne du tissu. */
+const RES_BY_ICON = {
+  walk: "bois", run: "bois", bike: "bois", strength: "bois", seed: "bois",
+  sun: "bois", dog: "bois", music: "bois",
+  book: "pierre", write: "pierre", meditate: "pierre", nophone: "pierre",
+  moon: "pierre", speak: "pierre", pill: "pierre", coffee: "pierre",
+  water: "tissu", salad: "tissu", fruit: "tissu", sleep: "tissu", bed: "tissu",
+  shower: "tissu", tooth: "tissu", broom: "tissu", heart: "tissu",
+};
+const resOf = h => RES_BY_ICON[h.icon] || "bois";
+
+/* Les pièces du campement. Trois niveaux chacune : le premier est presque
+   gratuit pour que la construction démarre tout de suite, le troisième se
+   mérite. */
+const PARTS = [
+  { k: "fire",    icon: "flame",    name: "Feu de camp",
+    lv: ["Foyer de pierres", "Feu abrité", "Grande cheminée"],
+    cost: [{ bois: 2 }, { bois: 5, pierre: 3 }, { bois: 10, pierre: 9 }] },
+  { k: "bed",     icon: "bed",      name: "Couchage",
+    lv: ["Tapis de sol", "Lit de camp", "Vrai lit"],
+    cost: [{ bois: 2, tissu: 1 }, { bois: 5, tissu: 4 }, { bois: 9, tissu: 8, pierre: 3 }] },
+  { k: "shelter", icon: "home",     name: "Abri",
+    lv: ["Bâche tendue", "Tente", "Cabane"],
+    cost: [{ bois: 3, tissu: 2 }, { bois: 8, tissu: 6 }, { bois: 14, tissu: 9, pierre: 8 }] },
+  { k: "store",   icon: "books",    name: "Réserve",
+    lv: ["Sacoche", "Coffre", "Cellier"],
+    cost: [{ bois: 3 }, { bois: 7, pierre: 2 }, { bois: 12, pierre: 8 }] },
+  { k: "table",   icon: "coffee",   name: "Table",
+    lv: ["Souche", "Table basse", "Grande table"],
+    cost: [{ bois: 4 }, { bois: 8, pierre: 3 }, { bois: 13, pierre: 7 }] },
+  { k: "garden",  icon: "salad",    name: "Potager",
+    lv: ["Carré de terre", "Potager", "Verger"],
+    cost: [{ bois: 3, tissu: 2 }, { bois: 6, tissu: 4, pierre: 3 }, { bois: 11, tissu: 7, pierre: 8 }] },
+];
+
+/* Le rang du campement se lit sur la somme des niveaux : construire
+   n'importe quoi fait progresser, il n'y a pas d'ordre imposé. */
+const TIERS = [
+  [0,  "Bivouac"], [3,  "Campement"], [6,  "Halte"], [9,  "Tente"],
+  [12, "Cabane"], [15, "Maison"], [18, "Domaine"],
+];
+const baseLevels = () => PARTS.reduce((n, p) => n + (S.base[p.k] || 0), 0);
+const baseTier = () => {
+  const n = baseLevels();
+  return TIERS.filter(t => n >= t[0]).pop()[1];
+};
+const canAfford = c => Object.keys(c).every(k => (S.res[k] || 0) >= c[k]);
+
 const GOLD_PER_HABIT = 3;
 const GOLD_PERFECT = 10;
 
@@ -1018,12 +1096,16 @@ function toggle(h, at) {
     S.xp = Math.max(0, S.xp - xp); S.done = Math.max(0, S.done - 1);
     S.steps = Math.max(0, S.steps - 1);
     S.gold = Math.max(0, S.gold - GOLD_PER_HABIT);
+    S.res[resOf(h)] = Math.max(0, (S.res[resOf(h)] || 0) - 1);
     on = false;
     Sfx.play("uncheck");
   } else {
     list.push(h.id);
     S.xp += xp; S.done++; S.steps++;
     S.gold += GOLD_PER_HABIT;
+    /* un matériau par habitude : le campement avance au même rythme que
+       le voyage, sans jamais demander d'attendre */
+    S.res[resOf(h)] = (S.res[resOf(h)] || 0) + 1;
     on = true;
     buzz(11);
     if (scene) scene.celebrate();
@@ -1035,6 +1117,8 @@ function toggle(h, at) {
          l'autre, jamais superposés */
       floatGain(at.x, at.y, "+" + xp + " XP", "xp", "bolt");
       setTimeout(() => floatGain(at.x, at.y + 26, "+" + GOLD_PER_HABIT, "gold", "gem"), 260);
+      const rk = RES.find(r => r.k === resOf(h));
+      setTimeout(() => floatGain(at.x, at.y + 52, "+1", "res", rk.icon), 500);
       burst(at.x, at.y, ["#7ec6ff", "#3d92e6", "#f7cc63", "#ffffff"]);
     }
   }
@@ -1043,11 +1127,13 @@ function toggle(h, at) {
   let gotFreeze = false;
   if (!wasP && nowP) {
     S.xp += PERFECT; S.gold += GOLD_PERFECT;
+    RES.forEach(r => S.res[r.k] += 2);
     if (S.freeze < MAX_FREEZE) { S.freeze++; gotFreeze = true; }
   }
   if (wasP && !nowP) {
     S.xp = Math.max(0, S.xp - PERFECT);
     S.gold = Math.max(0, S.gold - GOLD_PERFECT);
+    RES.forEach(r => S.res[r.k] = Math.max(0, S.res[r.k] - 2));
     if (S.freeze > 0) S.freeze--;
   }
 
@@ -1207,7 +1293,10 @@ function renderHeroScreen(L, st, J) {
   const wardEmpty = !html.trim();
   box.hidden = wardEmpty;
   $("heroWardSec").hidden = wardEmpty;
-  $("heroH1").textContent = wardEmpty ? "Ton personnage" : "Garde-robe";
+  /* on ne touche au titre que si l'onglet Personnage est à l'écran, sinon
+     il écraserait celui du campement à chaque rendu */
+  if (!$("campPane") || $("campPane").hidden)
+    $("heroH1").textContent = wardEmpty ? "Ton personnage" : "Garde-robe";
   box.querySelectorAll("[data-k]").forEach(el => {
     el.onclick = () => {
       S.look[el.dataset.k] = el.dataset.v;
@@ -1227,8 +1316,13 @@ function renderHeroScreen(L, st, J) {
       heroPreview = { cv, cx, t: 0, ph: 0 };
       const loop = () => {
         const p = heroPreview;
-        if (!document.hidden && $("sc-hero").classList.contains("on")) {
+        /* Le panneau Personnage peut être replié au profit du campement :
+           son canvas mesure alors zéro, et dessiner dedans lève une erreur
+           au lieu de ne rien faire. */
+        if (!document.hidden && $("sc-hero").classList.contains("on") &&
+            !$("heroPane").hidden) {
           const r = p.cv.getBoundingClientRect();
+          if (r.width < 8 || r.height < 8) { requestAnimationFrame(loop); return; }
           const dpr = Math.min(window.devicePixelRatio || 1, 2);
           if (p.cv.width !== Math.round(r.width * dpr)) {
             p.cv.width = Math.round(r.width * dpr);
@@ -1487,6 +1581,164 @@ function sparks() {
     s.style.opacity = .55 + Math.random() * .45;
     document.body.appendChild(s);
     setTimeout(() => s.remove(), 3600);
+  }
+}
+
+/* =========================================================
+   Écran du campement
+   ========================================================= */
+function costLine(c) {
+  return RES.filter(r => c[r.k]).map(r => {
+    const have = S.res[r.k] || 0;
+    return '<span class="cost' + (have >= c[r.k] ? " ok" : "") + '">' +
+      ic(r.icon, { size: 13 }) + c[r.k] + "</span>";
+  }).join("");
+}
+
+function renderCamp() {
+  const rr = $("resRow");
+  if (!rr) return;
+  rr.innerHTML = RES.map(r =>
+    '<div class="res-c"><span class="res-i ' + r.k + '">' + ic(r.icon, { size: 18 }) + "</span>" +
+    '<b class="roll">0</b><span class="res-l">' + r.label + "</span></div>").join("");
+  const rolls = rr.querySelectorAll(".roll");
+  RES.forEach((r, i) => roll(rolls[i], S.res[r.k] || 0));
+
+  const lvls = baseLevels();
+  $("campTier").textContent = baseTier();
+  const maxed = PARTS.filter(p => S.base[p.k] >= 3).length;
+  $("campSub").textContent = lvls === 0
+    ? "Rien n'est encore bâti"
+    : lvls + (lvls > 1 ? " aménagements" : " aménagement") +
+      (maxed ? " · " + maxed + " au maximum" : "");
+
+  $("partRows").innerHTML = PARTS.map(p => {
+    const lv = S.base[p.k] || 0;
+    const max = lv >= 3;
+    const c = max ? null : p.cost[lv];
+    const ok = c && canAfford(c);
+    return '<div class="row part' + (max ? " max" : "") + '" data-p="' + p.k + '">' +
+      '<div class="row-i" style="background:var(--fill);color:var(--ink-2)">' +
+        ic(p.icon, { size: 21 }) + "</div>" +
+      '<div class="row-b"><div class="row-n">' + p.name + "</div>" +
+      '<div class="row-m"><span>' + (lv ? p.lv[lv - 1] : "Rien de bâti") + "</span>" +
+      '<span class="lvdots">' + [0, 1, 2].map(i =>
+        '<i' + (i < lv ? ' class="on"' : "") + "></i>").join("") + "</span></div></div>" +
+      (max
+        ? '<span class="part-max">' + ic("check", { size: 15 }) + "</span>"
+        : '<button class="part-go' + (ok ? " ok" : "") + '"' + (ok ? "" : " disabled") + ">" +
+          costLine(c) + "</button>") +
+      "</div>";
+  }).join("");
+
+  $("partRows").querySelectorAll(".part-go:not([disabled])").forEach(btn => {
+    btn.onclick = e => {
+      e.stopPropagation();
+      const k = btn.closest(".part").dataset.p;
+      const p = PARTS.find(q => q.k === k);
+      const lv = S.base[k] || 0;
+      const c = p.cost[lv];
+      if (!canAfford(c)) return;
+      const before = baseTier();
+      Object.keys(c).forEach(r => S.res[r] -= c[r]);
+      S.base[k] = lv + 1;
+      save();
+      buzz(14);
+      Sfx.play("build");
+      sparks();
+      const after = baseTier();
+      render();
+      if (after !== before) {
+        alertBox("home", after,
+          "Ton campement change de visage. " + p.lv[lv] + " vient d'être bâti.");
+      } else {
+        alertBox(p.icon, p.lv[lv],
+          "Construit. Ton campement compte maintenant " + baseLevels() +
+          (baseLevels() > 1 ? " aménagements." : " aménagement."));
+      }
+    };
+  });
+}
+
+/* Le camp est rendu dans le même monde que le voyage : même ciel, même
+   heure, mêmes arbres quand les planches sont là. Un écran de menu aurait
+   coupé le campement de l'aventure. */
+let campView = null;
+function startCamp() {
+  const cv = $("campCanvas");
+  if (!cv || campView) return;
+  const cx = cv.getContext("2d");
+  campView = { cv, cx, t: 0, anim: null };
+  const loop = () => {
+    const v = campView;
+    if (!document.hidden && !$("campPane").hidden && $("sc-hero").classList.contains("on")) {
+      const r = v.cv.getBoundingClientRect();
+      /* Le panneau peut être encore replié au premier tour : dessiner dans
+         un canvas de taille nulle jette une erreur au lieu de ne rien faire. */
+      if (r.width < 8 || r.height < 8) { requestAnimationFrame(loop); return; }
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (v.cv.width !== Math.round(r.width * dpr)) {
+        v.cv.width = Math.round(r.width * dpr);
+        v.cv.height = Math.round(r.height * dpr);
+      }
+      v.cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      v.t += .016;
+      drawCampScene(v.cx, r.width, r.height, v.t, v);
+    }
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+
+function drawCampScene(x, W, H, t, v) {
+  const hour = new Date().getHours() + new Date().getMinutes() / 60;
+  const g = Odyssey.gradeAt(hour);
+  const J = journey();
+  const B = Odyssey.BIOMES[Math.floor(J.pos / SEG) % Odyssey.BIOMES.length];
+  const gy = H * .82;
+
+  /* ciel */
+  const sky = x.createLinearGradient(0, 0, 0, gy);
+  const top = B.sky[0], bot = B.sky[1];
+  const gc = h => {
+    const c = [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+    return "rgb(" + (c[0] * g.amb[0] | 0) + "," + (c[1] * g.amb[1] | 0) + "," + (c[2] * g.amb[2] | 0) + ")";
+  };
+  sky.addColorStop(0, gc(top)); sky.addColorStop(1, gc(bot));
+  x.fillStyle = sky; x.fillRect(0, 0, W, H);
+
+  /* arbres illustrés en fond, quand ils existent */
+  const SC = window.Scenery;
+  const trees = SC && SC.ready ? SC.props("round") : null;
+  if (trees) {
+    /* Ils encadrent le camp sans lui voler la vedette : plus de brume et
+       une taille contenue, sinon le décor mange la scène. */
+    const fog = [230, 220, 205];
+    [[.06, .58, .46], [.94, .52, .44], [.76, .43, .52]].forEach(([px, sc, f], i) => {
+      const im = trees[i % trees.length];
+      const th = H * sc, tw = im.width * (th / im.height);
+      x.drawImage(SC.tinted(im, g.amb, fog, f), W * px - tw / 2, gy - th, tw, th);
+    });
+  }
+
+  /* sol */
+  const gr2 = x.createLinearGradient(0, gy - 4, 0, H);
+  gr2.addColorStop(0, gc(B.ground));
+  gr2.addColorStop(1, gc(B.path));
+  x.fillStyle = gr2; x.fillRect(0, gy - 2, W, H - gy + 2);
+
+  /* le campement */
+  /* L'unité du camp est calée sur la taille du héros : au-delà, une simple
+     bâche le dépassait d'une tête et la scène perdait toute échelle. */
+  if (window.Camp) Camp.draw(x, W * .46, gy, Math.min(W * .30, H * .42), S.base, g, t);
+
+  /* le héros, près du feu */
+  if (window.Sprites && Sprites.ready && S.base.fire > 0) {
+    const st = { t, walk: 0, run: false, phase: 0, jump: 0, cheer: 0,
+                 resting: false, sleeping: false, anim: v.anim };
+    Sprites.draw(x, W * .76, gy + H * .01, H * .30, S.look, st,
+      { sun: g.sun, amb: g.amb, night: g.star, wind: .4 }, .016);
+    v.anim = st.anim;
   }
 }
 
@@ -1787,6 +2039,19 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
   /* on y touche pour remonter voir le voyageur en grand */
   bar.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
 })();
+
+/* bascule Personnage / Campement dans l'onglet Héros */
+$("heroTabs").querySelectorAll("button").forEach(b => {
+  b.onclick = () => {
+    $("heroTabs").querySelectorAll("button").forEach(o => o.classList.toggle("on", o === b));
+    const camp = b.dataset.v === "camp";
+    $("heroPane").hidden = camp;
+    $("campPane").hidden = !camp;
+    $("heroH1").textContent = camp ? "Campement" : "Ton personnage";
+    if (camp) startCamp();
+    buzz(8);
+  };
+});
 
 applyPrefs();
 wireProfile();
