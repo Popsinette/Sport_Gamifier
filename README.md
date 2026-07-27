@@ -24,6 +24,22 @@ Chaque habitude cochée fait avancer **le Voyageur** à travers un monde vivant 
   plateaux, forêts, mers, architecture, îles flottantes) × palettes = un
   catalogue extensible à l'infini, jamais dessiné à la main.
 
+## Premier lancement
+
+Quatre écrans, une fois pour toutes :
+
+1. **Bienvenue** — le monde tourne déjà en fond, avec le moteur du voyage.
+2. **Objectifs** — huit intentions au choix, multiples : bouger chaque jour,
+   moins d'écrans, boire plus d'eau, mieux dormir, manger mieux, apaiser le
+   mental, nourrir l'esprit, un intérieur clair. Chacune amorce une à deux
+   habitudes. Un lien permet de partir d'une page blanche.
+3. **Personnage** — les cinq héros côte à côte.
+4. **Récapitulatif** — les habitudes créées, avant de valider.
+
+Les objectifs restent modifiables depuis l'onglet **Habitudes** ; les
+habitudes déjà présentes ne sont jamais dupliquées. Un compte existant ne
+repasse pas par cet écran.
+
 ## Les personnages
 
 Cinq héros illustrés à la main, conformes à la planche de référence :

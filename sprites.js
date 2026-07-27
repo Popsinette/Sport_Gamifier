@@ -56,14 +56,17 @@ async function loadAtlas(id) {
 }
 
 /* Sonde une seule fois : le manifeste existe-t-il ? */
+/* Sonde le manifeste. Un échec ne doit pas être définitif : réseau
+   capricieux, worker en cours d'installation… on retente au chargement
+   suivant plutôt que de rester bloqué sur le rendu de secours. */
 async function probe() {
   if (probed) return ready;
-  probed = true;
   try {
     const r = await fetch(BASE + "manifest.json", { cache: "no-cache" });
-    if (!r.ok) return false;
+    if (!r.ok) throw new Error("manifeste " + r.status);
     manifest = await r.json();
     ready = Array.isArray(manifest.sets) && manifest.sets.length > 0;
+    probed = ready;
   } catch (e) {
     ready = false;   /* attendu tant qu'aucun asset n'est livré */
   }

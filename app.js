@@ -58,6 +58,41 @@ const SUGGEST = [
   { icon:"strength", name:"5 min de renforcement",  diff:2 },
 ];
 
+/* Objectifs proposés au premier lancement. Chacun amorce deux ou trois
+   habitudes — assez pour démarrer, jamais assez pour écraser. */
+const GOALS = [
+  { id:"move",   icon:"walk",     name:"Bouger chaque jour",
+    line:"Marche, étirements, renforcement",
+    habits:[{ icon:"walk", name:"Marcher 10 minutes", diff:2 },
+            { icon:"strength", name:"5 min de renforcement", diff:2 }] },
+  { id:"screen", icon:"nophone",  name:"Moins d'écrans",
+    line:"Reprendre la main sur son temps",
+    habits:[{ icon:"nophone", name:"Pas d'écran au lit", diff:3 },
+            { icon:"nophone", name:"30 min sans téléphone", diff:2 }] },
+  { id:"water",  icon:"water",    name:"Boire plus d'eau",
+    line:"Un réflexe simple, un effet rapide",
+    habits:[{ icon:"water", name:"Boire 1,5 L d'eau", diff:1 }] },
+  { id:"sleep",  icon:"sleep",    name:"Mieux dormir",
+    line:"Des soirées calmes, des matins clairs",
+    habits:[{ icon:"sleep", name:"Me coucher avant 23 h", diff:2 },
+            { icon:"moon", name:"Écrans éteints 30 min avant", diff:2 }] },
+  { id:"eat",    icon:"salad",    name:"Manger mieux",
+    line:"Sans régime et sans culpabilité",
+    habits:[{ icon:"salad", name:"Un fruit ou un légume", diff:1 },
+            { icon:"coffee", name:"Un vrai petit-déjeuner", diff:1 }] },
+  { id:"calm",   icon:"meditate", name:"Apaiser le mental",
+    line:"Respirer, ralentir, souffler",
+    habits:[{ icon:"meditate", name:"5 min de respiration", diff:1 },
+            { icon:"write", name:"Noter 3 gratitudes", diff:1 }] },
+  { id:"learn",  icon:"book",     name:"Nourrir l'esprit",
+    line:"Lire, apprendre, créer",
+    habits:[{ icon:"book", name:"Lire 10 pages", diff:2 }] },
+  { id:"home",   icon:"broom",    name:"Un intérieur clair",
+    line:"Dix minutes suffisent",
+    habits:[{ icon:"broom", name:"10 min de rangement", diff:1 }] },
+];
+const goalById = id => GOALS.find(g => g.id === id);
+
 const TITLES = [
   [20,"Légende du chemin"], [16,"Maître du rythme"], [12,"Inarrêtable"],
   [8,"Voyageur aguerri"], [5,"Marcheur assidu"], [3,"En route"], [1,"Premiers pas"],
@@ -177,6 +212,7 @@ function blank() {
     theme: 0,
     notice: 0, softReset: false,
     look: Hero.defaultLook(),
+    goals: [], onboarded: false,
     habits: [], log: {},
   };
 }
@@ -225,6 +261,9 @@ function migrate(s) {
   if (!s.look) s.look = Hero.defaultLook();
   else s.look = Object.assign(Hero.defaultLook(), s.look);
   if (BODY_MIGRATION[s.look.body]) s.look.body = BODY_MIGRATION[s.look.body];
+  if (!Array.isArray(s.goals)) s.goals = [];
+  /* Un compte déjà en route ne repasse pas par le premier lancement. */
+  if (!s.onboarded) s.onboarded = s.habits.length > 0 || s.done > 0;
   s.habits.forEach((h, i) => {
     if (!h.icon) h.icon = ICON_SET[i % ICON_SET.length];
     if (!h.hue) h.hue = HUES[i % HUES.length];
@@ -417,6 +456,7 @@ function render() {
   renderChallenge();
   renderToday(todays, k);
   renderHabits();
+  renderGoalTags();
   renderProgress(L, st, J);
   renderNotices(st);
 }
@@ -750,6 +790,26 @@ const SWATCHES = [
 ];
 let heroPreview = null;
 
+/* Cartes de choix du personnage — partagées par l'écran Héros et le
+   premier lancement, pour que le choix se présente partout pareil. */
+function heroCardsHTML(sel) {
+  return Hero.CATALOG.body.map(b =>
+    '<button class="card' + (b.id === sel ? " on" : "") + '" data-body="' + b.id + '">' +
+    '<img src="assets/hero/thumb_' + b.id + '.png" alt="" loading="lazy">' +
+    "<span>" + b.name + "</span></button>").join("");
+}
+/* Une vignette absente ne doit pas laisser d'icône cassée à l'écran. */
+function wireHeroCards(box, onPick) {
+  box.querySelectorAll("img").forEach(im => { im.onerror = () => im.remove(); });
+  box.querySelectorAll("[data-body]").forEach(el => {
+    el.onclick = () => {
+      box.querySelectorAll(".card").forEach(c => c.classList.toggle("on", c === el));
+      onPick(el.dataset.body);
+      if (navigator.vibrate) navigator.vibrate(8);
+    };
+  });
+}
+
 function renderHeroScreen(L, st, J) {
   const U = unlockStats(L, st, J);
   const box = $("wardrobe");
@@ -761,10 +821,25 @@ function renderHeroScreen(L, st, J) {
   const avail = sprite && Sprites.manifest ? Sprites.manifest.available || [] : null;
   const hasArt = (key, id) => !avail || avail.indexOf(key + "_" + id) !== -1;
 
+  /* — identité et choix du personnage — */
+  const cur = Hero.CATALOG.body.find(b => b.id === S.look.body) || Hero.CATALOG.body[0];
+  $("heroName").textContent = cur.name;
+  $("heroDesc").textContent = cur.desc || "";
+  const cards = $("heroCards");
+  cards.innerHTML = heroCardsHTML(S.look.body);
+  wireHeroCards(cards, id => {
+    S.look.body = id;
+    save();
+    if (scene) scene.setLook(S.look);
+    render();
+    if (window.Sprites) Sprites.preload(S.look).then(ok => { if (ok) render(); }).catch(() => {});
+  });
+
   let html = "";
   for (const grp of WARDROBE) {
     const items = Hero.CATALOG[grp.key];
     if (grp.key === "capeColor") continue;
+    if (grp.key === "body") continue;   /* présenté en cartes, plus haut */
     if (avail && !items.some(it => hasArt(grp.key, it.id))) continue;
     html += '<div class="fl-l">' + grp.label + "</div><div class=\"opts\">";
     for (const it of items) {
@@ -786,6 +861,13 @@ function renderHeroScreen(L, st, J) {
       "</div>";
   }
   box.innerHTML = html;
+  /* Pas d'illustration pour l'équipement : on masque la section plutôt que
+     d'afficher des options sans effet. Elle revient d'elle-même le jour où
+     les planches arrivent. */
+  const wardEmpty = !html.trim();
+  box.hidden = wardEmpty;
+  $("heroWardSec").hidden = wardEmpty;
+  $("heroH1").textContent = wardEmpty ? "Ton personnage" : "Garde-robe";
   box.querySelectorAll("[data-k]").forEach(el => {
     el.onclick = () => {
       S.look[el.dataset.k] = el.dataset.v;
@@ -836,16 +918,22 @@ function renderHeroScreen(L, st, J) {
     }
   }
 
-  /* prochains déblocages */
+  /* Prochains déblocages — uniquement ce qui a une illustration. Promettre
+     une récompense invisible serait de la fausse progression. */
   const pend = [];
   for (const grp of WARDROBE) {
+    if (grp.key === "body") continue;
     for (const it of Hero.CATALOG[grp.key]) {
+      if (!hasArt(grp.key, it.id)) continue;
       if (!Hero.unlocked(it.req, U)) pend.push({ it, grp, cur: U[it.req.t] || 0 });
     }
   }
   pend.sort((a, b) => (b.cur / b.it.req.n) - (a.cur / a.it.req.n));
   const nx = $("heroNext");
   if (nx) {
+    const noNext = wardEmpty && pend.length === 0;
+    nx.hidden = noNext;
+    $("heroNextSec").hidden = noNext;
     nx.innerHTML = pend.length === 0
       ? '<div class="next-i">' + Icons.svg("trophy", { size: 22 }) + '</div><div class="next-b">' +
         '<div class="next-n">Garde-robe complète</div><div class="next-s">Tu as tout débloqué.</div></div>'
@@ -955,6 +1043,159 @@ function sparks() {
 }
 
 /* =========================================================
+   Premier lancement
+   Deux usages : la découverte complète au tout premier
+   démarrage, et la seule étape « objectifs » quand on revient
+   les modifier depuis l'écran Habitudes.
+   ========================================================= */
+const Onb = (function () {
+  let step = 0, steps = [0, 1, 2, 3], sel = [], body = null, mode = "full";
+
+  const el = () => $("onb");
+  const $$ = s => document.querySelectorAll(s);
+
+  function paint() {
+    $$(".onb-step").forEach(s => s.classList.toggle("on", +s.dataset.step === steps[step]));
+    $("onbDots").innerHTML = steps.map((_, i) =>
+      '<i class="' + (i <= step ? "on" : "") + '"></i>').join("");
+    el().scrollTop = 0;
+  }
+
+  /* Les habitudes des objectifs cochés, sans doublon avec l'existant. */
+  function picked() {
+    const out = [], seen = new Set(S.habits.map(h => h.name));
+    for (const id of sel) {
+      const g = goalById(id);
+      if (!g) continue;
+      for (const h of g.habits) {
+        if (seen.has(h.name)) continue;
+        seen.add(h.name);
+        out.push(h);
+      }
+    }
+    return out;
+  }
+
+  function renderGoals() {
+    const box = $("onbGoals");
+    box.innerHTML = GOALS.map(g =>
+      '<button class="goal' + (sel.indexOf(g.id) !== -1 ? " on" : "") + '" data-g="' + g.id + '">' +
+      '<span class="goal-i">' + ic(g.icon, { size: 18 }) + "</span>" +
+      "<b>" + g.name + "</b><em>" + g.line + "</em></button>").join("");
+    box.querySelectorAll("[data-g]").forEach(b => {
+      b.onclick = () => {
+        const i = sel.indexOf(b.dataset.g);
+        if (i === -1) sel.push(b.dataset.g); else sel.splice(i, 1);
+        b.classList.toggle("on", i === -1);
+        $("onbGoalsNext").disabled = sel.length === 0;
+        if (navigator.vibrate) navigator.vibrate(8);
+      };
+    });
+    $("onbGoalsNext").disabled = sel.length === 0;
+  }
+
+  function renderHeroes() {
+    const box = $("onbHeroes");
+    box.innerHTML = heroCardsHTML(body);
+    wireHeroCards(box, id => {
+      body = id;
+      /* on précharge dès le choix : la planche est prête à l'arrivée */
+      if (window.Sprites) Sprites.preload(Object.assign({}, S.look, { body: id })).catch(() => {});
+    });
+  }
+
+  function renderSummary() {
+    const list = picked();
+    const box = $("onbSummary");
+    $("onbSumLead").textContent = list.length
+      ? "Voici tes premières habitudes. Tu pourras les modifier, en ajouter ou en retirer à tout moment."
+      : "Tu démarres avec une page blanche. Ajoute tes habitudes quand tu veux depuis l'onglet Habitudes.";
+    box.hidden = !list.length;
+    box.innerHTML = list.map((h, i) =>
+      '<div class="row" style="cursor:default;animation-delay:' + (i * 35) + 'ms">' +
+      '<div class="row-i" style="background:' + HUES[i % HUES.length] + '1f;color:' + HUES[i % HUES.length] + '">' +
+      ic(h.icon, { size: 21 }) + "</div>" +
+      '<div class="row-b"><div class="row-n">' + h.name + "</div>" +
+      '<div class="row-m"><span>+' + XP[h.diff] + " XP · tous les jours</span></div></div></div>").join("");
+  }
+
+  /* Aperçu animé de l'accueil : le même moteur que le voyage, en vitrine. */
+  let art = null;
+  function startArt() {
+    if (art || !window.Odyssey) return;
+    const host = $("onbArt");
+    if (!host) return;
+    const cv = document.createElement("canvas");
+    host.appendChild(cv);
+    art = Odyssey.createScene(cv, { look: S.look });
+    art.setSteps(6, true);
+    art.start();
+  }
+  function stopArt() { if (art) { art.stop(); art = null; $("onbArt").innerHTML = ""; } }
+
+  function next() {
+    if (step >= steps.length - 1) return finish();
+    step++;
+    if (steps[step] === 1) renderGoals();
+    if (steps[step] === 2) renderHeroes();
+    if (steps[step] === 3) renderSummary();
+    paint();
+  }
+
+  function finish() {
+    const list = picked();
+    list.forEach((h, i) => S.habits.push({
+      id: uid(), name: h.name, icon: h.icon,
+      hue: HUES[(S.habits.length + i) % HUES.length],
+      diff: h.diff, days: [0, 1, 2, 3, 4, 5, 6],
+    }));
+    S.goals = sel.slice();
+    if (body) S.look.body = body;
+    S.onboarded = true;
+    save();
+    stopArt();
+    el().hidden = true;
+    if (scene) scene.setLook(S.look);
+    if (window.Sprites) Sprites.preload(S.look).then(ok => { if (ok) render(); }).catch(() => {});
+    render();
+  }
+
+  function open(m) {
+    mode = m || "full";
+    sel = S.goals.slice();
+    body = S.look.body;
+    steps = mode === "goals" ? [1, 3] : [0, 1, 2, 3];
+    step = 0;
+    $("onbSkip").hidden = mode !== "full";
+    el().hidden = false;
+    if (steps[0] === 0) startArt();
+    if (steps[0] === 1) renderGoals();
+    paint();
+  }
+
+  $$("[data-next]").forEach(b => { b.onclick = next; });
+  $("onbDone").onclick = finish;
+  /* « partir de zéro » : on n'amorce aucune habitude, sans pour autant
+     effacer les objectifs déjà choisis lors d'une modification. */
+  $("onbSkip").onclick = () => { if (mode === "full") sel = []; next(); };
+
+  return { open };
+})();
+
+function renderGoalTags() {
+  const box = $("goalTags");
+  if (!box) return;
+  const tags = S.goals.map(id => goalById(id)).filter(Boolean);
+  box.innerHTML =
+    (tags.length
+      ? tags.map(g => '<span class="tag">' + ic(g.icon, { size: 14 }) + g.name + "</span>").join("")
+      : '<span class="tag">' + ic("compass", { size: 14 }) + "Aucun objectif défini</span>") +
+    '<button class="tag add" id="goalEdit">' + ic("plus", { size: 14 }) +
+    (tags.length ? "Modifier" : "En choisir") + "</button>";
+  $("goalEdit").onclick = () => Onb.open("goals");
+}
+
+/* =========================================================
    Navigation & démarrage
    ========================================================= */
 function go(name) {
@@ -981,6 +1222,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 
 boot3D();
 render();
+if (!S.onboarded) Onb.open("full");
 /* la citation change chaque jour, en pied de page de la scène */
 setInterval(() => { if (!document.hidden) $("phaseLine").innerHTML =
   ic("clock", { size: 15 }) + "<span>" + scene.phaseLabel() + "</span>"; }, 60000);

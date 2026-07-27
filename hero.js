@@ -31,11 +31,16 @@ const CATALOG = {
   /* Les cinq aventuriers de la planche de référence. Le choix du héros
      relève de l'identité, pas de la récompense : tous sont disponibles. */
   body: [
-    { id:"explorateur", name:"L'Explorateur",     req:null },
-    { id:"brumes",      name:"Voyageur des Brumes", req:null },
-    { id:"gardienne",   name:"Gardienne de Lumière", req:null },
-    { id:"saisons",     name:"Aventurière des Saisons", req:null },
-    { id:"reveur",      name:"Le Petit Rêveur",   req:null },
+    { id:"explorateur", name:"L'Explorateur",     req:null,
+      desc:"Sac au dos et cape rouge. Toujours partant pour la crête suivante." },
+    { id:"brumes",      name:"Voyageur des Brumes", req:null,
+      desc:"Lanterne à la main, il avance là où le chemin se devine à peine." },
+    { id:"gardienne",   name:"Gardienne de Lumière", req:null,
+      desc:"Elle porte la lumière dans les passages les plus sombres." },
+    { id:"saisons",     name:"Aventurière des Saisons", req:null,
+      desc:"Elle change avec le paysage, et ne craint ni le froid ni la pluie." },
+    { id:"reveur",      name:"Le Petit Rêveur",   req:null,
+      desc:"Il prend le temps de regarder les nuages. Le chemin n'en est pas plus court." },
   ],
   hair: [
     { id:"short",  name:"Courts",            req:null },

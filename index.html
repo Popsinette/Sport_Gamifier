@@ -76,11 +76,19 @@
 
   <!-- ===================== HÉROS ===================== -->
   <section class="screen" id="sc-hero">
-    <header><div><div class="eyebrow">Ton héros</div><h1>Garde-robe</h1></div></header>
-    <div class="glass hero-stage"><canvas id="heroCanvas"></canvas></div>
-    <div class="sec">Prochain déblocage</div>
+    <header><div><div class="eyebrow">Ton héros</div><h1 id="heroH1">Garde-robe</h1></div></header>
+    <div class="glass hero-stage">
+      <canvas id="heroCanvas"></canvas>
+      <div class="hero-id">
+        <div class="hero-id-n" id="heroName">—</div>
+        <div class="hero-id-d" id="heroDesc">—</div>
+      </div>
+    </div>
+    <div class="sec">Choisir un personnage</div>
+    <div class="glass cards" id="heroCards"></div>
+    <div class="sec" id="heroNextSec">Prochain déblocage</div>
     <div class="glass next" id="heroNext"></div>
-    <div class="sec">Apparence</div>
+    <div class="sec" id="heroWardSec">Apparence</div>
     <div class="glass wardrobe" id="wardrobe"></div>
   </section>
 
@@ -91,6 +99,8 @@
       <button class="w-orb" id="addBtn" style="background:linear-gradient(150deg,var(--a2),var(--a1));border:none;cursor:pointer" aria-label="Ajouter une habitude"></button>
     </header>
     <div class="glass rows" id="habitRows"></div>
+    <div class="sec">Mes objectifs</div>
+    <div class="glass goal-tags" id="goalTags"></div>
     <div class="sec">Suggestions</div>
     <div class="glass rows" id="suggRows"></div>
   </section>
@@ -174,6 +184,49 @@
     <div class="days" id="fDays"></div>
     <button class="go" id="fSave" style="margin-top:24px">Enregistrer</button>
     <button class="del" id="fDel" style="display:none">Supprimer cette habitude</button>
+  </div>
+</div>
+
+<!-- ===================== PREMIER LANCEMENT ===================== -->
+<div class="onb" id="onb" hidden>
+  <div class="onb-sheet">
+    <div class="onb-dots" id="onbDots"></div>
+
+    <!-- 1 · accueil -->
+    <div class="onb-step on" data-step="0">
+      <div class="onb-art" id="onbArt"></div>
+      <h2>Bienvenue dans Odyssée</h2>
+      <p>Tes habitudes du quotidien font avancer un voyageur à travers
+        dix-huit paysages. Pas de points de vie, pas de punition —
+        juste un chemin qui avance avec toi.</p>
+      <button class="go" data-next>Commencer</button>
+    </div>
+
+    <!-- 2 · objectifs -->
+    <div class="onb-step" data-step="1">
+      <h2>Qu'aimerais-tu changer ?</h2>
+      <p>Choisis ce qui compte pour toi. On te proposera quelques habitudes
+        pour démarrer — tu pourras tout modifier ensuite.</p>
+      <div class="goals" id="onbGoals"></div>
+      <button class="go" data-next id="onbGoalsNext" disabled>Continuer</button>
+      <button class="onb-skip" id="onbSkip">Je préfère partir de zéro</button>
+    </div>
+
+    <!-- 3 · personnage -->
+    <div class="onb-step" data-step="2">
+      <h2>Qui prend la route ?</h2>
+      <p>Ton compagnon de voyage. Tu pourras en changer quand tu veux.</p>
+      <div class="cards" id="onbHeroes"></div>
+      <button class="go" data-next>Continuer</button>
+    </div>
+
+    <!-- 4 · récapitulatif -->
+    <div class="onb-step" data-step="3">
+      <h2>Tout est prêt</h2>
+      <p id="onbSumLead">Voici tes premières habitudes.</p>
+      <div class="glass rows onb-rows" id="onbSummary"></div>
+      <button class="go" id="onbDone">En route</button>
+    </div>
   </div>
 </div>
 

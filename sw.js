@@ -1,5 +1,5 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "odyssee-v4";
+const CACHE = "odyssee-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,7 +12,14 @@ const ASSETS = [
   "./manifest.webmanifest",
   "./icon.svg",
   "./icon-512.png",
-  "./assets/hero/manifest.json"
+  "./assets/hero/manifest.json",
+  /* vignettes de choix du personnage : légères, et nécessaires dès le
+     premier lancement */
+  "./assets/hero/thumb_explorateur.png",
+  "./assets/hero/thumb_brumes.png",
+  "./assets/hero/thumb_gardienne.png",
+  "./assets/hero/thumb_saisons.png",
+  "./assets/hero/thumb_reveur.png"
 ];
 /* Les planches de héros pèsent ~1,8 Mo pièce : on ne les précharge pas
    toutes. Le cache d'exécution ci-dessous garde celle du personnage
@@ -39,8 +46,13 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     fetch(e.request)
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        /* On ne met en cache QUE les réponses valides et de même origine.
+           Un 404 mis en cache est un poison : il survit à la mise en ligne
+           du fichier manquant et fige l'application sur un état obsolète. */
+        if (res.ok && res.type === "basic") {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
         return res;
       })
       .catch(() => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match("./index.html")))

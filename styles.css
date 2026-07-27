@@ -51,6 +51,10 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* La règle `[hidden]` du navigateur perd face à n'importe quel `display`
+   déclaré ici. Sans ce garde-fou, masquer un bloc en JavaScript n'a
+   aucun effet visible. */
+[hidden] { display: none !important; }
 html, body { height: 100%; }
 
 body {
@@ -621,3 +625,149 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
 .opt.lk { opacity: .5; cursor: default; }
 .opt.lk em { font-style: normal; font-size: .68rem; opacity: .8; }
 .wardrobe .hues { border: 1px solid var(--glass-line); }
+
+/* ---------- identité du héros ---------- */
+.hero-stage { position: relative; }
+.hero-id {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 34px 18px 14px;
+  background: linear-gradient(transparent, rgba(8, 12, 18, .52));
+  pointer-events: none;
+}
+.hero-id-n {
+  font-size: 1.02rem; font-weight: 780; letter-spacing: -.02em;
+  color: #fff; text-shadow: 0 1px 10px rgba(0, 0, 0, .4);
+}
+.hero-id-d {
+  margin-top: 2px; font-size: .74rem; font-weight: 580; line-height: 1.42;
+  color: rgba(255, 255, 255, .82); text-shadow: 0 1px 8px rgba(0, 0, 0, .45);
+}
+
+/* ---------- cartes de personnage ---------- */
+.cards {
+  padding: 14px; display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+.card {
+  border: 1px solid var(--glass-line);
+  background: var(--glass-2);
+  border-radius: var(--r-m);
+  padding: 8px 6px 10px;
+  color: var(--ink);
+  cursor: pointer; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  transition: transform .14s, background .22s, border-color .22s, box-shadow .22s;
+}
+.card:active { transform: scale(.955); }
+.card img {
+  width: 100%; max-width: 88px; aspect-ratio: 4 / 5;
+  object-fit: contain; object-position: bottom;
+  /* les vignettes sont détourées : une ombre portée les pose au sol */
+  filter: drop-shadow(0 5px 7px rgba(16, 24, 40, .22));
+}
+.card span {
+  font-size: .69rem; font-weight: 660; line-height: 1.3;
+  color: var(--ink-2); text-align: center; letter-spacing: -.005em;
+}
+.card.on {
+  background: linear-gradient(165deg, rgba(127, 176, 255, .26), var(--glass-2));
+  border-color: var(--a1);
+  box-shadow: 0 10px 26px -14px var(--a1);
+}
+.card.on span { color: var(--ink); font-weight: 760; }
+
+/* ---------- premier lancement ---------- */
+.onb {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: flex-end; justify-content: center;
+  background:
+    radial-gradient(120% 60% at 50% 0%, var(--bg-2) 0%, var(--bg) 58%) fixed,
+    var(--bg);
+  overflow-y: auto;
+  animation: fade .3s ease;
+}
+.onb[hidden] { display: none; }
+.onb-sheet {
+  width: 100%; max-width: 520px;
+  min-height: 100%;
+  padding: calc(28px + var(--safe-t)) 20px calc(26px + var(--safe-b));
+  display: flex; flex-direction: column;
+}
+.onb-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 26px; flex: none; }
+.onb-dots i {
+  width: 22px; height: 4px; border-radius: 999px;
+  background: var(--fill-2); transition: background .3s;
+}
+.onb-dots i.on { background: linear-gradient(90deg, var(--a1), var(--a2)); }
+.onb-step { display: none; flex: 1; flex-direction: column; }
+.onb-step.on { display: flex; animation: onbIn .34s cubic-bezier(.22, .8, .3, 1); }
+@keyframes onbIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.onb-step h2 {
+  font-size: 1.62rem; font-weight: 800; letter-spacing: -.032em;
+  line-height: 1.15; margin-bottom: 9px;
+}
+.onb-step > p {
+  font-size: .85rem; font-weight: 560; line-height: 1.55;
+  color: var(--ink-2); margin-bottom: 20px;
+}
+.onb-step .go { margin-top: auto; flex: none; }
+.onb-skip {
+  margin-top: 10px; flex: none;
+  background: none; border: none; font-family: inherit;
+  font-size: .78rem; font-weight: 640; color: var(--ink-3);
+  padding: 10px; cursor: pointer;
+}
+.onb-art {
+  height: 36vh; min-height: 190px; max-height: 320px;
+  margin-bottom: 22px; border-radius: var(--r-l);
+  overflow: hidden; position: relative;
+  background: linear-gradient(170deg, rgba(126, 166, 220, .30), rgba(126, 166, 220, .05));
+  box-shadow: var(--glass-shadow);
+}
+.onb-art canvas { display: block; width: 100%; height: 100%; }
+.onb-rows { max-height: 44vh; overflow-y: auto; }
+.onb .cards { padding: 0; background: none; border: none; box-shadow: none; }
+
+/* ---------- objectifs ---------- */
+.goals { display: grid; gap: 9px; grid-template-columns: 1fr 1fr; margin-bottom: 8px; }
+.goal {
+  border: 1px solid var(--glass-line);
+  background: var(--glass-2);
+  border-radius: var(--r-m);
+  padding: 13px 12px;
+  /* sans couleur explicite, le bouton retombe sur le noir du navigateur
+     et devient illisible en mode sombre */
+  color: var(--ink);
+  cursor: pointer; font-family: inherit; text-align: left;
+  display: flex; flex-direction: column; gap: 7px;
+  transition: transform .14s, background .22s, border-color .22s, box-shadow .22s;
+}
+.goal:active { transform: scale(.96); }
+.goal-i {
+  width: 34px; height: 34px; border-radius: 11px;
+  display: grid; place-items: center;
+  background: var(--fill); color: var(--ink-2);
+  transition: background .22s, color .22s;
+}
+.goal-i svg { width: 18px; height: 18px; }
+.goal b { font-size: .81rem; font-weight: 720; letter-spacing: -.012em; line-height: 1.25; }
+.goal em {
+  font-style: normal; font-size: .68rem; font-weight: 560;
+  color: var(--ink-3); line-height: 1.35;
+}
+.goal.on {
+  background: linear-gradient(160deg, rgba(127, 176, 255, .28), var(--glass-2));
+  border-color: var(--a1);
+  box-shadow: 0 10px 26px -15px var(--a1);
+}
+.goal.on .goal-i { background: linear-gradient(140deg, var(--a1), var(--a2)); color: #fff; }
+
+/* rappel des objectifs, hors premier lancement */
+.goal-tags { padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 7px; }
+.goal-tags .tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .75rem; font-weight: 640; color: var(--ink-2);
+  background: var(--fill); border-radius: 999px; padding: 7px 12px;
+}
+.goal-tags .tag svg { width: 14px; height: 14px; }
+.goal-tags .tag.add { background: none; border: 1px dashed var(--sep); color: var(--ink-3); cursor: pointer; font-family: inherit; }
