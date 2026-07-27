@@ -27,6 +27,17 @@
 
 <div id="app">
 
+  <!-- Bandeau de progression, visible dès que la scène sort de l'écran.
+       Sans lui, la récompense se joue en haut pendant qu'on coche en bas. -->
+  <div class="minibar" id="miniBar" hidden>
+    <img class="mb-av" id="mbAv" alt="">
+    <div class="mb-b">
+      <div class="mb-h"><b id="mbNext">—</b><em id="mbDist">—</em></div>
+      <div class="mb-line"><i id="mbFill" style="width:0%"></i></div>
+    </div>
+    <div class="mb-steps"><b id="mbSteps">0</b><span>pas</span></div>
+  </div>
+
   <!-- ===================== VOYAGE ===================== -->
   <section class="screen on" id="sc-today">
     <header>

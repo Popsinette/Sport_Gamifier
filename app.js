@@ -605,6 +605,7 @@ function render() {
   if (found) pendingFind = found;
 
   renderRoute(J);
+  renderMini(J);
   renderObstacle(J);
   renderCarnet(J);
   renderChallenge();
@@ -632,6 +633,32 @@ function teaser(m, revealed) {
   if (m.kind === "chest") return "Un coffre";
   return { flore: "Une plante inconnue", vue: "Un point de vue",
            faune: "Une créature", ruine: "Un vestige" }[m.type] || "Une découverte";
+}
+
+/* Bandeau compact. Il ne duplique pas la scène — il en montre le seul
+   élément qui change quand on coche : la distance parcourue et ce qui
+   arrive. C'est ce qui rend le progrès visible sans quitter la liste. */
+function renderMini(J) {
+  const bar = $("miniBar");
+  if (!bar) return;
+  const ex = expedition(J);
+  const av = $("mbAv");
+  const src = "assets/hero/thumb_" + S.look.body + ".png";
+  if (av.getAttribute("src") !== src) { av.src = src; av.onerror = () => av.remove(); }
+
+  const next = ex.marks.find(m => m.pos > J.pos);
+  $("mbNext").textContent = next ? teaser(next, false) : "Le paysage suivant";
+  $("mbDist").textContent = next ? (next.pos - J.pos) + " pas" : ex.left + " pas";
+  $("mbFill").style.width = (clamp01(ex.walked / SEG) * 100).toFixed(1) + "%";
+
+  const prev = +($("mbSteps").dataset.v || 0);
+  roll($("mbSteps"), J.pos);
+  /* le pas se voit : l'avatar avance d'un cran à chaque progression */
+  if (J.pos > prev && prev && !reduceMotion()) {
+    av.classList.remove("step");
+    void av.offsetWidth;
+    av.classList.add("step");
+  }
 }
 
 function renderRoute(J) {
@@ -801,7 +828,12 @@ function renderToday(todays, k) {
     if (b) b.onclick = () => { go("habits"); openSheet(null); };
     return;
   }
-  box.innerHTML = todays.map((h, i) => {
+  /* Les habitudes cochées descendent en bas de liste. Ce qui reste à faire
+     remonte sous le pouce, et la liste raccourcit visiblement au lieu de
+     rester figée — le progrès se lit sans compter. */
+  const order = todays.slice().sort((a, b) =>
+    (isDone(a, k) ? 1 : 0) - (isDone(b, k) ? 1 : 0));
+  box.innerHTML = order.map((h, i) => {
     const d = isDone(h, k), s = hStreak(h);
     return '<div class="row' + (d ? " done" : "") + '" data-id="' + h.id + '" style="animation-delay:' + (i * 40) + 'ms">' +
       '<div class="row-i" style="background:' + h.hue + '1f;color:' + h.hue + '">' + ic(h.icon, { size: 21 }) + "</div>" +
@@ -1708,6 +1740,9 @@ function go(name) {
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.sc === name));
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("on"));
   $("sc-" + name).classList.add("on");
+  /* l'observateur ne se déclenche qu'au défilement : on masque nous-mêmes
+     en quittant l'onglet, sinon le bandeau survit sur les autres écrans */
+  if (name !== "today") $("miniBar").hidden = true;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("nav button").forEach((b, i) => {
@@ -1725,6 +1760,19 @@ $("resetBtn").onclick = () => {
 };
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+/* Le bandeau n'apparaît que lorsque la scène a quitté l'écran, et
+   uniquement sur l'onglet Voyage : ailleurs, il n'aurait rien à dire. */
+(function () {
+  const bar = $("miniBar"), world = document.querySelector(".world");
+  if (!bar || !world || !window.IntersectionObserver) return;
+  new IntersectionObserver(es => {
+    const hidden = !es[0].isIntersecting;
+    bar.hidden = !(hidden && $("sc-today").classList.contains("on"));
+  }, { rootMargin: "-64px 0px 0px 0px", threshold: 0 }).observe(world);
+  /* on y touche pour remonter voir le voyageur en grand */
+  bar.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+})();
 
 applyPrefs();
 wireProfile();

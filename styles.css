@@ -1270,3 +1270,69 @@ nav button svg { width: 21px; height: 21px; }
   color: #4a3208;
   box-shadow: 0 4px 12px -5px var(--gold);
 }
+
+/* =========================================================
+   Bandeau de progression
+   La scène est en haut, les habitudes en bas. Sans ce relais,
+   la récompense se joue hors de l'écran au moment précis où
+   l'on agit.
+   ========================================================= */
+.minibar {
+  position: fixed; top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  z-index: 55;
+  padding: calc(8px + var(--safe-t)) 14px 9px;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--glass);
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  border-bottom: 1px solid var(--glass-line);
+  box-shadow: 0 8px 24px -18px rgba(72, 44, 34, .5);
+  cursor: pointer;
+  animation: mbIn .32s var(--ease);
+}
+@keyframes mbIn { from { opacity: 0; transform: translate(-50%, -14px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.mb-av {
+  width: 34px; height: 42px; flex: none;
+  object-fit: contain; object-position: bottom;
+  filter: drop-shadow(0 3px 5px rgba(72, 44, 34, .3));
+}
+/* Un pas visible à chaque coche : le personnage bouge là où on regarde. */
+.mb-av.step { animation: mbStep .58s var(--spring); }
+@keyframes mbStep {
+  0%   { transform: translateX(0) scaleY(1); }
+  30%  { transform: translateX(5px) scaleY(.94); }
+  60%  { transform: translateX(9px) scaleY(1.03); }
+  100% { transform: translateX(0) scaleY(1); }
+}
+.mb-b { flex: 1; min-width: 0; }
+.mb-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.mb-h b {
+  font-size: .82rem; font-weight: 700; letter-spacing: -.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mb-h em {
+  flex: none; font-style: normal;
+  font-size: .72rem; font-weight: 780; color: var(--a1);
+  font-variant-numeric: tabular-nums;
+}
+.mb-line {
+  margin-top: 6px; height: 5px; border-radius: 999px;
+  background: var(--fill-2); overflow: hidden;
+}
+.mb-line i {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--a1), var(--a2));
+  box-shadow: 0 0 9px -2px var(--a1);
+  transition: width .9s var(--ease);
+}
+.mb-steps { flex: none; text-align: center; }
+.mb-steps b {
+  display: block; font-size: 1.06rem; font-weight: 800;
+  letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+}
+.mb-steps span {
+  display: block; font-size: .56rem; font-weight: 680;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3);
+}

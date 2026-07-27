@@ -72,6 +72,12 @@ panorama attend à trois pas donne envie d'y aller ; le nom reste la surprise.
 Rien n'est tiré au sort au moment de jouer : un même lieu offre toujours la
 même chose, hier comme sur un autre téléphone.
 
+Dès que la scène quitte l'écran, un **bandeau de progression** prend le
+relais en haut : avatar, distance parcourue et prochain jalon. Cocher une
+habitude en bas de liste fait avancer le compteur sous les yeux, sans avoir
+à remonter. Les habitudes cochées descendent en bas de liste : ce qui reste
+à faire remonte sous le pouce.
+
 Les trouvailles remplissent le **carnet de voyage**, une collection unique
 plutôt que huit. Il n'affiche que la route parcourue et celle en cours :
 étaler les lieux du monde entier donnerait un mur de cases vides, et

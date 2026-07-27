@@ -1,5 +1,5 @@
 /* Service worker : rend l'application utilisable hors-ligne. */
-const CACHE = "odyssee-v9";
+const CACHE = "odyssee-v10";
 const ASSETS = [
   "./",
   "./index.html",
