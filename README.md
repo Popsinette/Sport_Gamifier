@@ -76,6 +76,23 @@ Pour passer, il faut selon les cas :
 - Paliers de série (3/7/14/30/50/100 jours), défi hebdomadaire tournant,
   20 trophées, calendrier de chaleur mensuel
 
+## Profil, préférences et données
+
+Un onglet **Profil** rassemble le compte et les réglages :
+
+- **Carte de compte** : nom de voyageur modifiable sur place, portrait du
+  héros choisi, date du premier jour coché, niveau · or · pas.
+- **Couleur de l'application** : six accents, corail par défaut.
+- **Thème** : automatique (celui du téléphone), clair ou sombre forcé.
+- **Préférences** : vibrations, sons, réduction des animations. Le réglage
+  d'animation s'ajoute à celui du système et ne l'annule jamais.
+- **Mes données** : export d'une sauvegarde JSON datée, import avec
+  confirmation. Un fichier qui n'est pas une sauvegarde est refusé sans
+  toucher aux données existantes.
+
+Tout reste en `localStorage` : l'export est le seul moyen de retrouver ses
+données en changeant d'appareil.
+
 ## Habitudes
 
 Nom, icône (24 pictogrammes maison), couleur, difficulté, jours de la semaine.

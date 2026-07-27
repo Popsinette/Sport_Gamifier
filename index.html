@@ -148,13 +148,80 @@
     <div class="sec">Trophées</div>
     <div class="glass tro" id="troGrid"></div>
 
-    <div class="sec">Apparence</div>
+  </section>
+
+  <!-- ===================== PROFIL ===================== -->
+  <section class="screen" id="sc-profile">
+    <header><div><div class="eyebrow">Ton compte</div><h1>Profil</h1></div></header>
+
+    <div class="glass pcard">
+      <div class="pcard-top">
+        <img class="pcard-av" id="pAvatar" alt="">
+        <div class="pcard-id">
+          <input class="pname" id="pName" maxlength="24" placeholder="Ton nom de voyageur">
+          <div class="pcard-sub" id="pSince">—</div>
+        </div>
+      </div>
+      <div class="pcard-stats">
+        <div><b id="pLvl">1</b><span>niveau</span></div>
+        <div><b id="pGold">0</b><span>or</span></div>
+        <div><b id="pSteps">0</b><span>pas</span></div>
+      </div>
+    </div>
+
+    <div class="sec">Couleur de l'application</div>
     <div class="glass theme">
-      <div class="theme-l">Couleur de l'application</div>
+      <div class="theme-l">Accent</div>
       <div class="theme-r" id="themeRow"></div>
     </div>
 
+    <div class="sec">Apparence</div>
+    <div class="glass">
+      <div class="pref">
+        <div class="pref-b"><b>Thème</b><span>Suivre le téléphone, ou forcer un mode</span></div>
+      </div>
+      <div class="seg seg-in" id="prefAppearance">
+        <button data-v="auto">Automatique</button>
+        <button data-v="light">Clair</button>
+        <button data-v="dark">Sombre</button>
+      </div>
+    </div>
+
+    <div class="sec">Préférences</div>
+    <div class="glass rows">
+      <div class="pref sw" data-k="haptics">
+        <div class="pref-b"><b>Vibrations</b><span>Un retour léger à chaque coche</span></div>
+        <button class="switch" aria-label="Vibrations"><i></i></button>
+      </div>
+      <div class="pref sw" data-k="sound">
+        <div class="pref-b"><b>Sons</b><span>Effets sonores des récompenses</span></div>
+        <button class="switch" aria-label="Sons"><i></i></button>
+      </div>
+      <div class="pref sw" data-k="motion">
+        <div class="pref-b"><b>Réduire les animations</b><span>Moins de mouvement à l'écran</span></div>
+        <button class="switch" aria-label="Réduire les animations"><i></i></button>
+      </div>
+    </div>
+
+    <div class="sec">Mes données</div>
+    <div class="glass rows">
+      <div class="pref act" id="expBtn">
+        <div class="pref-b"><b>Exporter une sauvegarde</b><span>Un fichier à conserver ou à transférer</span></div>
+        <span class="pref-c" id="expIc"></span>
+      </div>
+      <div class="pref act" id="impBtn">
+        <div class="pref-b"><b>Importer une sauvegarde</b><span>Remplace les données actuelles</span></div>
+        <span class="pref-c" id="impIc"></span>
+      </div>
+    </div>
+    <input type="file" id="impFile" accept="application/json,.json" hidden>
+    <p class="hint" style="margin:12px 6px 0">Tes données restent sur ce téléphone.
+      Rien n'est envoyé en ligne, et rien n'est sauvegardé ailleurs — l'export est
+      le seul moyen de les retrouver si tu changes d'appareil.</p>
+
     <button class="danger" id="resetBtn"></button>
+
+    <p class="hint" style="margin:18px 6px 0;text-align:center">Odyssée · données locales</p>
   </section>
 
   <nav>
@@ -162,6 +229,7 @@
     <button data-sc="hero"><span class="ic"></span>Héros</button>
     <button data-sc="habits"><span class="ic"></span>Habitudes</button>
     <button data-sc="progress"><span class="ic"></span>Progrès</button>
+    <button data-sc="profile"><span class="ic"></span>Profil</button>
   </nav>
 </div>
 

@@ -53,8 +53,10 @@
   --spring: cubic-bezier(.34, 1.56, .64, 1);
 }
 
+/* Le mode sombre s'applique par défaut selon le téléphone, sauf si le
+   réglage de l'application impose explicitement le mode clair. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --ink: #fbf5ef;
     --ink-2: rgba(251, 245, 239, .66);
     --ink-3: rgba(251, 245, 239, .42);
@@ -82,6 +84,36 @@
     --xp-2: #96d4ff;
     --ok: #3ecb8c;
   }
+}
+
+/* Même palette, imposée par le réglage de l'application. */
+:root[data-theme="dark"] {
+    --ink: #fbf5ef;
+    --ink-2: rgba(251, 245, 239, .66);
+    --ink-3: rgba(251, 245, 239, .42);
+    /* Un noir chaud, pas un noir bleuté : la nuit d'un feu de camp plutôt
+       que celle d'un tableau de bord. */
+    --bg: #14100e;
+    --bg-2: #201917;
+    --glass: rgba(48, 39, 36, .68);
+    --glass-2: rgba(48, 39, 36, .46);
+    --glass-line: rgba(255, 226, 205, .13);
+    --glass-shadow:
+      0 2px 8px -2px rgba(0, 0, 0, .55),
+      0 20px 46px -22px rgba(0, 0, 0, .85);
+    --lift: inset 0 1px 0 rgba(255, 226, 205, .10);
+    --fill: rgba(255, 226, 205, .08);
+    --fill-2: rgba(255, 226, 205, .14);
+    --sep: rgba(255, 226, 205, .10);
+    /* accents remontés en luminosité : sur fond sombre, un corail non
+       ajusté vire au brun */
+    --a1: #ff7a6b;
+    --a2: #ffab84;
+    --gold: #f0b445;
+    --gold-2: #ffdc86;
+    --xp: #5aa8f5;
+    --xp-2: #96d4ff;
+    --ok: #3ecb8c;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -190,7 +222,9 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
   box-shadow: var(--glass-shadow);
   isolation: isolate;
 }
-.world canvas { display: block; width: 100%; height: 42vh; min-height: 262px; max-height: 340px; }
+/* Fenêtre plus haute : agrandir le héros sans lui donner d'air le
+   collerait au bandeau de progression. */
+.world canvas { display: block; width: 100%; height: 46vh; min-height: 288px; max-height: 384px; }
 .world::after {
   content: ""; position: absolute; inset: 0;
   border-radius: inherit;
@@ -978,3 +1012,100 @@ nav button.on .ic { transform: translateY(-2px) scale(1.06); }
   box-shadow: 0 0 10px -2px var(--a1);
 }
 .gc-s { font-size: .71rem; color: var(--ink-3); font-weight: 600; line-height: 1.4; }
+
+/* =========================================================
+   Profil, préférences, données
+   ========================================================= */
+
+/* réglage manuel, en plus de celui du système */
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+}
+.reduce-motion .float-gain, .reduce-motion .burst, .reduce-motion .spark { display: none; }
+
+/* ---------- carte de compte ---------- */
+.pcard { padding: 18px; }
+.pcard-top { display: flex; align-items: center; gap: 14px; }
+.pcard-av {
+  width: 64px; height: 80px; flex: none;
+  object-fit: contain; object-position: bottom;
+  filter: drop-shadow(0 6px 10px rgba(72, 44, 34, .26));
+}
+.pcard-id { flex: 1; min-width: 0; }
+/* Le nom s'édite sur place. Un écran de réglages qui renvoie vers un autre
+   écran pour changer un mot ajoute une étape sans rien apporter. */
+.pname {
+  width: 100%;
+  background: none; border: none; border-bottom: 1.5px dashed var(--sep);
+  font-family: inherit; font-size: 1.16rem; font-weight: 760;
+  letter-spacing: -.022em; color: var(--ink);
+  padding: 2px 0 5px;
+  outline: none;
+  transition: border-color .22s;
+}
+.pname::placeholder { color: var(--ink-3); font-weight: 620; }
+.pname:focus { border-bottom-color: var(--a1); }
+.pcard-sub { font-size: .74rem; color: var(--ink-3); font-weight: 620; margin-top: 6px; }
+.pcard-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-top: 16px;
+}
+.pcard-stats > div {
+  background: var(--fill); border-radius: var(--r-s);
+  padding: 11px 6px; text-align: center;
+}
+.pcard-stats b {
+  display: block; font-size: 1.18rem; font-weight: 780; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+.pcard-stats span {
+  display: block; margin-top: 2px;
+  font-size: .63rem; font-weight: 660; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+
+/* ---------- lignes de préférence ---------- */
+.pref {
+  display: flex; align-items: center; gap: 14px;
+  padding: 15px 17px;
+  transition: background .2s, transform .16s var(--spring);
+}
+.pref + .pref { border-top: 1px solid var(--sep); }
+.pref-b { flex: 1; min-width: 0; }
+.pref-b b { display: block; font-size: .92rem; font-weight: 660; letter-spacing: -.01em; }
+.pref-b span {
+  display: block; margin-top: 3px;
+  font-size: .73rem; font-weight: 580; color: var(--ink-3); line-height: 1.4;
+}
+.pref.sw, .pref.act { cursor: pointer; }
+.pref.sw:active, .pref.act:active { transform: scale(.985); background: var(--fill); }
+@media (hover: hover) { .pref.sw:hover, .pref.act:hover { background: var(--fill); } }
+.pref-c { color: var(--ink-3); display: grid; place-items: center; }
+.pref-c svg { width: 18px; height: 18px; }
+
+/* ---------- interrupteur ---------- */
+.switch {
+  width: 50px; height: 30px; flex: none;
+  border-radius: 999px; border: none; cursor: pointer;
+  background: var(--fill-2);
+  padding: 3px;
+  display: flex; align-items: center;
+  transition: background .26s var(--ease);
+}
+.switch i {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px -1px rgba(40, 24, 18, .40);
+  transition: transform .3s var(--spring);
+}
+.switch.on { background: linear-gradient(110deg, var(--a1), var(--a2)); }
+.switch.on i { transform: translateX(20px); }
+
+/* segment intégré dans une carte */
+.seg-in { margin: 0 17px 17px; }
+
+/* ---------- barre d'onglets à cinq entrées ---------- */
+nav button { font-size: .56rem; letter-spacing: .03em; }
+nav button svg { width: 21px; height: 21px; }

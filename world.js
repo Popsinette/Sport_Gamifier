@@ -1299,7 +1299,7 @@ function createScene(canvas, opts) {
          au-delà d'un quart de la hauteur d'image, les arbres deviennent des
          buissons et la profondeur s'effondre. */
       const hx2 = heroX, hy2 = gy + H * .080,
-            hh = H * (mounted ? .269 : (spriteMode ? .294 : .263));
+            hh = H * (mounted ? .315 : (spriteMode ? .345 : .308));
 
       /* Poussière sous les pas. Un personnage qui glisse sur une route
          propre paraît posé dessus ; le sol qui réagit le rend présent. */

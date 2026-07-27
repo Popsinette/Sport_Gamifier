@@ -217,6 +217,8 @@ function blank() {
     look: Hero.defaultLook(),
     goals: [], onboarded: false,
     gold: 0,
+    name: "",
+    prefs: { appearance: "auto", haptics: true, sound: true, motion: false },
     habits: [], log: {},
   };
 }
@@ -269,6 +271,11 @@ function migrate(s) {
   /* L'or récompense l'effort déjà fourni : un compte existant ne repart pas
      de zéro, il retrouve la contrepartie de son parcours. */
   if (typeof s.gold !== "number") s.gold = (s.done || 0) * 3 + (s.perf || 0) * 10;
+  if (typeof s.name !== "string") s.name = "";
+  /* on complète les préférences plutôt que de les remplacer : une clé
+     ajoutée plus tard ne doit pas effacer les choix déjà faits */
+  s.prefs = Object.assign({ appearance: "auto", haptics: true, sound: true, motion: false },
+    s.prefs || {});
   /* Un compte déjà en route ne repasse pas par le premier lancement. */
   if (!s.onboarded) s.onboarded = s.habits.length > 0 || s.done > 0;
   s.habits.forEach((h, i) => {
@@ -485,6 +492,7 @@ function render() {
   renderHabits();
   renderGoalTags();
   renderProgress(L, st, J);
+  renderProfile(L, J);
   renderNotices(st);
 }
 
@@ -544,7 +552,7 @@ function renderObstacle(J) {
   const tb = $("obTask");
   if (tb) tb.onclick = () => {
     taskDone.has(o.id) ? taskDone.delete(o.id) : taskDone.add(o.id);
-    if (navigator.vibrate) navigator.vibrate(10);
+    buzz(10);
     render();
   };
   const gb = $("obGo");
@@ -772,7 +780,7 @@ function toggle(h, at) {
     S.xp += xp; S.done++; S.steps++;
     S.gold += GOLD_PER_HABIT;
     on = true;
-    if (navigator.vibrate) navigator.vibrate(11);
+    buzz(11);
     if (scene) scene.celebrate();
     Sfx.play("check");
     if (at) {
@@ -876,7 +884,7 @@ function wireHeroCards(box, onPick) {
     el.onclick = () => {
       box.querySelectorAll(".card").forEach(c => c.classList.toggle("on", c === el));
       onPick(el.dataset.body);
-      if (navigator.vibrate) navigator.vibrate(8);
+      buzz(8);
     };
   });
 }
@@ -946,7 +954,7 @@ function renderHeroScreen(L, st, J) {
       if (scene) scene.setLook(S.look);
       render();
       if (window.Sprites) Sprites.preload(S.look).then(ok => { if (ok) render(); }).catch(() => {});
-      if (navigator.vibrate) navigator.vibrate(8);
+      buzz(8);
     };
   });
 
@@ -1117,8 +1125,38 @@ const Sfx = (function () {
   };
 })();
 
+/* Le réglage de l'application s'ajoute à celui du système, il ne l'annule
+   jamais : quelqu'un qui a demandé moins de mouvement à son téléphone ne
+   doit pas se le voir réimposer ici. */
 const reduceMotion = () =>
+  (S.prefs && S.prefs.motion) ||
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Vibration passée par les préférences, plutôt qu'appelée directement
+   partout : un seul endroit à respecter. */
+function buzz(ms) {
+  if (S.prefs && S.prefs.haptics === false) return;
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+/* Applique les préférences au document. Appelé au démarrage et à chaque
+   changement, jamais dispersé dans les gestionnaires. */
+function applyPrefs() {
+  const p = S.prefs || {};
+  const root = document.documentElement;
+  if (p.appearance === "light" || p.appearance === "dark") root.dataset.theme = p.appearance;
+  else delete root.dataset.theme;
+  root.classList.toggle("reduce-motion", !!p.motion);
+  Sfx.enabled = p.sound !== false;
+  /* la couleur de la barre système suit le thème réellement affiché */
+  const dark = p.appearance === "dark" ||
+    (p.appearance !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove());
+  const m = document.createElement("meta");
+  m.name = "theme-color";
+  m.content = dark ? "#14100e" : "#f7f2ed";
+  document.head.appendChild(m);
+}
 
 /* Compteur qui monte au lieu de sauter. Un chiffre qui saute informe ;
    un chiffre qui monte récompense. */
@@ -1237,7 +1275,7 @@ const Onb = (function () {
         if (i === -1) sel.push(b.dataset.g); else sel.splice(i, 1);
         b.classList.toggle("on", i === -1);
         $("onbGoalsNext").disabled = sel.length === 0;
-        if (navigator.vibrate) navigator.vibrate(8);
+        buzz(8);
       };
     });
     $("onbGoalsNext").disabled = sel.length === 0;
@@ -1345,6 +1383,110 @@ function renderGoalTags() {
 }
 
 /* =========================================================
+   Profil, préférences et données
+   ========================================================= */
+function firstDay() {
+  const ks = Object.keys(S.log).filter(k => (S.log[k] || []).length).sort();
+  return ks.length ? ks[0] : null;
+}
+
+function renderProfile(L, J) {
+  const av = $("pAvatar");
+  if (av) {
+    const src = "assets/hero/thumb_" + S.look.body + ".png";
+    if (av.getAttribute("src") !== src) av.src = src;
+    av.onerror = () => { av.style.display = "none"; };
+  }
+  const nm = $("pName");
+  /* on ne réécrit pas le champ pendant la frappe, sinon le curseur saute */
+  if (nm && document.activeElement !== nm) nm.value = S.name;
+
+  const f = firstDay();
+  $("pSince").textContent = f
+    ? "En route depuis le " + fromK(f).toLocaleDateString("fr-FR",
+        { day: "numeric", month: "long", year: "numeric" })
+    : "Le voyage commence aujourd'hui";
+  roll($("pLvl"), L.l);
+  roll($("pGold"), S.gold);
+  roll($("pSteps"), J.pos);
+
+  /* apparence */
+  const ap = S.prefs.appearance || "auto";
+  $("prefAppearance").querySelectorAll("button").forEach(b =>
+    b.classList.toggle("on", b.dataset.v === ap));
+
+  /* interrupteurs */
+  document.querySelectorAll(".pref.sw").forEach(el => {
+    const k = el.dataset.k;
+    el.querySelector(".switch").classList.toggle("on", !!S.prefs[k]);
+  });
+}
+
+function wireProfile() {
+  const nm = $("pName");
+  if (nm) nm.oninput = () => { S.name = nm.value.trim().slice(0, 24); save(); };
+
+  $("prefAppearance").querySelectorAll("button").forEach(b => {
+    b.onclick = () => {
+      S.prefs.appearance = b.dataset.v;
+      save(); applyPrefs(); render(); buzz(8);
+    };
+  });
+
+  document.querySelectorAll(".pref.sw").forEach(el => {
+    el.onclick = () => {
+      const k = el.dataset.k;
+      S.prefs[k] = !S.prefs[k];
+      save(); applyPrefs(); render();
+      if (k !== "haptics" || S.prefs[k]) buzz(8);
+    };
+  });
+
+  $("expIc").innerHTML = ic("boot", { size: 18 });
+  $("impIc").innerHTML = ic("flag", { size: 18 });
+
+  /* Export : un fichier daté que l'on peut ranger ou transférer. C'est la
+     seule sortie possible pour des données qui ne quittent pas l'appareil. */
+  $("expBtn").onclick = () => {
+    const blob = new Blob([JSON.stringify(S, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "odyssee-" + key() + ".json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    buzz(10);
+    alertBox("boot", "Sauvegarde exportée",
+      "Le fichier « " + a.download + " » contient tes habitudes, ton XP et ton voyage.");
+  };
+
+  $("impBtn").onclick = () => $("impFile").click();
+  $("impFile").onchange = e => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      let data = null;
+      try { data = JSON.parse(r.result); } catch (err) {}
+      /* On refuse un fichier qui ne ressemble pas à une sauvegarde plutôt
+         que d'écraser des données réelles avec n'importe quoi. */
+      if (!data || !Array.isArray(data.habits)) {
+        alertBox("shield", "Fichier illisible",
+          "Ce fichier n'est pas une sauvegarde d'Odyssée. Tes données n'ont pas été touchées.");
+        return;
+      }
+      const n = data.habits.length;
+      if (!confirm("Remplacer tes données actuelles par cette sauvegarde ?\n\n" +
+          n + " habitude" + (n > 1 ? "s" : "") + " · " + (data.xp || 0) + " XP\n\n" +
+          "Cette action est définitive.")) return;
+      localStorage.setItem(KEY, JSON.stringify(data));
+      location.reload();
+    };
+    r.readAsText(f);
+  };
+}
+
+/* =========================================================
    Navigation & démarrage
    ========================================================= */
 function go(name) {
@@ -1354,7 +1496,7 @@ function go(name) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("nav button").forEach((b, i) => {
-  b.querySelector(".ic").innerHTML = ic(["compass", "heart", "list", "chart"][i], { size: 23 });
+  b.querySelector(".ic").innerHTML = ic(["compass", "heart", "list", "chart", "shield"][i], { size: 23 });
   b.onclick = () => go(b.dataset.sc);
 });
 
@@ -1369,6 +1511,8 @@ $("resetBtn").onclick = () => {
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
+applyPrefs();
+wireProfile();
 boot3D();
 render();
 if (!S.onboarded) Onb.open("full");
