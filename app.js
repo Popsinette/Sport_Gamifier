@@ -20,19 +20,22 @@ const ICON_SET = ["water","walk","run","meditate","strength","bike","salad","fru
                   "sleep","bed","book","write","tooth","shower","sun","moon",
                   "pill","nophone","broom","music","speak","coffee","dog","heart"];
 const HUES = ["#4f7df3","#3dbe7c","#e8a33d","#e0628a","#9b6ce0","#38a8c8","#d4a03c","#7a8595"];
+/* Palette chaleureuse. Le corail arrive en tête : c'est la couleur qui
+   donne son caractère à l'application, et un accent froid par défaut
+   refroidissait tout l'écran alors que le voyage est une aventure douce. */
 const THEMES = [
-  { a1:"#4f7df3", a2:"#7fb0ff" },
-  { a1:"#9b6ce0", a2:"#c49bff" },
-  { a1:"#e0628a", a2:"#ff9dba" },
-  { a1:"#e08a3d", a2:"#ffc07a" },
-  { a1:"#3dbe7c", a2:"#7fe0ab" },
-  { a1:"#2fa6b8", a2:"#6fd8e4" },
+  { a1:"#f0655c", a2:"#ff9a72" },   /* corail — défaut */
+  { a1:"#dc9a2e", a2:"#f7cc63" },   /* or */
+  { a1:"#e05f8a", a2:"#ff9dba" },   /* rose */
+  { a1:"#9b6ce0", a2:"#c49bff" },   /* violet */
+  { a1:"#2fb37a", a2:"#6fe0ac" },   /* vert */
+  { a1:"#3d92e6", a2:"#7ec6ff" },   /* bleu */
 ];
 /* teinte de cape assortie au thème */
 const CLOAKS = [
-  ["#5b7fd4","#39548f","#e8836b"], ["#8b6cd0","#584596","#f0a05e"],
-  ["#d4628a","#8f3f5e","#f0c25e"], ["#d4894a","#8f5528","#5fa8c0"],
-  ["#4aa87a","#2c6b4c","#e8a04a"], ["#3f9cb0","#256a7c","#f0a86e"],
+  ["#d4574e","#8f342d","#f0c25e"], ["#d4894a","#8f5528","#5fa8c0"],
+  ["#d4628a","#8f3f5e","#f0c25e"], ["#8b6cd0","#584596","#f0a05e"],
+  ["#4aa87a","#2c6b4c","#e8a04a"], ["#5b7fd4","#39548f","#e8836b"],
 ];
 
 const QUOTES = [
@@ -213,6 +216,7 @@ function blank() {
     notice: 0, softReset: false,
     look: Hero.defaultLook(),
     goals: [], onboarded: false,
+    gold: 0,
     habits: [], log: {},
   };
 }
@@ -262,6 +266,9 @@ function migrate(s) {
   else s.look = Object.assign(Hero.defaultLook(), s.look);
   if (BODY_MIGRATION[s.look.body]) s.look.body = BODY_MIGRATION[s.look.body];
   if (!Array.isArray(s.goals)) s.goals = [];
+  /* L'or récompense l'effort déjà fourni : un compte existant ne repart pas
+     de zéro, il retrouve la contrepartie de son parcours. */
+  if (typeof s.gold !== "number") s.gold = (s.done || 0) * 3 + (s.perf || 0) * 10;
   /* Un compte déjà en route ne repasse pas par le premier lancement. */
   if (!s.onboarded) s.onboarded = s.habits.length > 0 || s.done > 0;
   s.habits.forEach((h, i) => {
@@ -418,6 +425,7 @@ function applyTheme() {
 }
 
 const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const fmtDays = d => d.length === 7 ? "Tous les jours"
   : d.slice().sort((a, b) => a - b).map(i => ["lun","mar","mer","jeu","ven","sam","dim"][i]).join(" · ");
@@ -431,7 +439,8 @@ function render() {
 
   if (scene) {
     scene.setSteps(J.pos);
-    scene.setBlocked(J.blocked, J.blocked && J.next ? J.next.scene : null);
+    scene.setBlocked(J.blocked, J.next ? J.next.scene : null,
+      J.next ? J.next.pos - J.pos : 99);
   }
 
   /* — en-tête — */
@@ -444,9 +453,22 @@ function render() {
   const tour = Math.floor(J.pos / (SEG * Odyssey.BIOMES.length));
   $("wPlace").textContent = biome.name;
   $("wSub").textContent = J.pos + " pas" + (tour ? " · tour " + (tour + 1) : "");
-  $("wPills").innerHTML =
-    '<span class="w-pill">' + ic("flame", { size: 13 }) + st + "</span>" +
-    '<span class="w-pill">' + ic("snowflake", { size: 13 }) + S.freeze + "</span>";
+  /* Les pastilles ne sont réécrites que si leur contenu change : sinon on
+     relance l'animation des compteurs à chaque rendu, et le mouvement
+     permanent cesse d'attirer l'œil quand il compte vraiment. */
+  const pills = $("wPills");
+  const sig = st + "|" + S.freeze + "|" + S.gold;
+  if (pills.dataset.sig !== sig) {
+    if (!pills.firstChild) {
+      pills.innerHTML =
+        '<span class="w-pill">' + ic("flame", { size: 13 }) + '<b class="roll">0</b></span>' +
+        '<span class="w-pill">' + ic("snowflake", { size: 13 }) + '<b class="roll">0</b></span>' +
+        '<span class="w-pill gold">' + ic("gem", { size: 13 }) + '<b class="roll">0</b></span>';
+    }
+    const rs = pills.querySelectorAll(".roll");
+    roll(rs[0], st); roll(rs[1], S.freeze); roll(rs[2], S.gold);
+    pills.dataset.sig = sig;
+  }
 
   const todays = forDay(today);
   const doneN = todays.filter(h => isDone(h, k)).length;
@@ -470,12 +492,29 @@ function render() {
 function renderObstacle(J) {
   const slot = $("obSlot");
   if (!J.blocked || !J.next) {
-    const left = J.next ? J.next.pos - J.pos : 0;
-    slot.innerHTML = '<div class="glass ob"><div class="hint">' +
-      (J.next
-        ? "Prochain obstacle dans <b>" + left + (left > 1 ? " pas" : " pas") + "</b>. Chaque habitude cochée fait avancer le voyageur."
-        : "La route est libre à perte de vue. Continue d'avancer.") +
-      "</div></div>";
+    if (!J.next) {
+      slot.innerHTML = '<div class="glass ob"><div class="hint">' +
+        "La route est libre à perte de vue. Continue d'avancer.</div></div>";
+      return;
+    }
+    /* Cap à atteindre plutôt que simple phrase : nommer la prochaine
+       épreuve et montrer la distance qui en reste transforme une liste de
+       cases à cocher en objectif visible. */
+    const left = J.next.pos - J.pos;
+    const prev = OBSTACLES.reduce((m, o) =>
+      (o.pos <= J.pos && S.passed.indexOf(o.id) !== -1) ? Math.max(m, o.pos) : m, 0);
+    const span = Math.max(1, J.next.pos - prev);
+    const pct = Math.round(clamp01((J.pos - prev) / span) * 100);
+    slot.innerHTML =
+      '<div class="glass ob goalcard">' +
+        '<div class="ob-i">' + ic(J.next.icon, { size: 22 }) + "</div>" +
+        '<div class="gc-b">' +
+          '<div class="gc-h"><b>' + J.next.name + "</b>" +
+          '<span class="gc-d">' + left + (left > 1 ? " pas" : " pas") + "</span></div>" +
+          '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+          '<div class="gc-s">Chaque habitude cochée rapproche le voyageur.</div>' +
+        "</div>" +
+      "</div>";
     return;
   }
   const o = J.next;
@@ -565,7 +604,12 @@ function renderToday(todays, k) {
       '<div class="tick">' + ic("check", { size: 14 }) + "</div></div>";
   }).join("");
   box.querySelectorAll(".row").forEach(el => {
-    el.onclick = () => toggle(S.habits.find(h => h.id === el.dataset.id));
+    el.onclick = () => {
+      /* la récompense part de la coche elle-même, pas d'un coin de l'écran */
+      const t = el.querySelector(".tick").getBoundingClientRect();
+      toggle(S.habits.find(h => h.id === el.dataset.id),
+        { x: t.left + t.width / 2, y: t.top + t.height / 2 });
+    };
   });
 }
 
@@ -659,10 +703,12 @@ function renderProgress(L, st, J) {
 
   heatmap(today);
 
-  $("stDone").textContent = S.done;
-  $("stXp").textContent = S.xp;
-  $("stBest").textContent = S.best;
-  $("stPerf").textContent = S.perf;
+  roll($("stDone"), S.done);
+  roll($("stXp"), S.xp);
+  roll($("stBest"), S.best);
+  roll($("stPerf"), S.perf);
+  roll($("stGold"), S.gold);
+  roll($("stBiomes"), Math.min(Odyssey.BIOMES.length, Math.floor(J.pos / SEG) + 1));
 
   $("troGrid").innerHTML = TROPHIES.map(t => {
     const w = T[t.stat] >= t.goal;
@@ -700,7 +746,10 @@ function heatmap(today) {
 }
 
 /* ---------- cocher ---------- */
-function toggle(h) {
+const GOLD_PER_HABIT = 3;
+const GOLD_PERFECT = 10;
+
+function toggle(h, at) {
   const today = new Date(), k = key(today);
   const list = S.log[k] || (S.log[k] = []);
   const prevL = level(S.xp).l;
@@ -715,22 +764,39 @@ function toggle(h) {
     list.splice(i, 1);
     S.xp = Math.max(0, S.xp - xp); S.done = Math.max(0, S.done - 1);
     S.steps = Math.max(0, S.steps - 1);
+    S.gold = Math.max(0, S.gold - GOLD_PER_HABIT);
     on = false;
+    Sfx.play("uncheck");
   } else {
     list.push(h.id);
     S.xp += xp; S.done++; S.steps++;
+    S.gold += GOLD_PER_HABIT;
     on = true;
     if (navigator.vibrate) navigator.vibrate(11);
     if (scene) scene.celebrate();
+    Sfx.play("check");
+    if (at) {
+      /* deux gains distincts, décalés : lus l'un après l'autre plutôt que
+         confondus en un seul chiffre */
+      /* décalés dans le temps ET en hauteur : deux gains lus l'un après
+         l'autre, jamais superposés */
+      floatGain(at.x, at.y, "+" + xp + " XP", "xp", "bolt");
+      setTimeout(() => floatGain(at.x, at.y + 26, "+" + GOLD_PER_HABIT, "gold", "gem"), 260);
+      burst(at.x, at.y, ["#7ec6ff", "#3d92e6", "#f7cc63", "#ffffff"]);
+    }
   }
 
   const nowP = perfect(today);
   let gotFreeze = false;
   if (!wasP && nowP) {
-    S.xp += PERFECT;
+    S.xp += PERFECT; S.gold += GOLD_PERFECT;
     if (S.freeze < MAX_FREEZE) { S.freeze++; gotFreeze = true; }
   }
-  if (wasP && !nowP) { S.xp = Math.max(0, S.xp - PERFECT); if (S.freeze > 0) S.freeze--; }
+  if (wasP && !nowP) {
+    S.xp = Math.max(0, S.xp - PERFECT);
+    S.gold = Math.max(0, S.gold - GOLD_PERFECT);
+    if (S.freeze > 0) S.freeze--;
+  }
 
   const st = streak();
   if (st > S.best) S.best = st;
@@ -1027,6 +1093,84 @@ function alertBox(icon, t, txt) {
   $("alertBg").classList.add("on");
 }
 $("alBtn").onclick = () => $("alertBg").classList.remove("on");
+
+/* =========================================================
+   Récompense — le retour immédiat du geste
+   Cocher une habitude doit se voir, se sentir et s'entendre.
+   Sans ce retour, le geste n'est qu'une case cochée.
+   ========================================================= */
+
+/* Crochet sonore. Aucun fichier n'est encore livré : la fonction reste
+   silencieuse mais l'appel est déjà en place partout, il n'y aura qu'à
+   déposer les sons. */
+const Sfx = (function () {
+  let on = true;
+  const bank = {};   /* nom -> HTMLAudioElement, à remplir à la livraison */
+  return {
+    play(name) {
+      if (!on || !bank[name]) return;
+      try { const a = bank[name].cloneNode(); a.volume = .35; a.play(); } catch (e) {}
+    },
+    get enabled() { return on; },
+    set enabled(v) { on = !!v; },
+    bank,
+  };
+})();
+
+const reduceMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Compteur qui monte au lieu de sauter. Un chiffre qui saute informe ;
+   un chiffre qui monte récompense. */
+function roll(el, to, dur) {
+  if (!el) return;
+  const from = parseInt(el.dataset.v || el.textContent.replace(/\D/g, ""), 10) || 0;
+  el.dataset.v = to;
+  if (from === to || reduceMotion()) { el.textContent = to; return; }
+  el.classList.add("bump");
+  setTimeout(() => el.classList.remove("bump"), 520);
+  const t0 = performance.now(), d = dur || 620;
+  (function step(now) {
+    const k = Math.min(1, (now - t0) / d);
+    const e = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(from + (to - from) * e);
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+/* Gain qui s'échappe du point touché et monte. Le regard suit la
+   récompense jusqu'à la barre : le lien de cause à effet devient visible. */
+function floatGain(x, y, text, kind, icon) {
+  if (reduceMotion()) return;
+  const d = document.createElement("div");
+  d.className = "float-gain " + kind;
+  /* la coche est près du bord droit : sans cette marge, la moitié du gain
+     sort de l'écran et la récompense passe inaperçue */
+  d.style.left = Math.min(Math.max(x, 62), window.innerWidth - 62) + "px";
+  d.style.top = y + "px";
+  d.innerHTML = ic(icon, { size: 15 }) + "<span>" + text + "</span>";
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 1200);
+}
+
+/* Éclat court au point du doigt, distinct des confettis des grands paliers. */
+function burst(x, y, colors) {
+  if (reduceMotion()) return;
+  for (let i = 0; i < 12; i++) {
+    const s = document.createElement("div");
+    s.className = "burst";
+    const a = (i / 12) * Math.PI * 2 + Math.random() * .5;
+    const r = 26 + Math.random() * 42;
+    s.style.left = x + "px";
+    s.style.top = y + "px";
+    s.style.background = colors[i % colors.length];
+    s.style.setProperty("--dx", (Math.cos(a) * r).toFixed(1) + "px");
+    s.style.setProperty("--dy", (Math.sin(a) * r - 14).toFixed(1) + "px");
+    s.style.animationDelay = (Math.random() * .06) + "s";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 900);
+  }
+}
 
 function sparks() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

@@ -4,49 +4,83 @@
    ========================================================= */
 
 :root {
-  /* encre */
-  --ink: #0b0f14;
-  --ink-2: rgba(11, 15, 20, .62);
-  --ink-3: rgba(11, 15, 20, .38);
-  /* surfaces */
-  --bg: #eef1f5;
-  --bg-2: #e4e9ef;
-  --glass: rgba(255, 255, 255, .72);
-  --glass-2: rgba(255, 255, 255, .52);
-  --glass-line: rgba(255, 255, 255, .55);
-  --glass-shadow: 0 12px 32px -14px rgba(16, 24, 40, .34);
-  --fill: rgba(11, 15, 20, .06);
-  --fill-2: rgba(11, 15, 20, .10);
-  --sep: rgba(11, 15, 20, .09);
-  /* accent (surchargé par le thème) */
-  --a1: #4f7df3;
-  --a2: #7fb0ff;
-  /* statut — volontairement désaturé, jamais criard */
-  --ok: #3dbe7c;
-  --warn: #e8a33d;
-  --bad: #e06a5f;
+  /* Encre. Jamais un gris neutre : une encre légèrement chaude se pose sur
+     le fond crème sans le trouer, et fait lire le texte comme de l'encre
+     sur du papier plutôt que comme du texte sur un écran. */
+  --ink: #241b18;
+  --ink-2: rgba(36, 27, 24, .66);
+  --ink-3: rgba(36, 27, 24, .42);
+  /* Surfaces crème. Un fond froid rendait chaque carte clinique ; le crème
+     réchauffe toute l'interface sans coûter un seul pixel de contraste. */
+  --bg: #f7f2ed;
+  --bg-2: #efe4da;
+  --glass: rgba(255, 252, 249, .78);
+  --glass-2: rgba(255, 252, 249, .56);
+  --glass-line: rgba(255, 255, 255, .72);
+  /* deux ombres : une proche pour le relief, une lointaine pour la portance */
+  --glass-shadow:
+    0 2px 6px -2px rgba(72, 44, 34, .12),
+    0 18px 40px -20px rgba(72, 44, 34, .34);
+  --lift: inset 0 1px 0 rgba(255, 255, 255, .85);
+  --fill: rgba(72, 44, 34, .06);
+  --fill-2: rgba(72, 44, 34, .11);
+  --sep: rgba(72, 44, 34, .10);
+
+  /* Accent principal — corail. Chaud, vivant, jamais agressif. */
+  --a1: #f0655c;
+  --a2: #ff9a72;
+  /* Or : la récompense. Réservé aux paliers et aux trophées, jamais au
+     décor — s'il est partout, il ne récompense plus rien. */
+  --gold: #dc9a2e;
+  --gold-2: #f7cc63;
+  /* XP : bleu lumineux, seule couleur froide de la palette. Ce contraste
+     de température fait lire la barre d'XP au premier coup d'œil. */
+  --xp: #3d92e6;
+  --xp-2: #7ec6ff;
+  /* statut */
+  --ok: #2fb37a;
+  --warn: #e09a2c;
+  --bad: #e05f52;
+
   /* rythme */
-  --r-l: 26px;
-  --r-m: 18px;
-  --r-s: 13px;
+  --r-l: 28px;
+  --r-m: 19px;
+  --r-s: 14px;
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-t: env(safe-area-inset-top, 0px);
+  /* une seule courbe pour toute l'application : l'élan puis la pose */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --spring: cubic-bezier(.34, 1.56, .64, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ink: #f4f7fa;
-    --ink-2: rgba(244, 247, 250, .64);
-    --ink-3: rgba(244, 247, 250, .40);
-    --bg: #080a0e;
-    --bg-2: #0d1117;
-    --glass: rgba(30, 36, 46, .62);
-    --glass-2: rgba(30, 36, 46, .42);
-    --glass-line: rgba(255, 255, 255, .10);
-    --glass-shadow: 0 14px 36px -16px rgba(0, 0, 0, .7);
-    --fill: rgba(255, 255, 255, .07);
-    --fill-2: rgba(255, 255, 255, .12);
-    --sep: rgba(255, 255, 255, .09);
+    --ink: #fbf5ef;
+    --ink-2: rgba(251, 245, 239, .66);
+    --ink-3: rgba(251, 245, 239, .42);
+    /* Un noir chaud, pas un noir bleuté : la nuit d'un feu de camp plutôt
+       que celle d'un tableau de bord. */
+    --bg: #14100e;
+    --bg-2: #201917;
+    --glass: rgba(48, 39, 36, .68);
+    --glass-2: rgba(48, 39, 36, .46);
+    --glass-line: rgba(255, 226, 205, .13);
+    --glass-shadow:
+      0 2px 8px -2px rgba(0, 0, 0, .55),
+      0 20px 46px -22px rgba(0, 0, 0, .85);
+    --lift: inset 0 1px 0 rgba(255, 226, 205, .10);
+    --fill: rgba(255, 226, 205, .08);
+    --fill-2: rgba(255, 226, 205, .14);
+    --sep: rgba(255, 226, 205, .10);
+    /* accents remontés en luminosité : sur fond sombre, un corail non
+       ajusté vire au brun */
+    --a1: #ff7a6b;
+    --a2: #ffab84;
+    --gold: #f0b445;
+    --gold-2: #ffdc86;
+    --xp: #5aa8f5;
+    --xp-2: #96d4ff;
+    --ok: #3ecb8c;
   }
 }
 
@@ -93,11 +127,13 @@ h1 { font-size: 2rem; font-weight: 760; letter-spacing: -.028em; line-height: 1.
 /* ---------- verre ---------- */
 .glass {
   background: var(--glass);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
   border: 1px solid var(--glass-line);
   border-radius: var(--r-l);
-  box-shadow: var(--glass-shadow);
+  /* le liseré interne clair simule l'épaisseur du verre : c'est lui qui
+     transforme un rectangle posé à plat en objet qui a du relief */
+  box-shadow: var(--glass-shadow), var(--lift);
 }
 
 /* ---------- en-tête ---------- */
@@ -216,11 +252,25 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
 }
 .w-title { font-size: .84rem; font-weight: 700; letter-spacing: -.01em; }
 .w-meta { font-size: .66rem; font-weight: 600; opacity: .8; margin-top: 1px; }
-.w-xp { margin-top: 9px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.22); overflow: hidden; }
+.w-xp {
+  margin-top: 10px; height: 7px; border-radius: 999px;
+  background: rgba(8, 12, 20, .38);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+/* L'XP est la seule couleur froide de l'application. Ce contraste de
+   température la fait lire instantanément, sans avoir à la chercher. */
 .w-xp i {
   display: block; height: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, #fff, rgba(255,255,255,.72));
-  transition: width .7s cubic-bezier(.22,1,.36,1);
+  background: linear-gradient(90deg, var(--xp), var(--xp-2));
+  box-shadow: 0 0 12px -1px var(--xp-2);
+  transition: width .9s var(--ease);
+  position: relative; overflow: hidden;
+}
+.w-xp i::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 34%, rgba(255,255,255,.62) 50%, transparent 66%);
+  animation: sheen 3.4s ease-in-out infinite;
 }
 
 /* ---------- carte d'obstacle ---------- */
@@ -315,13 +365,17 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
 .rows { overflow: hidden; }
 .row {
   display: flex; align-items: center; gap: 13px;
-  padding: 13px 16px;
+  padding: 14px 16px;
   cursor: pointer;
-  transition: background .18s, transform .12s;
-  animation: rowIn .4s cubic-bezier(.22,1,.36,1) backwards;
+  position: relative;
+  transition: background .2s, transform .16s var(--spring);
+  animation: rowIn .46s var(--ease) backwards;
 }
-@keyframes rowIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.row:active { transform: scale(.99); }
+@keyframes rowIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+/* L'enfoncement doit se sentir : une ligne qui ne bouge pas sous le doigt
+   laisse douter que le geste a été pris en compte. */
+.row:active { transform: scale(.975); background: var(--fill); }
+@media (hover: hover) { .row:hover { background: var(--fill); } }
 .row + .row { border-top: 1px solid var(--sep); }
 .row-i {
   width: 40px; height: 40px; flex: none;
@@ -336,15 +390,33 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
 .row-m .fl { color: var(--warn); font-weight: 720; display: inline-flex; align-items: center; gap: 3px; }
 .row-m .fl svg { width: 12px; height: 12px; }
 .tick {
-  width: 27px; height: 27px; flex: none;
+  width: 29px; height: 29px; flex: none;
   border-radius: 50%;
   border: 2px solid var(--ink-3);
   display: grid; place-items: center;
-  transition: .2s;
+  position: relative;
+  transition: .22s var(--spring);
 }
+.row:active .tick { transform: scale(.86); }
 .tick svg { width: 14px; height: 14px; opacity: 0; stroke: #fff; transition: opacity .18s; }
-.row.done .tick { background: var(--ok); border-color: var(--ok); animation: pop .34s cubic-bezier(.22,1.7,.36,1); }
+.row.done .tick {
+  background: linear-gradient(150deg, var(--ok), #6fe0ac);
+  border-color: transparent;
+  box-shadow: 0 4px 14px -4px var(--ok);
+  animation: pop .42s var(--spring);
+}
 .row.done .tick svg { opacity: 1; }
+/* Onde qui s'échappe de la coche : la récompense doit dépasser du bouton,
+   sinon le geste reste une simple case cochée. */
+.row.done .tick::before {
+  content: ""; position: absolute; inset: -3px;
+  border-radius: 50%; border: 2px solid var(--ok);
+  animation: ring .62s var(--ease) forwards;
+}
+@keyframes ring {
+  from { opacity: .85; transform: scale(.7); }
+  to   { opacity: 0;   transform: scale(2.1); }
+}
 .row.done .row-n { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
 .row.done .row-i { opacity: .45; }
 @keyframes pop { 0% { transform: scale(.45) rotate(-14deg); } 100% { transform: scale(1); } }
@@ -389,8 +461,9 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
 .xpbar { height: 9px; border-radius: 999px; background: var(--fill-2); overflow: hidden; position: relative; }
 .xpbar i {
   display: block; height: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, var(--a1), var(--a2));
-  transition: width .8s cubic-bezier(.22,1,.36,1);
+  background: linear-gradient(90deg, var(--xp), var(--xp-2));
+  box-shadow: 0 0 14px -2px var(--xp-2);
+  transition: width .9s var(--ease);
   position: relative; overflow: hidden;
 }
 .xpbar i::after {
@@ -771,3 +844,137 @@ nav button.on svg { transform: translateY(-1px) scale(1.06); stroke: url(#navGra
 }
 .goal-tags .tag svg { width: 14px; height: 14px; }
 .goal-tags .tag.add { background: none; border: 1px dashed var(--sep); color: var(--ink-3); cursor: pointer; font-family: inherit; }
+
+/* =========================================================
+   Refonte — récompense, relief, micro-interactions
+   ========================================================= */
+
+/* ---------- pastilles de la scène ---------- */
+/* L'or n'apparaît que là où il récompense. Utilisé partout, il cesserait
+   d'être une récompense pour devenir une couleur de décor. */
+.w-pill.gold {
+  background: linear-gradient(150deg, rgba(247, 204, 99, .30), rgba(220, 154, 46, .20));
+  border-color: rgba(247, 204, 99, .48);
+  color: #ffe7ae;
+}
+.w-pill.gold svg { color: var(--gold-2); }
+.w-pill b { font-weight: 760; font-variant-numeric: tabular-nums; }
+
+/* ---------- orbe de niveau ---------- */
+/* Un halo qui respire : l'écran reste vivant même quand rien ne se passe,
+   ce qui donne envie de revenir le regarder. */
+.w-orb, .lvl-o { position: relative; isolation: isolate; }
+.w-orb::after, .lvl-o::after {
+  content: ""; position: absolute; inset: -6px; z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--a1) 0%, transparent 68%);
+  opacity: .5;
+  animation: breathe 4.2s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { opacity: .34; transform: scale(.94); }
+  50%      { opacity: .62; transform: scale(1.08); }
+}
+
+/* ---------- chiffres qui montent ---------- */
+/* Un compteur qui saute d'un coup n'est qu'une donnée. Un compteur qui
+   monte, c'est un gain — c'est la différence entre informer et récompenser. */
+.roll { display: inline-block; transition: transform .2s var(--spring); }
+.roll.bump { animation: bump .5s var(--spring); }
+@keyframes bump {
+  0%   { transform: scale(1); }
+  32%  { transform: scale(1.26); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- gain flottant ---------- */
+/* La récompense quitte la ligne cochée et monte vers la barre d'XP :
+   le regard suit le gain jusqu'à sa destination, et le lien de cause à
+   effet devient physique. */
+.float-gain {
+  position: fixed; z-index: 90;
+  pointer-events: none;
+  font-size: .92rem; font-weight: 800; letter-spacing: -.01em;
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 5px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .28);
+  animation: floatUp 1.15s var(--ease) forwards;
+}
+.float-gain.xp   { color: var(--xp-2); }
+.float-gain.gold { color: var(--gold-2); }
+.float-gain svg  { width: 15px; height: 15px; }
+@keyframes floatUp {
+  0%   { opacity: 0; transform: translate(-50%, 4px) scale(.7); }
+  18%  { opacity: 1; transform: translate(-50%, -8px) scale(1.08); }
+  70%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -74px) scale(.94); }
+}
+
+/* ---------- éclat au point de la coche ---------- */
+/* Distinct des confettis `.spark`, qui tombent du haut de l'écran pour les
+   grands paliers. Celui-ci part du doigt, pour le geste ordinaire. */
+.burst {
+  position: fixed; z-index: 89;
+  width: 7px; height: 7px; border-radius: 50%;
+  pointer-events: none;
+  animation: burstOut .78s var(--ease) forwards;
+}
+@keyframes burstOut {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); }
+}
+
+/* ---------- boutons ---------- */
+.go {
+  box-shadow: 0 10px 26px -12px var(--a1), var(--lift);
+  transition: transform .16s var(--spring), opacity .22s, box-shadow .22s;
+}
+.go:active { transform: scale(.965); box-shadow: 0 4px 14px -10px var(--a1); }
+@media (hover: hover) {
+  .go:hover:not(:disabled) { box-shadow: 0 14px 32px -12px var(--a1), var(--lift); }
+}
+
+/* ---------- barre d'onglets ---------- */
+nav button .ic {
+  transition: transform .3s var(--spring);
+}
+nav button.on .ic { transform: translateY(-2px) scale(1.06); }
+
+/* ---------- cartes ---------- */
+/* Un enfoncement partagé par toutes les surfaces cliquables : le geste a
+   toujours la même réponse, quel que soit l'écran. */
+.opt:active, .goal:active, .card:active, .add:active { transform: scale(.955); }
+
+@media (prefers-reduced-motion: reduce) {
+  .w-orb::after, .lvl-o::after,
+  .w-xp i::after, .xpbar i::after { animation: none; }
+  .float-gain, .burst { display: none; }
+}
+
+/* ---------- statistique or ---------- */
+.cell.gold-cell b {
+  background: linear-gradient(140deg, var(--gold-2), var(--gold));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---------- prochain cap ---------- */
+/* Le voyage doit avoir un but nommé et une distance visible, même quand la
+   route est libre : c'est ce qui donne envie de cocher une habitude de plus. */
+.goalcard { display: flex; gap: 14px; align-items: center; }
+.gc-b { flex: 1; min-width: 0; }
+.gc-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.gc-h b { font-size: .95rem; font-weight: 720; letter-spacing: -.012em; }
+.gc-d {
+  flex: none;
+  font-size: .72rem; font-weight: 780; letter-spacing: -.005em;
+  color: var(--a1);
+  background: color-mix(in srgb, var(--a1) 12%, transparent);
+  border-radius: 999px; padding: 3px 9px;
+}
+.goalcard .bar { margin: 9px 0 7px; }
+.goalcard .bar i {
+  background: linear-gradient(90deg, var(--a1), var(--a2));
+  box-shadow: 0 0 10px -2px var(--a1);
+}
+.gc-s { font-size: .71rem; color: var(--ink-3); font-weight: 600; line-height: 1.4; }

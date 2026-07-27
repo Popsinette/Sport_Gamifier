@@ -903,7 +903,8 @@ function createScene(canvas, opts) {
   let running = false, raf = 0, last = 0, t = 0;
   let blocked = false, obstacle = null;
   let cheer = 0, jump = 0, walkPhase = 0;
-  let particles = [], birds = [], clouds = [];
+  let particles = [], birds = [], clouds = [], dust = [];
+  let obAhead = 99, dustAcc = 0;
   let biomeIndex = 0, prevBiome = -1, fadeT = 1;
   let heroAnim = null;
   const reduce = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1276,11 +1277,17 @@ function createScene(canvas, opts) {
       }
     }
 
-    /* obstacle */
+    /* Obstacle. Visible dès quatre pas : il entre par la droite, encore
+       lointain et pâli par la brume, puis se rapproche à chaque coche.
+       C'est ce qui transforme une case à cocher en objectif. */
     const heroX = W * HERO_X;
-    if (blocked && obstacle && OB_DRAW[obstacle]) {
+    if (obstacle && OB_DRAW[obstacle] && obAhead <= 4) {
+      const k4 = clamp(obAhead / 4, 0, 1);
+      const ox = W * .74 + k4 * W * .78;
+      const os = H * .125 * (1 - k4 * .28);
       ctx.save();
-      OB_DRAW[obstacle](ctx, W * .74, gy + H * .052, H * .125, g, t);
+      ctx.globalAlpha = 1 - k4 * .55;
+      OB_DRAW[obstacle](ctx, ox, gy + H * .052, os, g, t);
       ctx.restore();
     }
 
@@ -1292,7 +1299,34 @@ function createScene(canvas, opts) {
          au-delà d'un quart de la hauteur d'image, les arbres deviennent des
          buissons et la profondeur s'effondre. */
       const hx2 = heroX, hy2 = gy + H * .080,
-            hh = H * (mounted ? .215 : (spriteMode ? .235 : .21));
+            hh = H * (mounted ? .269 : (spriteMode ? .294 : .263));
+
+      /* Poussière sous les pas. Un personnage qui glisse sur une route
+         propre paraît posé dessus ; le sol qui réagit le rend présent. */
+      if (walking && !blocked && !reduce) {
+        dustAcc += dt;
+        while (dustAcc > .13) {
+          dustAcc -= .13;
+          dust.push({ x: hx2 - hh * .10 + (Math.random() - .5) * hh * .10,
+                      y: hy2 - hh * .012, r: hh * (.030 + Math.random() * .028),
+                      vx: -14 - Math.random() * 26, vy: -6 - Math.random() * 12,
+                      life: 0, max: .55 + Math.random() * .35 });
+        }
+      }
+      if (dust.length) {
+        const dc = mixRgb(hexRgb(B.path), [255, 255, 255], .30);
+        for (let i = dust.length - 1; i >= 0; i--) {
+          const d = dust[i];
+          d.life += dt;
+          if (d.life >= d.max) { dust.splice(i, 1); continue; }
+          d.x += d.vx * dt; d.y += d.vy * dt; d.vy += 22 * dt;
+          const kk = 1 - d.life / d.max;
+          ctx.fillStyle = css(grade(dc, g), kk * .34);
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.r * (1.7 - kk * .7), 0, 7);
+          ctx.fill();
+        }
+      }
 
       /* Ombre de contact. C'est elle qui pose le personnage au sol : sans
          elle, l'illustration paraît collée par-dessus le décor. Elle
@@ -1437,7 +1471,13 @@ function createScene(canvas, opts) {
         seedAmbience();
       }
     },
-    setBlocked(b, kind) { blocked = b; obstacle = kind || null; },
+    /* `ahead` : nombre de pas restants avant l'obstacle. Il se montre à
+       l'horizon bien avant de barrer la route — on ne se motive pas pour
+       un obstacle qu'on ne voit pas encore. */
+    setBlocked(b, kind, ahead) {
+      blocked = b; obstacle = kind || null;
+      obAhead = ahead == null ? (b ? 0 : 99) : ahead;
+    },
     celebrate() { cheer = 1; },
     leap() { jump = 1; },
     biomeAt(steps) { return BIOMES[Math.floor(steps / 25) % BIOMES.length]; },

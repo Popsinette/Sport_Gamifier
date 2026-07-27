@@ -181,6 +181,9 @@ function draw(ctx, x, y, height, look, state, env, dt) {
   if (state.jump > .02)  lift -= Math.sin(state.jump * Math.PI) * height * .55;
   if (state.cheer > .02) lift -= Math.abs(Math.sin(state.cheer * Math.PI * 2)) * height * .30;
   if (state.walk > .02)  lift -= Math.abs(Math.sin((state.phase || 0) * .5)) * height * .022;
+  /* Respiration. Les planches sont des poses fixes : sans ce souffle, un
+     héros à l'arrêt paraît en pause plutôt que vivant. */
+  else lift -= (Math.sin((state.t || 0) * 1.5) * .5 + .5) * height * .009;
 
   /* zone de travail généreuse : cape et monture débordent du corps */
   const pad = height * .9;
