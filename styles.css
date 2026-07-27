@@ -1109,3 +1109,164 @@ nav button.on .ic { transform: translateY(-2px) scale(1.06); }
 /* ---------- barre d'onglets à cinq entrées ---------- */
 nav button { font-size: .56rem; letter-spacing: .03em; }
 nav button svg { width: 21px; height: 21px; }
+
+/* =========================================================
+   Carte de route — le composant signature
+   ========================================================= */
+.route { padding: 17px 18px 15px; margin-top: 12px; }
+.rt-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.rt-e {
+  font-size: .63rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--a1); margin-bottom: 3px;
+}
+.rt-h b { display: block; font-size: 1.08rem; font-weight: 780; letter-spacing: -.022em; }
+.rt-h span {
+  display: block; margin-top: 3px;
+  font-size: .72rem; font-weight: 600; color: var(--ink-3); line-height: 1.35;
+}
+.rt-d { flex: none; text-align: right; font-variant-numeric: tabular-nums; }
+.rt-d b { font-size: 1.32rem; font-weight: 800; letter-spacing: -.03em; color: var(--a1); }
+.rt-d em { font-style: normal; font-size: .78rem; font-weight: 700; color: var(--ink-3); }
+
+/* La ligne EST la route : chaque jalon est posé à sa distance réelle.
+   Aucune traduction entre ce qu'on voit et ce qui se passe. */
+.rt-line {
+  position: relative;
+  height: 26px; margin: 18px 4px 6px;
+}
+.rt-line::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 11px;
+  height: 4px; border-radius: 999px; background: var(--fill-2);
+}
+.rt-fill {
+  position: absolute; left: 0; top: 11px; height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--a1), var(--a2));
+  box-shadow: 0 0 10px -2px var(--a1);
+  transition: width .9s var(--ease);
+}
+.rt-pin {
+  position: absolute; top: 0; transform: translateX(-50%);
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--glass-2);
+  border: 1.5px solid var(--sep);
+  color: var(--ink-3);
+  transition: .3s var(--spring);
+}
+.rt-pin svg { width: 13px; height: 13px; }
+.rt-pin.obstacle.on { background: var(--fill-2); color: var(--ink-3); border-color: transparent; }
+.rt-pin.obstacle:not(.on) {
+  background: linear-gradient(150deg, var(--a2), var(--a1));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 12px -4px var(--a1);
+}
+/* Le doré ne récompense que ce qui n'a pas encore été trouvé : une fois
+   ramassé, le jalon s'éteint et laisse la place au suivant. */
+.rt-pin.chest:not(.on), .rt-pin.find:not(.on) {
+  background: linear-gradient(150deg, var(--gold-2), var(--gold));
+  color: #4a3208; border-color: transparent;
+  box-shadow: 0 4px 12px -4px var(--gold);
+  animation: pinGlow 2.6s ease-in-out infinite;
+}
+@keyframes pinGlow {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50%      { transform: translateX(-50%) scale(1.13); }
+}
+.rt-pin.on { opacity: .5; }
+/* Le voyageur sur sa ligne */
+.rt-me {
+  position: absolute; top: 5px; transform: translateX(-50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--a1);
+  box-shadow: 0 2px 10px -2px var(--a1);
+  transition: left .9s var(--ease);
+  z-index: 2;
+}
+
+.rt-next { margin-top: 12px; display: grid; gap: 2px; }
+.rn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0;
+  font-size: .82rem;
+}
+.rn + .rn { border-top: 1px solid var(--sep); }
+.rn-i {
+  width: 30px; height: 30px; flex: none;
+  border-radius: 10px; display: grid; place-items: center;
+  background: var(--fill); color: var(--ink-2);
+}
+.rn-i.chest, .rn-i.find {
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
+  color: var(--gold);
+}
+.rn-i svg { width: 16px; height: 16px; }
+.rn b { flex: 1; min-width: 0; font-weight: 640; letter-spacing: -.008em;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rn em {
+  flex: none; font-style: normal;
+  font-size: .74rem; font-weight: 760; color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.rt-empty { margin-top: 12px; font-size: .76rem; color: var(--ink-3); font-weight: 600; }
+
+/* =========================================================
+   Carnet de voyage
+   ========================================================= */
+.carnet { padding: 16px; }
+.carnet-h { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+.carnet-n {
+  font-size: 1.22rem; font-weight: 800; letter-spacing: -.024em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(140deg, var(--gold-2), var(--gold));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.carnet-l {
+  font-size: .66rem; font-weight: 660; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.cn-empty {
+  grid-column: 1 / -1;
+  font-size: .78rem; font-weight: 600; color: var(--ink-3);
+  line-height: 1.5; padding: 6px 2px 2px;
+}
+.carnet-g {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+/* Une case vide n'est pas un manque, c'est une indication : elle nomme le
+   paysage où aller la remplir. */
+.cn {
+  border-radius: var(--r-s);
+  background: var(--fill);
+  padding: 11px 8px;
+  text-align: center;
+  opacity: .55;
+  transition: .3s var(--ease);
+}
+.cn-i {
+  display: grid; place-items: center;
+  width: 34px; height: 34px; margin: 0 auto 7px;
+  border-radius: 50%;
+  background: var(--fill-2); color: var(--ink-3);
+}
+.cn-i svg { width: 19px; height: 19px; }
+.cn b {
+  display: block; font-size: .7rem; font-weight: 700; letter-spacing: -.008em;
+  line-height: 1.25;
+}
+.cn em {
+  display: block; margin-top: 3px; font-style: normal;
+  font-size: .6rem; font-weight: 620; color: var(--ink-3); line-height: 1.2;
+}
+.cn.on {
+  opacity: 1;
+  background: color-mix(in srgb, var(--gold) 10%, var(--fill));
+}
+.cn.on .cn-i {
+  background: linear-gradient(150deg, var(--gold-2), var(--gold));
+  color: #4a3208;
+  box-shadow: 0 4px 12px -5px var(--gold);
+}

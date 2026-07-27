@@ -217,6 +217,7 @@ function blank() {
     look: Hero.defaultLook(),
     goals: [], onboarded: false,
     gold: 0,
+    found: [],
     name: "",
     prefs: { appearance: "auto", haptics: true, sound: true, motion: false },
     habits: [], log: {},
@@ -272,6 +273,7 @@ function migrate(s) {
      de zéro, il retrouve la contrepartie de son parcours. */
   if (typeof s.gold !== "number") s.gold = (s.done || 0) * 3 + (s.perf || 0) * 10;
   if (typeof s.name !== "string") s.name = "";
+  if (!Array.isArray(s.found)) s.found = [];
   /* on complète les préférences plutôt que de les remplacer : une clé
      ajoutée plus tard ne doit pas effacer les choix déjà faits */
   s.prefs = Object.assign({ appearance: "auto", haptics: true, sound: true, motion: false },
@@ -388,6 +390,113 @@ function journey() {
   const pos = next ? Math.min(base, next.pos) : base;
   return { pos, next, blocked: !!next && base >= next.pos };
 }
+/* =========================================================
+   EXPÉDITIONS
+   La journée n'est plus une liste de cases. C'est une portion
+   de route nommée, avec une distance, et des lieux qu'on voit
+   venir de loin.
+
+   Toute la mécanique tient dans une idée : rendre visible ce
+   qui est à quelques pas. On ne coche pas une habitude de plus
+   pour la case — on la coche parce que le coffre est à trois
+   pas et qu'on veut savoir ce qu'il y a dedans.
+   ========================================================= */
+
+/* Découvertes. Elles ne bloquent JAMAIS la route : les croiser suffit.
+   C'est ce qui les distingue des obstacles et les rend gratuites — une
+   surprise qui empêcherait d'avancer cesserait d'être une surprise. */
+const DISC_NAMES = {
+  flore: ["Orchidée de brume", "Lys des névés", "Fougère argentée", "Bruyère pourpre",
+          "Sauge sauvage", "Iris des mares", "Chardon doré", "Ancolie bleue"],
+  vue: ["Belvédère du col", "Corniche des vents", "Promontoire nord", "Rocher penché",
+        "Terrasse d'ardoise", "Balcon des cimes", "Éperon calcaire", "Table d'orientation"],
+  faune: ["Renard roux", "Chouette hulotte", "Chevreuil craintif", "Héron cendré",
+          "Lièvre variable", "Martre des pins", "Faucon crécerelle", "Salamandre tachetée"],
+  ruine: ["Borne millénaire", "Chapelle effondrée", "Pont oublié", "Cairn de pierres",
+          "Tour de guet", "Muret de berger", "Puits scellé", "Dolmen penché"],
+};
+const DISC_KINDS = [
+  { k: "flore", icon: "seed",     label: "Flore" },
+  { k: "vue",   icon: "mountain", label: "Panorama" },
+  { k: "faune", icon: "bear",     label: "Faune" },
+  { k: "ruine", icon: "door",     label: "Vestige" },
+];
+const CHEST_GOLD = 25;
+
+/* Lieux d'une expédition, engendrés de façon déterministe : le même
+   paysage offre toujours les mêmes découvertes, hier comme sur un autre
+   téléphone. Rien n'est tiré au hasard au moment de jouer. */
+const marksCache = new Map();
+function marksOf(idx) {
+  if (marksCache.has(idx)) return marksCache.get(idx);
+  const rng = Odyssey.mulberry32(Odyssey.seedOf("exp|" + idx));
+  const start = idx * SEG;
+  const out = [];
+
+  /* obstacles déjà en place, aux pas 9, 17 et 25 */
+  OBSTACLES.forEach(o => {
+    if (o.pos > start && o.pos <= start + SEG)
+      out.push({ kind: "obstacle", id: o.id, pos: o.pos, icon: o.icon, name: o.name, ob: o });
+  });
+
+  /* deux découvertes, glissées dans les intervalles laissés libres */
+  const slots = [3, 6, 12, 14, 20, 22];
+  for (let n = 0; n < 2; n++) {
+    const s = slots.splice((rng() * slots.length) | 0, 1)[0];
+    const chest = rng() < .34;
+    if (chest) {
+      out.push({ kind: "chest", id: "c" + idx + "_" + n, pos: start + s,
+                 icon: "gem", name: "Coffre oublié" });
+    } else {
+      const d = DISC_KINDS[(rng() * DISC_KINDS.length) | 0];
+      const pool = DISC_NAMES[d.k];
+      out.push({ kind: "find", id: "f" + idx + "_" + n, pos: start + s,
+                 icon: d.icon, type: d.k, label: d.label,
+                 name: pool[(rng() * pool.length) | 0] });
+    }
+  }
+  out.sort((a, b) => a.pos - b.pos);
+  marksCache.set(idx, out);
+  return out;
+}
+
+/* L'expédition en cours : une traversée de paysage, plusieurs jours. */
+function expedition(J) {
+  const idx = Math.floor(J.pos / SEG);
+  const biome = Odyssey.BIOMES[idx % Odyssey.BIOMES.length];
+  const start = idx * SEG;
+  return {
+    idx, biome, start, end: start + SEG,
+    walked: J.pos - start,
+    left: start + SEG - J.pos,
+    marks: marksOf(idx),
+  };
+}
+
+/* Ramassage. Franchir le pas suffit — aucun geste supplémentaire, aucune
+   fenêtre à ne pas rater. */
+function collect(J, announce) {
+  const ex = expedition(J);
+  const fresh = [];
+  /* On balaie TOUTE la route parcourue, pas seulement l'expédition en
+     cours : une sauvegarde importée ou un long trajet rattrapé d'un coup
+     doit retrouver ses découvertes, sinon le carnet reste vide sans raison
+     visible. Les jalons sont mis en cache, le balayage ne coûte rien. */
+  for (let i = 0; i <= ex.idx; i++) {
+    marksOf(i).forEach(m => {
+      if (m.kind === "obstacle") return;
+      if (m.pos > J.pos) return;
+      if (S.found.indexOf(m.id) !== -1) return;
+      S.found.push(m.id);
+      if (m.kind === "chest") S.gold += CHEST_GOLD;
+      fresh.push(m);
+    });
+  }
+  if (!fresh.length) return null;
+  save();
+  return announce ? fresh[fresh.length - 1] : null;
+}
+
 const reqLabel = r => r.t === "level" ? "Niveau " + r.n
   : r.t === "streak" ? "Série de " + r.n + " jours" : r.n + " habitudes cochées";
 const reqNow = r => r.t === "level" ? level(S.xp).l : r.t === "streak" ? streak() : S.done;
@@ -399,6 +508,10 @@ const reqOk = r => reqNow(r) >= r.n;
 const $ = id => document.getElementById(id);
 const ic = (n, o) => Icons.svg(n, o);
 let scene = null;
+/* Au tout premier rendu on ramasse en silence : sans ce garde-fou, un
+   compte repris annoncerait vingt découvertes d'affilée. */
+let booted = false;
+let pendingFind = null;
 
 function boot3D() {
   scene = Odyssey.createScene($("stage"), { look: S.look });
@@ -486,7 +599,14 @@ function render() {
   $("wXp").style.width = Math.round(L.into / L.need * 100) + "%";
 
   renderHeroScreen(L, st, J);
+  /* Ramassage avant l'affichage, pour que la carte montre déjà le jalon
+     comme atteint quand la découverte s'annonce. */
+  const found = collect(J, booted);
+  if (found) pendingFind = found;
+
+  renderRoute(J);
   renderObstacle(J);
+  renderCarnet(J);
   renderChallenge();
   renderToday(todays, k);
   renderHabits();
@@ -497,34 +617,113 @@ function render() {
 }
 
 /* ---------- obstacle ---------- */
-function renderObstacle(J) {
-  const slot = $("obSlot");
-  if (!J.blocked || !J.next) {
-    if (!J.next) {
-      slot.innerHTML = '<div class="glass ob"><div class="hint">' +
-        "La route est libre à perte de vue. Continue d'avancer.</div></div>";
-      return;
-    }
-    /* Cap à atteindre plutôt que simple phrase : nommer la prochaine
-       épreuve et montrer la distance qui en reste transforme une liste de
-       cases à cocher en objectif visible. */
-    const left = J.next.pos - J.pos;
-    const prev = OBSTACLES.reduce((m, o) =>
-      (o.pos <= J.pos && S.passed.indexOf(o.id) !== -1) ? Math.max(m, o.pos) : m, 0);
-    const span = Math.max(1, J.next.pos - prev);
-    const pct = Math.round(clamp01((J.pos - prev) / span) * 100);
-    slot.innerHTML =
-      '<div class="glass ob goalcard">' +
-        '<div class="ob-i">' + ic(J.next.icon, { size: 22 }) + "</div>" +
-        '<div class="gc-b">' +
-          '<div class="gc-h"><b>' + J.next.name + "</b>" +
-          '<span class="gc-d">' + left + (left > 1 ? " pas" : " pas") + "</span></div>" +
-          '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
-          '<div class="gc-s">Chaque habitude cochée rapproche le voyageur.</div>' +
-        "</div>" +
-      "</div>";
+/* ---------------------------------------------------------
+   La carte de route
+   Le seul écran qui compte. On y lit d'un coup d'œil où l'on
+   est, ce qui arrive, et dans combien de pas.
+   --------------------------------------------------------- */
+/* Ce qu'on annonce d'un lieu qu'on n'a pas encore atteint. On dit sa
+   NATURE, jamais son nom : savoir qu'un panorama attend à trois pas donne
+   envie d'y aller, mais la surprise reste entière. Cacher jusqu'à la nature
+   ne créerait qu'une répétition de « quelque chose ». */
+function teaser(m, revealed) {
+  if (m.kind === "obstacle") return m.name;
+  if (revealed) return m.name;
+  if (m.kind === "chest") return "Un coffre";
+  return { flore: "Une plante inconnue", vue: "Un point de vue",
+           faune: "Une créature", ruine: "Un vestige" }[m.type] || "Une découverte";
+}
+
+function renderRoute(J) {
+  const slot = $("routeSlot");
+  if (!slot) return;
+  const ex = expedition(J);
+  const pct = clamp01(ex.walked / SEG) * 100;
+
+  /* Les jalons sont placés à leur distance réelle sur la ligne : la
+     position du coffre à l'écran EST sa position sur la route. Aucune
+     abstraction entre ce qu'on voit et ce qui se passe. */
+  const pins = ex.marks.map(m => {
+    const at = clamp01((m.pos - ex.start) / SEG) * 100;
+    const done = m.kind === "obstacle"
+      ? S.passed.indexOf(m.id) !== -1
+      : S.found.indexOf(m.id) !== -1;
+    return '<span class="rt-pin ' + m.kind + (done ? " on" : "") +
+      '" style="left:' + at.toFixed(1) + '%" title="' + esc(teaser(m, done)) + '">' +
+      ic(m.icon, { size: 13 }) + "</span>";
+  }).join("");
+
+  /* les trois prochains jalons, en clair */
+  const next = ex.marks.filter(m => m.pos > J.pos).slice(0, 3).map(m =>
+    '<div class="rn">' +
+      '<span class="rn-i ' + m.kind + '">' + ic(m.icon, { size: 16 }) + "</span>" +
+      "<b>" + esc(teaser(m, false)) + "</b>" +
+      "<em>" + (m.pos - J.pos) + " pas</em></div>").join("");
+
+  slot.innerHTML =
+    '<div class="glass route">' +
+      '<div class="rt-h">' +
+        '<div><div class="rt-e">Expédition ' + (ex.idx + 1) + "</div>" +
+        "<b>" + esc(ex.biome.name) + "</b>" +
+        "<span>" + (ex.left > 0
+          ? ex.left + " pas avant le paysage suivant"
+          : "Paysage traversé") + "</span></div>" +
+        '<div class="rt-d"><b>' + ex.walked + "</b><em>/" + SEG + "</em></div>" +
+      "</div>" +
+      '<div class="rt-line">' +
+        '<i class="rt-fill" style="width:' + pct.toFixed(1) + '%"></i>' +
+        pins +
+        '<span class="rt-me" style="left:' + pct.toFixed(1) + '%"></span>' +
+      "</div>" +
+      (next ? '<div class="rt-next">' + next + "</div>"
+            : '<div class="rt-empty">Plus rien devant toi : le paysage suivant se dessine.</div>') +
+    "</div>";
+}
+
+/* ---------------------------------------------------------
+   Carnet de voyage
+   Une seule collection, pas huit. Chaque case vide dit où
+   aller la remplir : c'est une carte au trésor, pas un
+   inventaire.
+   --------------------------------------------------------- */
+function renderCarnet(J) {
+  const g = $("carnetGrid");
+  if (!g) return;
+  const ex = expedition(J);
+
+  /* On ne montre que la route déjà parcourue et celle en cours. Étaler les
+     quarante lieux du monde entier donnerait un mur de cases vides — c'est
+     décourageant, et ça éventerait la surprise des paysages à venir. */
+  const list = [];
+  for (let i = 0; i <= ex.idx; i++) {
+    const b = Odyssey.BIOMES[i % Odyssey.BIOMES.length];
+    marksOf(i).forEach(m => {
+      if (m.kind !== "find") return;
+      list.push({ m, biome: b, on: S.found.indexOf(m.id) !== -1 });
+    });
+  }
+  const got = list.filter(f => f.on).length;
+  $("carnetN").textContent = String(got);
+
+  if (!list.length) {
+    g.innerHTML = '<div class="cn-empty">Ton carnet est encore vierge. ' +
+      "Les premières découvertes t'attendent sur la route.</div>";
     return;
   }
+  /* Trouvées en tête, de la plus récente à la plus ancienne ; les lieux
+     encore devant ferment la marche. Le carnet s'ouvre sur ce qu'on a fait,
+     pas sur ce qu'il reste — et se termine par ce qui donne envie. */
+  const ordered = list.filter(f => f.on).reverse().concat(list.filter(f => !f.on));
+  g.innerHTML = ordered.map(f =>
+    '<div class="cn' + (f.on ? " on" : "") + '">' +
+      '<span class="cn-i">' + ic(f.on ? f.m.icon : "spark", { size: 19 }) + "</span>" +
+      "<b>" + esc(f.on ? f.m.name : teaser(f.m, false)) + "</b>" +
+      "<em>" + esc(f.biome.name) + "</em></div>").join("");
+}
+
+function renderObstacle(J) {
+  const slot = $("obSlot");
+  if (!J.blocked || !J.next) { slot.innerHTML = ""; return; }
   const o = J.next;
   const ok = o.reqs.every(reqOk);
   const tOk = !o.task || taskDone.has(o.id);
@@ -823,6 +1022,10 @@ function toggle(h, at) {
   render();
   if (!on) return;
 
+  /* Un seul message à la fois, du plus rare au plus courant. Une
+     découverte cède le pas à un niveau : deux fenêtres empilées
+     transformeraient une récompense en corvée de clics. */
+  const f = pendingFind; pendingFind = null;
   const newL = level(S.xp).l;
   if (newL > prevL) { sparks(); alertBox("star", "Niveau " + newL, "Tu deviens « " + title(newL) + " ». Le voyageur avance plus loin que jamais."); }
   else if (mile) { sparks(); alertBox("flame", mile + " jours d'affilée", "Quelle régularité. +" + MILESTONES[mile] + " XP en récompense."); }
@@ -831,6 +1034,18 @@ function toggle(h, at) {
     sparks();
     alertBox("gem", "Journée parfaite",
       "Toutes tes habitudes sont cochées. +" + PERFECT + " XP" + (gotFreeze ? " et un gel de série en réserve." : "."));
+  }
+  else if (f) {
+    sparks();
+    Sfx.play("find");
+    if (f.kind === "chest") {
+      alertBox("gem", "Coffre oublié",
+        "Personne ne l'avait ouvert depuis longtemps. +" + CHEST_GOLD + " or.");
+    } else {
+      alertBox(f.icon, f.name,
+        "Tu ne l'avais encore jamais croisé. " + f.label +
+        " — ajouté à ton carnet de voyage.");
+    }
   }
 }
 
@@ -1515,6 +1730,7 @@ applyPrefs();
 wireProfile();
 boot3D();
 render();
+booted = true;
 if (!S.onboarded) Onb.open("full");
 /* la citation change chaque jour, en pied de page de la scène */
 setInterval(() => { if (!document.hidden) $("phaseLine").innerHTML =

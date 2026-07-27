@@ -1495,6 +1495,9 @@ function createScene(canvas, opts) {
   return api;
 }
 
-global.Odyssey = { BIOMES, createScene, gradeAt };
+/* `mulberry32` et `seedOf` sont exposés pour que le jeu génère ses
+   découvertes avec exactement la même graine que le décor : un même lieu
+   donne toujours le même contenu, sur tous les appareils. */
+global.Odyssey = { BIOMES, createScene, gradeAt, mulberry32, seedOf };
 
 })(window);

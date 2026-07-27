@@ -55,6 +55,28 @@ personnage comme au décor : il appartient vraiment au paysage.
 
 Le rendu vectoriel de `hero.js` reste en secours si une planche manque.
 
+## Les expéditions
+
+La journée n'est pas une liste de cases : c'est une portion de route nommée.
+Chaque paysage est une **expédition** de 25 pas, avec une **carte de route**
+qui montre où l'on est et ce qui arrive.
+
+Sur cette ligne, chaque jalon est posé à sa distance réelle — la position du
+coffre à l'écran EST sa position sur la route. On y lit :
+
+- les **obstacles**, qui bloquent et demandent un défi ;
+- les **découvertes**, qui ne bloquent jamais : les croiser suffit.
+
+Une découverte annonce sa **nature** mais jamais son nom. Savoir qu'un
+panorama attend à trois pas donne envie d'y aller ; le nom reste la surprise.
+Rien n'est tiré au sort au moment de jouer : un même lieu offre toujours la
+même chose, hier comme sur un autre téléphone.
+
+Les trouvailles remplissent le **carnet de voyage**, une collection unique
+plutôt que huit. Il n'affiche que la route parcourue et celle en cours :
+étaler les lieux du monde entier donnerait un mur de cases vides, et
+éventerait la surprise des paysages à venir.
+
 ## Les obstacles
 
 Le monde s'arrête devant un **événement mis en scène** : éboulement, rivière en
