@@ -1444,3 +1444,34 @@ nav button svg { width: 20px; height: 20px; }
 }
 .part-max svg { width: 15px; height: 15px; }
 .row.max .row-n { color: var(--ink-2); }
+
+/* ---------- gain de matériau sur une habitude ---------- */
+.rtag {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: .68rem; font-weight: 760;
+  padding: 2px 7px 2px 5px; border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.rtag svg { width: 12px; height: 12px; }
+.rtag.bois   { background: color-mix(in srgb, #a9702f 16%, transparent); color: #a06d30; }
+.rtag.pierre { background: color-mix(in srgb, #7d8894 18%, transparent); color: #74808c; }
+.rtag.tissu  { background: color-mix(in srgb, #c2748f 16%, transparent); color: #b56a85; }
+.row.done .rtag { opacity: .45; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .rtag.bois   { color: #d09755; }
+  :root:not([data-theme="light"]) .rtag.pierre { color: #a8b3bf; }
+  :root:not([data-theme="light"]) .rtag.tissu  { color: #e096b1; }
+}
+:root[data-theme="dark"] .rtag.bois   { color: #d09755; }
+:root[data-theme="dark"] .rtag.pierre { color: #a8b3bf; }
+:root[data-theme="dark"] .rtag.tissu  { color: #e096b1; }
+
+/* rappel de la règle dans l'éditeur d'habitude */
+.res-hint {
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: .76rem; font-weight: 580; color: var(--ink-2); line-height: 1.4;
+}
+.res-hint .res-i { width: 30px; height: 30px; margin: 0; flex: none; border-radius: 10px; }
+.res-hint .res-i svg { width: 15px; height: 15px; }
+.res-hint b { font-weight: 760; }

@@ -844,6 +844,14 @@ function renderChallenge() {
 }
 
 /* ---------- habitudes du jour ---------- */
+/* Le gain de matériaux, affiché sur chaque habitude. Sans lui, le lien
+   entre ce qu'on coche et ce qu'on construit reste à deviner : la règle est
+   simple mais elle doit être lisible, pas devinée. */
+function resTag(h) {
+  const r = RES.find(q => q.k === resOf(h));
+  return '<span class="rtag ' + r.k + '">' + ic(r.icon, { size: 12 }) + "+1</span>";
+}
+
 function renderToday(todays, k) {
   const box = $("todayRows");
   if (!todays.length) {
@@ -864,7 +872,7 @@ function renderToday(todays, k) {
     return '<div class="row' + (d ? " done" : "") + '" data-id="' + h.id + '" style="animation-delay:' + (i * 40) + 'ms">' +
       '<div class="row-i" style="background:' + h.hue + '1f;color:' + h.hue + '">' + ic(h.icon, { size: 21 }) + "</div>" +
       '<div class="row-b"><div class="row-n">' + esc(h.name) + "</div>" +
-      '<div class="row-m"><span>+' + XP[h.diff] + " XP</span>" +
+      '<div class="row-m"><span>+' + XP[h.diff] + " XP</span>" + resTag(h) +
       (s > 1 ? '<span class="fl">' + ic("flame", { size: 12 }) + s + "</span>" : "") + "</div></div>" +
       '<div class="tick">' + ic("check", { size: 14 }) + "</div></div>";
   }).join("");
@@ -889,7 +897,7 @@ function renderHabits() {
       '<div class="row" data-id="' + h.id + '" style="animation-delay:' + (i * 35) + 'ms">' +
       '<div class="row-i" style="background:' + h.hue + '1f;color:' + h.hue + '">' + ic(h.icon, { size: 21 }) + "</div>" +
       '<div class="row-b"><div class="row-n">' + esc(h.name) + "</div>" +
-      '<div class="row-m"><span>' + fmtDays(h.days) + " · +" + XP[h.diff] + " XP</span>" +
+      '<div class="row-m"><span>' + fmtDays(h.days) + " · +" + XP[h.diff] + " XP</span>" + resTag(h) +
       '<span class="fl">' + ic("flame", { size: 12 }) + hStreak(h) + "</span></div></div>" +
       '<div class="chev">' + ic("chevron", { size: 17 }) + "</div></div>").join("");
     box.querySelectorAll(".row").forEach(el => {
@@ -902,7 +910,7 @@ function renderHabits() {
       '<div class="row-i" style="background:' + HUES[i % HUES.length] + '1f;color:' + HUES[i % HUES.length] + '">' +
       ic(s.icon, { size: 21 }) + "</div>" +
       '<div class="row-b"><div class="row-n">' + s.name + "</div>" +
-      '<div class="row-m"><span>+' + XP[s.diff] + " XP · tous les jours</span></div></div>" +
+      '<div class="row-m"><span>+' + XP[s.diff] + " XP · tous les jours</span>" + resTag(s) + "</div></div>" +
       '<button class="add" data-i="' + i + '"' + (has ? " disabled" : "") + ">" + (has ? "Ajoutée" : "Ajouter") + "</button></div>";
   }).join("");
   $("suggRows").querySelectorAll(".add:not([disabled])").forEach(b => {
@@ -1403,6 +1411,12 @@ function drawSheet() {
   $("fIcon").innerHTML = ICON_SET.map(n =>
     '<div class="' + (form.icon === n ? "on" : "") + '" data-n="' + n + '">' + ic(n, { size: 22 }) + "</div>").join("");
   $("fIcon").querySelectorAll("[data-n]").forEach(e => e.onclick = () => { form.icon = e.dataset.n; drawSheet(); });
+  /* Le matériau se déduit de l'icône. Le montrer ici évite d'avoir à
+     l'expliquer ailleurs : on voit la règle au moment où on choisit. */
+  const r = RES.find(q => q.k === resOf(form));
+  $("fRes").innerHTML = '<span class="res-i ' + r.k + '">' + ic(r.icon, { size: 15 }) + "</span>" +
+    "<span>Cette habitude rapportera <b>1 " + r.label.toLowerCase() +
+    "</b> pour ton campement.</span>";
   $("fHue").innerHTML = HUES.map(c =>
     '<div class="hue' + (form.hue === c ? " on" : "") + '" data-c="' + c + '" style="background:' + c + '"></div>').join("");
   $("fHue").querySelectorAll("[data-c]").forEach(e => e.onclick = () => { form.hue = e.dataset.c; drawSheet(); });
@@ -1811,7 +1825,8 @@ const Onb = (function () {
       '<div class="row-i" style="background:' + HUES[i % HUES.length] + '1f;color:' + HUES[i % HUES.length] + '">' +
       ic(h.icon, { size: 21 }) + "</div>" +
       '<div class="row-b"><div class="row-n">' + h.name + "</div>" +
-      '<div class="row-m"><span>+' + XP[h.diff] + " XP · tous les jours</span></div></div></div>").join("");
+      '<div class="row-m"><span>+' + XP[h.diff] + " XP · tous les jours</span>" + resTag(h) +
+      "</div></div></div>").join("");
   }
 
   /* Aperçu animé de l'accueil : le même moteur que le voyage, en vitrine. */
