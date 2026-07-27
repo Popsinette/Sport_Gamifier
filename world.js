@@ -286,7 +286,7 @@ function buildLayer(L, W, H, rng) {
   }
 
   if (L.t === "forest") {
-    const n = L.n || 12, h = (L.h || .12) * H;
+    const n = L.n || 12, h = (L.h || .12) * H * treeMul(L);
     const alt = L.kind === "conifer" ? "round" : L.kind === "round" ? "conifer" : L.kind;
     for (let i = 0; i < n; i++) {
       const x = (i + .5) / n * W + (rng() - .5) * (W / n) * .62;
@@ -319,6 +319,30 @@ function buildLayer(L, W, H, rng) {
     return p;
   }
   return p;
+}
+
+/* Échelle des arbres. Un personnage doit passer sous une frondaison, pas la
+   dominer : les rangées proches sont nettement plus hautes que lui, les
+   lointaines restent basses par perspective. On se cale sur la vitesse de
+   parallaxe, qui EST la distance. */
+function treeMul(L) {
+  let m = 1.35 + clamp(L.s || .2, .06, .5) * 2.1;
+  /* Une rangée plantée au niveau du héros ne peut pas lui arriver à la
+     taille : on garantit une cime à sa hauteur, sans toucher aux rangées
+     lointaines, dont la petitesse EST la perspective. */
+  if ((L.y || .7) >= .74) m = Math.max(m, Math.min(3.6, .26 / (L.h || .12)));
+  return m;
+}
+/* Facteur de taille le plus grand tiré dans le générateur (.62 + .74). */
+const TREE_MAX = 1.36;
+
+/* Sommet géométrique réel d'une couche. Le dégradé de remplissage part de
+   là : s'il démarre plus bas que la cime, tout ce qui dépasse se peint avec
+   la couleur de tête du dégradé et les arbres virent au blanc laiteux. */
+function layerTopY(L, H, HV) {
+  if (L.t === "forest")
+    return L.y * HV - (L.h || .12) * H * treeMul(L) * TREE_MAX;
+  return (L.y - (L.a || L.h || .1)) * HV;
 }
 
 function drawTree(p, x, base, h, kind, rng) {
@@ -1086,7 +1110,7 @@ function createScene(canvas, opts) {
       /* Volume + dissolution du plan au sol.
          Sans ce fondu, les couches s'empilent en bandes horizontales dures :
          c'est ce qui distingue un décor peint d'un empilement de rectangles. */
-      const topY = (L.y - (L.a || L.h || .1)) * HV;
+      const topY = layerTopY(L, H, HV);
       const baseY = L.y * HV;
       const fadeEnd = baseY + Math.max(8, gy - baseY) * 1.25 + H * .04;
       const lg = ctx.createLinearGradient(0, topY, 0, fadeEnd);
@@ -1131,8 +1155,14 @@ function createScene(canvas, opts) {
           ctx.restore();
         }
         /* Liseré solaire le long de l'arête : c'est cet accroche-lumière
-           qui « décolle » chaque plan et donne le rendu peint. */
-        if (L.f < .6) {
+           qui « décolle » chaque plan et donne le rendu peint.
+           Réservé aux silhouettes d'un seul tenant. Sur une forêt — des
+           dizaines de formes distinctes réunies dans un même chemin — il
+           détourerait chaque arbre, y compris ceux masqués par les autres,
+           et la rangée virerait au fil de fer. */
+        const rimOK = L.t === "ridge" || L.t === "hills" || L.t === "dunes"
+                   || L.t === "mesa"  || L.t === "sea";
+        if (rimOK && L.f < .6) {
           ctx.save();
           ctx.clip(p);
           const rimC = mixRgb(g.sun, [255, 255, 255], .25);
@@ -1211,9 +1241,30 @@ function createScene(canvas, opts) {
     if (opts.look) {
       const mounted = opts.look.mount && opts.look.mount !== "none";
       const spriteMode = global.Sprites && global.Sprites.ready;
-      /* les sprites illustrés méritent plus de place que la silhouette vectorielle */
+      /* Taille du héros. Il doit rester lisible sans écraser le paysage :
+         au-delà d'un quart de la hauteur d'image, les arbres deviennent des
+         buissons et la profondeur s'effondre. */
       const hx2 = heroX, hy2 = gy + H * .080,
-            hh = H * (mounted ? .30 : (spriteMode ? .345 : .27));
+            hh = H * (mounted ? .215 : (spriteMode ? .235 : .21));
+
+      /* Ombre de contact. C'est elle qui pose le personnage au sol : sans
+         elle, l'illustration paraît collée par-dessus le décor. Elle
+         rétrécit et pâlit dès qu'il quitte le sol. */
+      const airJ = jump > .02 ? Math.sin(jump * Math.PI) : 0;
+      const airC = cheer > .02 ? Math.abs(Math.sin(cheer * Math.PI * 2)) : 0;
+      const air = clamp(Math.max(airJ, airC * .55), 0, 1);
+      const shR = hh * .34 * (1 - air * .30);
+      const shA = .34 * (1 - air * .60) * (1 - g.star * .45);
+      ctx.save();
+      ctx.translate(hx2, hy2 + hh * .012);
+      ctx.scale(1, .26);
+      const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, shR);
+      sg.addColorStop(0, "rgba(18,24,32," + shA.toFixed(3) + ")");
+      sg.addColorStop(.55, "rgba(18,24,32," + (shA * .45).toFixed(3) + ")");
+      sg.addColorStop(1, "rgba(18,24,32,0)");
+      ctx.fillStyle = sg;
+      ctx.beginPath(); ctx.arc(0, 0, shR, 0, 7); ctx.fill();
+      ctx.restore();
       const hState = { t, walk: (walking && !blocked) ? 1 : 0, run: false,
                        phase: walkPhase, jump, cheer,
                        resting: blocked && !walking, sleeping: false, anim: heroAnim };
@@ -1223,6 +1274,34 @@ function createScene(canvas, opts) {
       heroAnim = hState.anim;
       if (!done && global.Hero) global.Hero.draw(ctx, hx2, hy2, hh, opts.look,
         { t, walk: hState.walk, phase: walkPhase, jump, cheer }, hEnv);
+    }
+
+    /* Tout premier plan, DEVANT le héros. Sans une couche qui le recouvre,
+       il reste posé au-dessus de toute l'image au lieu d'être dedans. */
+    if (!reduce) {
+      const nOff = -(camX * 2.3) % 300;
+      ctx.fillStyle = css(mixRgb(ground, [8, 12, 20], .72), .95);
+      for (let ti = -1; ti <= 2; ti++) {
+        const ox = nOff + ti * 300;
+        const rngN = mulberry32(seedOf(B.id + "nf" + (Math.floor((camX * 2.3) / 300) + ti)));
+        for (let i = 0; i < 3; i++) {
+          const px = ox + rngN() * 300;
+          const s = (.7 + rngN() * .7) * H * .078;
+          /* Enraciné juste sous le sentier : les brins doivent croiser les
+             bottes du héros, sinon la couche ne recouvre rien. */
+          const by = gy + H * .112;
+          const sway = Math.sin(t * 1.4 + px * .04) * s * .10;
+          ctx.beginPath();
+          for (let b = -3; b <= 3; b++) {
+            ctx.moveTo(px + b * s * .11, by);
+            ctx.quadraticCurveTo(px + b * s * .17 + sway * .5, by - s * .62,
+                                 px + b * s * .26 + sway, by - s);
+            ctx.quadraticCurveTo(px + b * s * .14, by - s * .5,
+                                 px + b * s * .11 + s * .05, by);
+          }
+          ctx.fill();
+        }
+      }
     }
 
     /* particules */
